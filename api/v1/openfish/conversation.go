@@ -2,6 +2,7 @@ package openfish
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-contrib/sse"
@@ -81,7 +82,7 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 	client := openai.NewClientWithConfig(config)
 	req := openai.ChatCompletionRequest{
 		Model:     openai.GPT3Dot5Turbo0301,
-		MaxTokens: 200,
+		MaxTokens: 1000,
 		Messages:  messages,
 		Stream:    true,
 	}
@@ -93,7 +94,6 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 	}
 	defer stream.Close()
 
-	fmt.Printf("回答: ")
 	var streamResponse string
 	for {
 		respResult, err := stream.Recv()
@@ -126,12 +126,13 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 			return
 		}
 		streamResponse += respResult.Choices[0].Delta.Content
+		server := make(map[string]string)
+		server["content"] = respResult.Choices[0].Delta.Content
+		marshal, _ := json.Marshal(server)
 		sse.Encode(c.Writer, sse.Event{
-			Event: "message",
-			Data:  respResult.Choices[0].Delta.Content,
+			Data: string(marshal),
 		})
 		c.Writer.Flush()
-		fmt.Printf(respResult.Choices[0].Delta.Content)
 	}
 }
 
@@ -426,5 +427,6 @@ func (conversationApi *ConversationApi) GetCurrentUserConversationList(c *gin.Co
 	resultData["history"] = reConversationList
 	resultData["usingContext"] = true
 	resultData["active"] = reConversationList[0]["uuid"]
+	resultData["activeConversationId"] = reConversationList[0]["uuid"]
 	response.OkWithDetailed(resultData, "获取成功", c)
 }
