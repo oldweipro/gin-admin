@@ -96,7 +96,7 @@ func (conversationService *ConversationService) GetConversationInfoList(info ope
 // GetConversationRecordListByConversationId 根据pid查询会话信息列表
 func (conversationService *ConversationService) GetConversationRecordListByConversationId(conversationId uint) ([]openfish.ConversationRecord, error) {
 	var conversationRecords []openfish.ConversationRecord
-	err := global.GVA_DB.Model(&openfish.ConversationRecord{}).Where("conversation_id = ?", conversationId).Order("created_at asc").Find(&conversationRecords).Error
+	err := global.GVA_DB.Model(&openfish.ConversationRecord{}).Where("conversation_id = ? and role != 'system'", conversationId).Order("created_at asc").Find(&conversationRecords).Error
 	return conversationRecords, err
 }
 

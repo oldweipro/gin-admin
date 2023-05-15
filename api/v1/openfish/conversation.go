@@ -18,7 +18,6 @@ import (
 	"go.uber.org/zap"
 	"io"
 	"net/http"
-	"net/url"
 	"sort"
 )
 
@@ -68,17 +67,18 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 	ctx := context.Background()
 	config := openai.DefaultConfig("TOKEN")
 	// 如果需要代理，请配置代理地址，如不需要可注释或删掉以下代码
-	config.HTTPClient.Transport = &http.Transport{
-		// 设置Transport字段为自定义Transport，包含代理设置
-		Proxy: func(req *http.Request) (*url.URL, error) {
-			// 设置代理
-			proxyURL, err := url.Parse("http://127.0.0.1:7890")
-			if err != nil {
-				return nil, err
-			}
-			return proxyURL, nil
-		},
-	}
+	//config.HTTPClient.Transport = &http.Transport{
+	//	// 设置Transport字段为自定义Transport，包含代理设置
+	//	Proxy: func(req *http.Request) (*url.URL, error) {
+	//		// 设置代理
+	//		proxyURL, err := url.Parse("http://127.0.0.1:7890")
+	//		if err != nil {
+	//			return nil, err
+	//		}
+	//		return proxyURL, nil
+	//	},
+	//}
+	config.BaseURL = "http://172.16.174.230:8080/v1"
 	client := openai.NewClientWithConfig(config)
 	req := openai.ChatCompletionRequest{
 		Model:     openai.GPT3Dot5Turbo0301,
@@ -160,7 +160,7 @@ func (conversationApi *ConversationApi) CreateConversation(c *gin.Context) {
 	}
 	// conversationId等于空则创建该信息到数据库
 	conversationRecord := openfish.ConversationRecord{}
-	conversationRecord.Content = "你是ChatGPT，一个由OpenAI训练的大型语言模型。请仔细遵循用户的说明。使用markdown进行响应。"
+	conversationRecord.Content = "我是由OpenFish训练的大型语言模型。请详细描述你的问题。"
 	conversationRecord.Role = "system"
 	conversationRecord.ConversationId = &conversation.ID
 	conversationRecord.CreatedBy = utils.GetUserID(c)
