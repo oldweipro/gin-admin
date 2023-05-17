@@ -2,6 +2,8 @@ package openfish
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -20,6 +22,7 @@ import (
 	"net/http"
 	"net/url"
 	"sort"
+	"strconv"
 )
 
 type ConversationApi struct {
@@ -34,6 +37,7 @@ var semaphore = make(chan struct{}, 3)
 func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 	semaphore <- struct{}{} // 获取信号量
 	defer func() { <-semaphore }()
+	// 获取参数
 	var chatReq openfishReq.ChatReq
 	err := c.ShouldBindJSON(&chatReq)
 	if err != nil {
@@ -45,12 +49,21 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 		global.GVA_LOG.Error("系统错误，缺少必要参数。")
 		return
 	}
+	// md5校验参数
+	str := chatReq.Prompt + "-" + strconv.FormatUint(uint64(*chatReq.ConversationId), 10) + "5eb63bbbe01eeed093cb22bb8f5acdc3"
+	hash := md5.Sum([]byte(str))
+	hexHash := hex.EncodeToString(hash[:])
+	if hexHash != chatReq.Sign {
+		response.FailWithMessage("系统错误，缺少必要参数。", c)
+		return
+	}
 	c.Status(http.StatusOK)
 	c.Header("Content-Type", "text/event-stream")
 	c.Header("Cache-Control", "no-cache")
 	c.Header("Connection", "keep-alive")
+	tokenCount := len(chatReq.Prompt)
 	// 查询会话记录
-	conversationRecordList, _ := conversationService.GetConversationRecordListByConversationId(*chatReq.ConversationId)
+	conversationRecordList, _ := conversationService.GetConversationRecordListByConversationId(*chatReq.ConversationId, tokenCount)
 	var messages []openai.ChatCompletionMessage
 	for _, cr := range conversationRecordList {
 		messages = append(messages, openai.ChatCompletionMessage{
