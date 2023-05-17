@@ -17,6 +17,7 @@ type ConversationSearch struct {
 type ChatReq struct {
 	Prompt         string `json:"prompt"`
 	ConversationId *uint  `json:"conversationId"`
+	Sign           string `json:"sign"`
 }
 
 type ConversationDataGroups struct {
