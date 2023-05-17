@@ -94,9 +94,23 @@ func (conversationService *ConversationService) GetConversationInfoList(info ope
 }
 
 // GetConversationRecordListByConversationId 根据pid查询会话信息列表
+// error: error, status code: 400, message: This model's maximum context length is 4097 tokens. However, your messages resulted in 6301 tokens. Please reduce the length of the messages.
 func (conversationService *ConversationService) GetConversationRecordListByConversationId(conversationId uint) ([]openfish.ConversationRecord, error) {
 	var conversationRecords []openfish.ConversationRecord
-	query := `SELECT * FROM (SELECT * FROM conversation_record WHERE conversation_id = ? and role != 'system' ORDER BY created_at desc LIMIT 4) AS latest_data ORDER BY created_at asc`
+	query := `SELECT *
+		FROM conversation_record
+		WHERE id IN (
+		  SELECT id
+		  FROM (
+			SELECT id, created_by,created_at,
+				   @sum := @sum + CHAR_LENGTH(REPLACE(content, ' ', '')) AS sum
+			FROM conversation_record, 
+				 (SELECT @sum := 0) AS vars 
+				WHERE conversation_id = ?
+			ORDER BY created_at desc
+		  ) AS t
+		  WHERE sum <= 4096
+		) ORDER BY created_at ASC`
 	err := global.GVA_DB.Raw(query, conversationId).Scan(&conversationRecords).Error
 	return conversationRecords, err
 }
