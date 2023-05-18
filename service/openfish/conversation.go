@@ -6,6 +6,7 @@ import (
 	"github.com/oldweipro/gin-admin/model/openfish"
 	openfishReq "github.com/oldweipro/gin-admin/model/openfish/request"
 	"gorm.io/gorm"
+	"time"
 )
 
 type ConversationService struct {
@@ -59,6 +60,13 @@ func (conversationService *ConversationService) DeleteConversationByIds(ids requ
 // Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) UpdateConversation(conversation openfish.Conversation) (err error) {
 	err = global.GVA_DB.Save(&conversation).Error
+	return err
+}
+
+// UpdateConversationTime 更新Conversation时间
+// Author [piexlmax](https://github.com/piexlmax)
+func (conversationService *ConversationService) UpdateConversationTime(id uint) (err error) {
+	err = global.GVA_DB.Model(&openfish.Conversation{}).Where("id = ?", id).Update("updated_at", time.Now()).Error
 	return err
 }
 
@@ -125,6 +133,6 @@ func (conversationService *ConversationService) GetConversationRecordListByUserI
 // GetConversationListByUserId 根据用户ID查询会话列表
 func (conversationService *ConversationService) GetConversationListByUserId(userId uint) ([]openfish.Conversation, error) {
 	var conversations []openfish.Conversation
-	err := global.GVA_DB.Model(&openfish.Conversation{}).Where("created_by = ?", userId).Order("created_at desc").Find(&conversations).Error
+	err := global.GVA_DB.Model(&openfish.Conversation{}).Where("created_by = ?", userId).Order("updated_at desc").Find(&conversations).Error
 	return conversations, err
 }

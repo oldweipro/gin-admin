@@ -143,6 +143,12 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 					response.FailWithMessage("系统异常", c)
 					return
 				}
+				// 更新聊天室时间
+				if err := conversationService.UpdateConversationTime(*chatReq.ConversationId); err != nil {
+					global.GVA_LOG.Error("更新聊天室时间异常!", zap.Error(err))
+					response.FailWithMessage("系统异常", c)
+					return
+				}
 			}
 			return
 		}
