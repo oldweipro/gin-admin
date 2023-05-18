@@ -103,7 +103,7 @@ func (conversationService *ConversationService) GetConversationRecordListByConve
 		  SELECT id
 		  FROM (
 			SELECT id, created_by,created_at,
-				   @sum := @sum + CHAR_LENGTH(REPLACE(content, ' ', '')) AS sum
+				   @sum := @sum + CHAR_LENGTH(content) AS sum
 			FROM conversation_record, 
 				 (SELECT @sum := 0) AS vars 
 				WHERE conversation_id = ?
