@@ -2,11 +2,11 @@ package system
 
 import (
 	"context"
+	"github.com/google/uuid"
 	sysModel "github.com/oldweipro/gin-admin/model/system"
 	"github.com/oldweipro/gin-admin/service/system"
 	"github.com/oldweipro/gin-admin/utils"
 	"github.com/pkg/errors"
-	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
 
@@ -49,7 +49,7 @@ func (i *initUser) InitializeData(ctx context.Context) (next context.Context, er
 
 	entities := []sysModel.SysUser{
 		{
-			UUID:        uuid.NewV4(),
+			UUID:        uuid.New(),
 			Username:    "admin",
 			Password:    adminPassword,
 			NickName:    "Mr.奇淼",
@@ -59,7 +59,7 @@ func (i *initUser) InitializeData(ctx context.Context) (next context.Context, er
 			Email:       "333333333@qq.com",
 		},
 		{
-			UUID:        uuid.NewV4(),
+			UUID:        uuid.New(),
 			Username:    "a303176530",
 			Password:    password,
 			NickName:    "用户1",

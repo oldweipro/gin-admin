@@ -6,12 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-resty/resty/v2"
+	"github.com/google/uuid"
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/ladder"
 	ladderReq "github.com/oldweipro/gin-admin/model/ladder/request"
 	systemReq "github.com/oldweipro/gin-admin/model/system/request"
-	uuid "github.com/satori/go.uuid"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"math/rand"
@@ -129,7 +129,7 @@ func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo sy
 	inbounds.ExpiryTime = &expiryTime
 	inbounds.Protocol = "vmess"
 	inbounds.Uid = &userInfo.BaseClaims.ID
-	inbounds.ClientId = uuid.NewV4().String()
+	inbounds.ClientId = uuid.NewString()
 
 	// 👇组装请求参数
 	queryParams := make(map[string]string)

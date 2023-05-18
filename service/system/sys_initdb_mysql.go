@@ -11,9 +11,9 @@ import (
 
 	"github.com/oldweipro/gin-admin/utils"
 
+	"github.com/google/uuid"
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/system/request"
-	uuid "github.com/satori/go.uuid"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -32,7 +32,7 @@ func (h MysqlInitHandler) WriteConfig(ctx context.Context) error {
 	}
 	global.GVA_CONFIG.System.DbType = "mysql"
 	global.GVA_CONFIG.Mysql = c
-	global.GVA_CONFIG.JWT.SigningKey = uuid.NewV4().String()
+	global.GVA_CONFIG.JWT.SigningKey = uuid.NewString()
 	cs := utils.StructToMap(global.GVA_CONFIG)
 	for k, v := range cs {
 		global.GVA_VP.Set(k, v)

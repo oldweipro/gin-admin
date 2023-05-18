@@ -2,9 +2,9 @@ package utils
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/oldweipro/gin-admin/global"
 	systemReq "github.com/oldweipro/gin-admin/model/system/request"
-	uuid "github.com/satori/go.uuid"
 )
 
 func GetClaims(c *gin.Context) (*systemReq.CustomClaims, error) {
