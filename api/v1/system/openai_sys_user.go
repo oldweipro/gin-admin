@@ -52,7 +52,11 @@ func (b *BaseApi) OpenFishLogin(c *gin.Context) {
 		sysUser, err := userService.FindUserByPhone(l.Phone)
 		if err != nil {
 			//注册
-			u := &system.SysUser{Username: l.Phone, NickName: l.Phone, Password: "123456", HeaderImg: "", AuthorityId: 9953, Enable: 1, Phone: l.Phone}
+			var authorities []system.SysAuthority
+			authorities = append(authorities, system.SysAuthority{
+				AuthorityId: 9953,
+			})
+			u := &system.SysUser{Username: l.Phone, NickName: l.Phone, Password: "123456", HeaderImg: "", AuthorityId: 9953, Authorities: authorities, Enable: 1, Phone: l.Phone}
 			*sysUser, err = userService.Register(*u)
 			if err != nil {
 				global.GVA_LOG.Error("注册失败!", zap.Error(err))
