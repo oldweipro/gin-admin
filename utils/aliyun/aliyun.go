@@ -1,7 +1,6 @@
 package aliyun
 
 import (
-	"fmt"
 	openapi "github.com/alibabacloud-go/darabonba-openapi/v2/client"
 	dysmsapi20170525 "github.com/alibabacloud-go/dysmsapi-20170525/v3/client"
 	util "github.com/alibabacloud-go/tea-utils/v2/service"
@@ -46,8 +45,7 @@ func GetSmsCode(mobile string, code string) (_err error) {
 		if _err != nil {
 			return _err
 		}
-		global.GVA_LOG.Info("aliyun" + str.String())
-		fmt.Println(str)
+		global.GVA_LOG.Info("aliyun: " + str.String())
 		return nil
 	}()
 

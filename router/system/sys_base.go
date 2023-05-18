@@ -3,12 +3,14 @@ package system
 import (
 	"github.com/gin-gonic/gin"
 	v1 "github.com/oldweipro/gin-admin/api/v1"
+	"github.com/oldweipro/gin-admin/middleware"
 )
 
 type BaseRouter struct{}
 
 func (s *BaseRouter) InitBaseRouter(Router *gin.RouterGroup) (R gin.IRoutes) {
 	baseRouter := Router.Group("base")
+	baseRouterWithRecord := Router.Group("base").Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.SystemApiGroup.BaseApi
 	certificationRecordApi := v1.ApiGroupApp.PatrolApiGroup.CertificationRecordApi
 	{
@@ -21,8 +23,8 @@ func (s *BaseRouter) InitBaseRouter(Router *gin.RouterGroup) (R gin.IRoutes) {
 		baseRouter.POST("certification", certificationRecordApi.CreateCertificationRecord)
 	}
 	{
-		baseRouter.POST("openFishLogin", baseApi.OpenFishLogin)
-		baseRouter.POST("smsCode", baseApi.SmsCode)
+		baseRouterWithRecord.POST("openFishLogin", baseApi.OpenFishLogin)
+		baseRouterWithRecord.POST("smsCode", baseApi.SmsCode)
 	}
 	return baseRouter
 }

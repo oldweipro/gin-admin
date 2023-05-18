@@ -26,7 +26,7 @@ func (b *BaseApi) OpenFishLogin(c *gin.Context) {
 	var l request.OpenFishLogin
 	err := c.ShouldBindJSON(&l)
 	key := c.ClientIP()
-
+	global.GVA_LOG.Info("登陆手机号: " + l.Phone)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
@@ -100,7 +100,7 @@ func (b *BaseApi) SmsCode(c *gin.Context) {
 	rand.Seed(uint64(time.Now().UnixNano()))
 	verificationCode := fmt.Sprintf("%06d", rand.Intn(1000000))
 	global.Cache.Set(s.Mobile, verificationCode, time.Second*time.Duration(openCaptchaTimeOut))
-	global.GVA_LOG.Info("打印verificationCode：" + verificationCode)
+	global.GVA_LOG.Info(s.Mobile + " 验证码: " + verificationCode)
 	// 发短信 阿里云依赖
 	err = aliyun.GetSmsCode(s.Mobile, verificationCode)
 	if err != nil {
