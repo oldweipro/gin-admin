@@ -101,7 +101,7 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 	// =======end 官方接口：更换TOKEN，使用代理=======
 
 	// =======start 逆向官网接口：使用逆向工程=======
-	config.BaseURL = "http://172.16.174.230:8080/v1"
+	config.BaseURL = "http://127.0.0.1:8080/v1"
 	// =======end 逆向官网接口：使用逆向工程=======
 
 	client := openai.NewClientWithConfig(config)
