@@ -361,6 +361,29 @@ func (conversationApi *ConversationApi) GetCurrentUserConversationList(c *gin.Co
 	userInfo := utils.GetUserInfo(c)
 	conversationList, err := conversationService.GetConversationListByUserId(userInfo.BaseClaims.ID)
 
+	if len(conversationList) == 0 {
+		// 创建一个聊天
+		var conversation openfish.Conversation
+		conversation.ConversationName = "新聊天"
+		conversation.CreatedBy = utils.GetUserID(c)
+		if err := conversationService.CreateConversation(&conversation); err != nil {
+			global.GVA_LOG.Error("创建会话失败!", zap.Error(err))
+			response.FailWithMessage("系统异常", c)
+			return
+		}
+		// conversationId等于空则创建该信息到数据库
+		conversationRecord := openfish.ConversationRecord{}
+		conversationRecord.Content = "我是由开放鱼训练的大型语言模型，请详细描述您的问题。"
+		conversationRecord.Role = "system"
+		conversationRecord.ConversationId = &conversation.ID
+		conversationRecord.CreatedBy = utils.GetUserID(c)
+		if err := conversationService.CreateConversationRecord(&conversationRecord); err != nil {
+			global.GVA_LOG.Error("AI会话创建失败!", zap.Error(err))
+			response.FailWithMessage("系统异常", c)
+			return
+		}
+		conversationList = append(conversationList, conversation)
+	}
 	/**
 	遍历成前端所需要的
 	{
