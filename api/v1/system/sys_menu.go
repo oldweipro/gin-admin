@@ -48,7 +48,8 @@ func (a *AuthorityMenuApi) GetMenus(c *gin.Context) {
     "redirect": "/dashboard/console",
     "meta": {
       "icon": "DashboardOutlined",
-      "title": "仪表盘"
+      "title": "仪表盘",
+      "sort": 2
     },
     "children": [
       {
@@ -77,9 +78,113 @@ func (a *AuthorityMenuApi) GetMenus(c *gin.Context) {
         }
       }
     ]
+  }, {
+    "path": "/system",
+    "name": "System",
+    "component": "Layout",
+    "redirect": "/system/menu",
+    "meta": {
+      "title": "系统设置",
+      "icon": "DashboardOutlined",
+      "sort": 1
+    },
+    "children": [
+      {
+        "path": "menu",
+        "name": "system_menu",
+        "component": "/system/menu/menu",
+        "meta": {
+          "title": "菜单权限管理"
+        }
+      },
+      {
+        "path": "role",
+        "name": "system_role",
+        "component": "/system/role/role",
+        "meta": {
+          "title": "角色权限管理"
+        }
+      }
+    ]
   }
 ]`
 
+	var menus []map[string]interface{}
+	err := json.Unmarshal([]byte(menusStr), &menus)
+	fmt.Println(err)
+	response.OkWithDetailed(menus, "获取成功", c)
+}
+
+func (a *AuthorityMenuApi) GetMenusList(c *gin.Context) {
+	menusStr := `[
+    {
+      "label": "Dashboard",
+      "key": "dashboard",
+      "type": 1,
+      "subtitle": "dashboard",
+      "openType": 1,
+      "auth": "dashboard",
+      "path": "/dashboard",
+      "children": [
+        {
+          "label": "主控台",
+          "key": "console",
+          "type": 1,
+          "subtitle": "console",
+          "openType": 1,
+          "auth": "console",
+          "path": "/dashboard/console"
+        },
+        {
+          "label": "工作台",
+          "key": "workplace",
+          "type": 1,
+          "subtitle": "workplace",
+          "openType": 1,
+          "auth": "workplace",
+          "path": "/dashboard/workplace"
+        }
+      ]
+    },
+    {
+      "label": "表单管理",
+      "key": "form",
+      "type": 1,
+      "subtitle": "form",
+      "openType": 1,
+      "auth": "form",
+      "path": "/form",
+      "children": [
+        {
+          "label": "基础表单",
+          "key": "basic-form",
+          "type": 1,
+          "subtitle": "basic-form",
+          "openType": 1,
+          "auth": "basic-form",
+          "path": "/form/basic-form"
+        },
+        {
+          "label": "分步表单",
+          "key": "step-form",
+          "type": 1,
+          "subtitle": "step-form",
+          "openType": 1,
+          "auth": "step-form",
+          "path": "/form/step-form"
+        },
+        {
+          "label": "表单详情",
+          "key": "detail",
+          "type": 1,
+          "subtitle": "detail",
+          "openType": 1,
+          "auth": "detail",
+          "path": "/form/detail"
+        }
+      ]
+    }
+  ]`
 	var menus []map[string]interface{}
 	err := json.Unmarshal([]byte(menusStr), &menus)
 	fmt.Println(err)
