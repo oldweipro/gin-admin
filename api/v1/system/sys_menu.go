@@ -81,7 +81,7 @@ func (a *AuthorityMenuApi) GetMenus(c *gin.Context) {
   }, {
     "path": "/system",
     "name": "System",
-    "component": "Layout",
+    "component": "LAYOUT",
     "redirect": "/system/menu",
     "meta": {
       "title": "系统设置",
