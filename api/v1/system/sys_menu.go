@@ -1,6 +1,8 @@
 package system
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/common/response"
@@ -33,6 +35,54 @@ func (a *AuthorityMenuApi) GetMenu(c *gin.Context) {
 		menus = []system.SysMenu{}
 	}
 	response.OkWithDetailed(systemRes.SysMenusResponse{Menus: menus}, "获取成功", c)
+}
+
+func (a *AuthorityMenuApi) GetMenus(c *gin.Context) {
+	menusStr := `
+[
+  {
+    "path": "/dashboard",
+    "name": "Dashboard",
+    "component": "LAYOUT",
+    "redirect": "/dashboard/console",
+    "meta": {
+      "icon": "DashboardOutlined",
+      "title": "仪表盘"
+    },
+    "children": [
+      {
+        "path": "console",
+        "name": "dashboard_console",
+        "component": "/dashboard/console/console",
+        "meta": {
+          "title": "主控台"
+        }
+      },
+      {
+        "path": "monitor",
+        "name": "dashboard_monitor",
+        "component": "/dashboard/monitor/monitor",
+        "meta": {
+          "title": "监控页"
+        }
+      },
+      {
+        "path": "workplace",
+        "name": "dashboard_workplace",
+        "component": "/dashboard/workplace/workplace",
+        "meta": {
+          "hidden": true,
+          "title": "工作台"
+        }
+      }
+    ]
+  }
+]`
+
+	var menus []map[string]interface{}
+	err := json.Unmarshal([]byte(menusStr), &menus)
+	fmt.Println(err)
+	response.OkWithDetailed(menus, "获取成功", c)
 }
 
 // GetBaseMenuTree

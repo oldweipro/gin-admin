@@ -111,7 +111,7 @@ func (conversationService *ConversationService) GetConversationRecordListByConve
 		  SELECT id
 		  FROM (
 			SELECT id, created_by,created_at,
-				   @sum := @sum + CHAR_LENGTH(content) AS sum
+				   @sum := @sum + CHAR_LENGTH(REPLACE(content, ' ', '')) AS sum
 			FROM conversation_record, 
 				 (SELECT @sum := 0) AS vars 
 				WHERE conversation_id = ?
@@ -119,7 +119,7 @@ func (conversationService *ConversationService) GetConversationRecordListByConve
 		  ) AS t
 		  WHERE sum <= ?
 		) ORDER BY created_at ASC`
-	err := global.GVA_DB.Raw(query, conversationId, 4096-tokenCount).Scan(&conversationRecords).Error
+	err := global.GVA_DB.Raw(query, conversationId, 3096-tokenCount).Scan(&conversationRecords).Error
 	return conversationRecords, err
 }
 
