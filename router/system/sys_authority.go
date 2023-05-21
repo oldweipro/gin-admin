@@ -21,5 +21,6 @@ func (s *AuthorityRouter) InitAuthorityRouter(Router *gin.RouterGroup) {
 	}
 	{
 		authorityRouterWithoutRecord.POST("getAuthorityList", authorityApi.GetAuthorityList) // 获取角色列表
+		authorityRouterWithoutRecord.GET("list", authorityApi.GetRoleList)                   // 获取角色列表
 	}
 }

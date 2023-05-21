@@ -177,6 +177,97 @@ func (a *AuthorityApi) GetAuthorityList(c *gin.Context) {
 	}, "获取成功", c)
 }
 
+func (a *AuthorityApi) GetRoleList(c *gin.Context) {
+	var list []map[string]interface{}
+	role := make(map[string]interface{})
+	role["id"] = 1
+	role["name"] = "范杰"
+	role["explain"] = "丁秀兰"
+	role["isDefault"] = true
+	role["menu_keys"] = []string{
+		"detail",
+		"dashboard",
+	}
+	role["create_date"] = "2003-09-02 00:25:18"
+	//"normal",
+	//"enable",
+	//"disable",
+	role["status"] = "normal"
+	list = append(list, role)
+
+	role["menu_keys"] = []string{
+		"console",
+		"step-form",
+	}
+	role["status"] = "enable"
+	role["id"] = 2
+	list = append(list, role)
+
+	role["menu_keys"] = []string{
+		"dashboard",
+		"step-form",
+		"basic-form",
+		"detail",
+	}
+	role["status"] = "disable"
+	role["id"] = 3
+	list = append(list, role)
+
+	role["menu_keys"] = []string{
+		"dashboard",
+		"basic-form",
+	}
+	role["id"] = 4
+	list = append(list, role)
+
+	role["menu_keys"] = []string{
+		"console",
+		"detail",
+		"workplace",
+	}
+	role["id"] = 5
+	list = append(list, role)
+
+	role["menu_keys"] = []string{
+		"dashboard",
+	}
+	role["id"] = 6
+	list = append(list, role)
+
+	role["menu_keys"] = []string{
+		"basic-form",
+		"console",
+	}
+	role["id"] = 7
+	list = append(list, role)
+
+	role["menu_keys"] = []string{
+		"workplace",
+		"basic-form",
+		"step-form",
+	}
+	role["id"] = 8
+	list = append(list, role)
+
+	role["menu_keys"] = []string{}
+	role["id"] = 9
+	list = append(list, role)
+
+	role["menu_keys"] = []string{
+		"detail",
+		"step-form",
+		"workplace",
+	}
+	role["id"] = 10
+	list = append(list, role)
+	page := make(map[string]interface{})
+	page["list"] = list
+	page["page"] = 1
+	page["pageCount"] = 60
+	page["pageSize"] = 10
+	response.OkWithDetailed(page, "获取成功", c)
+}
+
 // SetDataAuthority
 // @Tags      Authority
 // @Summary   设置角色资源权限
