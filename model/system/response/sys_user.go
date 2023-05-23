@@ -5,7 +5,8 @@ import (
 )
 
 type SysUserResponse struct {
-	User system.SysUser `json:"user"`
+	User        system.SysUser      `json:"user"`
+	Permissions []map[string]string `json:"permissions"` // 用户权限
 }
 
 type LoginResponse struct {

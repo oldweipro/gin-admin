@@ -505,13 +505,38 @@ func (b *BaseApi) SetSelfInfo(c *gin.Context) {
 // @Router    /user/getUserInfo [get]
 func (b *BaseApi) GetUserInfo(c *gin.Context) {
 	uuid := utils.GetUserUuid(c)
-	ReqUser, err := userService.GetUserInfo(uuid)
+	reqUser, err := userService.GetUserInfo(uuid)
 	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 		return
 	}
-	response.OkWithDetailed(gin.H{"userInfo": ReqUser}, "获取成功", c)
+
+	response.OkWithDetailed(gin.H{"userInfo": systemRes.SysUserResponse{
+		User: reqUser,
+		Permissions: []map[string]string{
+			{
+				"label": "主控台",
+				"value": "dashboard_console",
+			},
+			{
+				"label": "监控页",
+				"value": "dashboard_monitor",
+			},
+			{
+				"label": "工作台",
+				"value": "dashboard_workplace",
+			},
+			{
+				"label": "基础列表",
+				"value": "basic_list",
+			},
+			{
+				"label": "基础列表删除",
+				"value": "basic_list_delete",
+			},
+		},
+	}}, "获取成功", c)
 }
 
 // ResetPassword
