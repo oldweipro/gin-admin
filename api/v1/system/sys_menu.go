@@ -110,18 +110,18 @@ func (a *AuthorityMenuApi) GetMenus(c *gin.Context) {
     "path": "/chat",
     "name": "Chat",
     "component": "LAYOUT",
-    "redirect": "/chat/chatgpt",
+    "redirect": "/chat/chat",
     "meta": {
       "icon": "DashboardOutlined",
       "title": "ChatGPT",
       "isRoot": true,
-      "sort": 2
+      "sort": 3
     },
     "children": [
       {
-        "path": "chatgpt",
-        "name": "chat_chatgpt",
-        "component": "/chat/chatgpt/chatgpt",
+        "path": "chat",
+        "name": "chat",
+        "component": "/chat/chat",
         "meta": {
           "title": "ChatGPT"
         }
@@ -131,8 +131,7 @@ func (a *AuthorityMenuApi) GetMenus(c *gin.Context) {
 ]`
 
 	var menus []map[string]interface{}
-	err := json.Unmarshal([]byte(menusStr), &menus)
-	fmt.Println(err)
+	json.Unmarshal([]byte(menusStr), &menus)
 	response.OkWithDetailed(menus, "获取成功", c)
 }
 
