@@ -106,6 +106,27 @@ func (a *AuthorityMenuApi) GetMenus(c *gin.Context) {
         }
       }
     ]
+  },{
+    "path": "/chat",
+    "name": "Chat",
+    "component": "LAYOUT",
+    "redirect": "/chat/chatgpt",
+    "meta": {
+      "icon": "DashboardOutlined",
+      "title": "ChatGPT",
+      "isRoot": true,
+      "sort": 2
+    },
+    "children": [
+      {
+        "path": "chatgpt",
+        "name": "chat_chatgpt",
+        "component": "/chat/chatgpt/chatgpt",
+        "meta": {
+          "title": "ChatGPT"
+        }
+      }
+    ]
   }
 ]`
 
