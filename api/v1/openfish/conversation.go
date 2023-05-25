@@ -408,6 +408,14 @@ func (conversationApi *ConversationApi) GetCurrentUserConversationList(c *gin.Co
 		reConversation["conversationId"] = conversation.ID
 		reConversationList = append(reConversationList, reConversation)
 	}
+	var chatList []map[string]interface{}
+	for _, conversation := range conversationList {
+		reConversation := make(map[string]interface{})
+		reConversation["label"] = conversation.ConversationName
+		reConversation["key"] = conversation.ID
+		reConversation["icon"] = "BookOutline"
+		chatList = append(chatList, reConversation)
+	}
 	conversationRecordList, err := conversationService.GetConversationRecordListByUserId(userInfo.BaseClaims.ID)
 	if err != nil {
 		return
@@ -479,6 +487,7 @@ func (conversationApi *ConversationApi) GetCurrentUserConversationList(c *gin.Co
 	resultData := make(map[string]interface{})
 	resultData["chat"] = conversationDataGroups
 	resultData["history"] = reConversationList
+	resultData["chatList"] = chatList
 	resultData["usingContext"] = true
 	resultData["active"] = reConversationList[0]["uuid"]
 	resultData["activeConversationId"] = reConversationList[0]["uuid"]
