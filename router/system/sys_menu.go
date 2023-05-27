@@ -20,7 +20,6 @@ func (s *MenuRouter) InitMenuRouter(Router *gin.RouterGroup) (R gin.IRoutes) {
 	}
 	{
 		menuRouterWithoutRecord.POST("getMenu", authorityMenuApi.GetMenu)                   // 获取菜单树
-		menuRouterWithoutRecord.GET("getMenus", authorityMenuApi.GetMenus)                  // 获取菜单树
 		menuRouterWithoutRecord.GET("list", authorityMenuApi.GetMenusList)                  // 获取菜单树
 		menuRouterWithoutRecord.POST("getMenuList", authorityMenuApi.GetMenuList)           // 分页获取基础menu列表
 		menuRouterWithoutRecord.POST("getBaseMenuTree", authorityMenuApi.GetBaseMenuTree)   // 获取用户动态路由
