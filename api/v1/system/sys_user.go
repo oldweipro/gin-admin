@@ -202,6 +202,34 @@ func (b *BaseApi) Register(c *gin.Context) {
 	response.OkWithDetailed(systemRes.SysUserResponse{User: userReturn}, "注册成功", c)
 }
 
+// ForgotPasswordWithSmsCode 忘记/找回密码
+func (b *BaseApi) ForgotPasswordWithSmsCode(c *gin.Context) {
+	var r systemReq.ForgotPasswordWithSmsCode
+	err := c.ShouldBindJSON(&r)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = utils.Verify(r, utils.ForgotPasswordVerify)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	verifyUsernameWithSmsCode := userService.VerifyUsernameWithSmsCode(r.Phone, r.SmsCode)
+	if !verifyUsernameWithSmsCode {
+		response.FailWithMessage("验证码错误", c)
+		return
+	}
+	u := &system.SysUser{Phone: r.Phone, Password: r.Password}
+	_, err = userService.ForgotPassword(u, r.Password)
+	if err != nil {
+		global.GVA_LOG.Error("重置密码失败!", zap.Error(err))
+		response.FailWithMessage("重置密码失败，账号异常，请联系客服", c)
+		return
+	}
+	response.OkWithMessage("重置密码成功", c)
+}
+
 // RegisterWithSmsCode
 // @Tags     SysUser
 // @Summary  用户注册账号

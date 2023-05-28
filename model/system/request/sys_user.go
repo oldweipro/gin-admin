@@ -16,9 +16,17 @@ type Register struct {
 	Phone        string `json:"phone" example:"电话号码"`
 	Email        string `json:"email" example:"电子邮箱"`
 }
+
 type RegisterWithSmsCode struct {
 	Register
 	SmsCode string `json:"smsCode"` // 验证码
+}
+
+// ForgotPasswordWithSmsCode 找回/忘记密码
+type ForgotPasswordWithSmsCode struct {
+	Phone    string `json:"phone"`
+	Password string `json:"passWord"`
+	SmsCode  string `json:"smsCode"`
 }
 
 // User login structure

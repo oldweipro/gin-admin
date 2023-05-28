@@ -98,6 +98,18 @@ func (userService *UserService) ChangePassword(u *system.SysUser, newPassword st
 
 }
 
+// ForgotPassword 忘记密码
+func (userService *UserService) ForgotPassword(u *system.SysUser, newPassword string) (userInter *system.SysUser, err error) {
+	var user system.SysUser
+	if err = global.GVA_DB.Where("phone = ?", u.Phone).First(&user).Error; err != nil {
+		return nil, err
+	}
+	user.Password = utils.BcryptHash(newPassword)
+	err = global.GVA_DB.Save(&user).Error
+	return &user, err
+
+}
+
 //@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetUserInfoList
 //@description: 分页获取数据

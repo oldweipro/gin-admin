@@ -15,7 +15,8 @@ func (s *BaseRouter) InitBaseRouter(Router *gin.RouterGroup) (R gin.IRoutes) {
 		baseRouter.POST("login", baseApi.Login)
 		baseRouter.POST("emailLogin", baseApi.EmailLogin)
 		baseRouter.POST("captcha", baseApi.Captcha)
-		baseRouter.POST("registerWithSmsCode", baseApi.RegisterWithSmsCode) // 用户使用短信验证码注册
+		baseRouter.POST("registerWithSmsCode", baseApi.RegisterWithSmsCode)             // 用户使用短信验证码注册
+		baseRouter.POST("forgotPasswordWithSmsCode", baseApi.ForgotPasswordWithSmsCode) // 用户使用短信验证码注册
 	}
 	{
 		baseRouter.POST("certification", certificationRecordApi.CreateCertificationRecord)
