@@ -101,9 +101,9 @@ func (conversationService *ConversationService) GetConversationInfoList(info ope
 	return conversations, total, err
 }
 
-// GetConversationRecordListByConversationId 根据pid查询会话信息列表
+// GetConversationRecordListWithTokenByConversationId 根据pid查询会话信息列表
 // error: error, status code: 400, message: This model's maximum context length is 4097 tokens. However, your messages resulted in 6301 tokens. Please reduce the length of the messages.
-func (conversationService *ConversationService) GetConversationRecordListByConversationId(conversationId uint, tokenCount int) ([]openfish.ConversationRecord, error) {
+func (conversationService *ConversationService) GetConversationRecordListWithTokenByConversationId(conversationId uint, tokenCount int) ([]openfish.ConversationRecord, error) {
 	var conversationRecords []openfish.ConversationRecord
 	query := `SELECT *
 		FROM conversation_record
@@ -130,9 +130,16 @@ func (conversationService *ConversationService) GetConversationRecordListByUserI
 	return conversationRecords, err
 }
 
+// GetConversationRecordListByConversationId 根据conversationId查询会话信息列表
+func (conversationService *ConversationService) GetConversationRecordListByConversationId(conversationId uint) ([]openfish.ConversationRecord, error) {
+	var conversationRecords []openfish.ConversationRecord
+	err := global.GVA_DB.Model(&openfish.ConversationRecord{}).Where("conversation_id = ?", conversationId).Order("created_at asc").Find(&conversationRecords).Error
+	return conversationRecords, err
+}
+
 // GetConversationListByUserId 根据用户ID查询会话列表
 func (conversationService *ConversationService) GetConversationListByUserId(userId uint) ([]openfish.Conversation, error) {
 	var conversations []openfish.Conversation
-	err := global.GVA_DB.Model(&openfish.Conversation{}).Where("created_by = ?", userId).Order("updated_at desc").Find(&conversations).Error
+	err := global.GVA_DB.Model(&openfish.Conversation{}).Where("created_by = ?", userId).Order("updated_at desc").First(&conversations).Error
 	return conversations, err
 }

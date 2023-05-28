@@ -62,7 +62,7 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 	c.Header("Connection", "keep-alive")
 	tokenCount := len(chatReq.Prompt)
 	// 查询会话记录
-	conversationRecordList, _ := conversationService.GetConversationRecordListByConversationId(*chatReq.ConversationId, tokenCount)
+	conversationRecordList, _ := conversationService.GetConversationRecordListWithTokenByConversationId(*chatReq.ConversationId, tokenCount)
 	var messages []openai.ChatCompletionMessage
 	for _, cr := range conversationRecordList {
 		messages = append(messages, openai.ChatCompletionMessage{
@@ -416,7 +416,8 @@ func (conversationApi *ConversationApi) GetCurrentUserConversationList(c *gin.Co
 		reConversation["icon"] = "BookOutline"
 		chatList = append(chatList, reConversation)
 	}
-	conversationRecordList, err := conversationService.GetConversationRecordListByUserId(userInfo.BaseClaims.ID)
+	//conversationRecordList, err := conversationService.GetConversationRecordListByUserId(userInfo.BaseClaims.ID)
+	conversationRecordList, err := conversationService.GetConversationRecordListByConversationId(conversationList[0].ID)
 	if err != nil {
 		return
 	}
@@ -480,7 +481,7 @@ func (conversationApi *ConversationApi) GetCurrentUserConversationList(c *gin.Co
 			})
 		}
 	}
-	// 按年龄倒序排序
+	// 按时间倒序排序
 	sort.Slice(conversationDataGroups, func(i, j int) bool {
 		return conversationDataGroups[i].Uuid > conversationDataGroups[j].Uuid
 	})
