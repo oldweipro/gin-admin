@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"sync"
 )
 
 type ConversationApi struct {
@@ -23,13 +24,20 @@ type ConversationApi struct {
 
 var conversationService = service.ServiceGroupApp.OpenfishServiceGroup.ConversationService
 
-// 并发数为n的信号量
-var semaphore = make(chan struct{}, 4)
+var userRequestStatus sync.Map
 
 // ChatCompletions 使用第三方库新接口
 func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
-	semaphore <- struct{}{} // 获取信号量
-	defer func() { <-semaphore }()
+	// 获取用户ID
+	userID := utils.GetUserID(c)
+	// 检查用户的请求状态
+	_, loaded := userRequestStatus.LoadOrStore(userID, true)
+	if loaded {
+		c.JSON(429, gin.H{"msg": "太多请求了"})
+		return
+	}
+
+	defer userRequestStatus.Delete(userID) // 在处理完毕后删除用户的请求状态
 	// 获取参数
 	var chatReq openfishReq.ChatReq
 	err := c.ShouldBindJSON(&chatReq)
@@ -57,8 +65,7 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 	c.Header("Connection", "keep-alive")
 	err = conversationService.ChatGPTCompletions(chatReq, c)
 	if err != nil {
-		c.Header("Content-Type", "application/json")
-		c.Status(500)
+		c.JSON(500, gin.H{"data": "服务器负载，请稍后重试。"})
 	}
 }
 
