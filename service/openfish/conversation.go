@@ -194,7 +194,7 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 	return nil
 }
 
-// ChatOpenAIApiKey 官方接口：更换TOKEN，使用代理
+// ChatOpenAIReverse https://chat.openai.com逆向接口: 需要自己搭建服务 https://github.com/acheong08/ChatGPT-to-API
 func (conversationService *ConversationService) ChatOpenAIReverse(conversationRecordUser *openfish.ConversationRecord, req openai.ChatCompletionRequest, c *gin.Context, chatReq openfishReq.ChatReq) error {
 	config := openai.DefaultConfig("OpenAIReverse")
 	config.BaseURL = "http://127.0.0.1:8080/v1"
@@ -209,6 +209,7 @@ func (conversationService *ConversationService) ChatOpenAIReverse(conversationRe
 	return conversationService.ChatStream(stream, conversationRecordUser, c, chatReq)
 }
 
+// ChatOpenAIApiKey 官方接口：更换TOKEN，使用代理
 func (conversationService *ConversationService) ChatOpenAIApiKey(conversationRecordUser *openfish.ConversationRecord, req openai.ChatCompletionRequest, c *gin.Context, chatReq openfishReq.ChatReq) error {
 	config := openai.DefaultConfig("TOKEN")
 	// 如果需要代理，请配置代理地址，如不需要可注释或删掉以下代码
