@@ -89,6 +89,7 @@ func Routers() *gin.Engine {
 	{
 		openfishRouter := router.RouterGroupApp.Openfish
 		openfishRouter.InitConversationRouter(PrivateGroup)
+		openfishRouter.InitChatTicketRouter(PrivateGroup)
 	}
 
 	global.GVA_LOG.Info("router register success")

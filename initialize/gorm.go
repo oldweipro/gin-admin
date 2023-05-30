@@ -59,7 +59,7 @@ func RegisterTables() {
 		patrol.Identity{},
 		patrol.Account{},
 		patrol.CertificationRecord{},
-		patrol.Personnel{}, ladder.ServerNode{}, ladder.Inbounds{}, openfish.Conversation{},
+		patrol.Personnel{}, ladder.ServerNode{}, ladder.Inbounds{}, openfish.Conversation{}, openfish.ChatTicket{},
 	)
 	if err != nil {
 		global.GVA_LOG.Error("register table failed", zap.Error(err))
