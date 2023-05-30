@@ -1,13 +1,9 @@
 package openfish
 
 import (
-	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/common/request"
@@ -16,9 +12,7 @@ import (
 	openfishReq "github.com/oldweipro/gin-admin/model/openfish/request"
 	"github.com/oldweipro/gin-admin/service"
 	"github.com/oldweipro/gin-admin/utils"
-	"github.com/sashabaranov/go-openai"
 	"go.uber.org/zap"
-	"io"
 	"net/http"
 	"sort"
 	"strconv"
@@ -43,6 +37,7 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
+	// 校验prompt是否为空
 	if chatReq.Prompt == "" || chatReq.ConversationId == nil {
 		response.FailWithMessage("系统错误，缺少必要参数。", c)
 		global.GVA_LOG.Error("系统错误，缺少必要参数。")
@@ -60,110 +55,10 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 	c.Header("Content-Type", "text/event-stream")
 	c.Header("Cache-Control", "no-cache")
 	c.Header("Connection", "keep-alive")
-	tokenCount := len(chatReq.Prompt)
-	// 查询会话记录
-	conversationRecordList, _ := conversationService.GetConversationRecordListWithTokenByConversationId(*chatReq.ConversationId, tokenCount)
-	var messages []openai.ChatCompletionMessage
-	for _, cr := range conversationRecordList {
-		messages = append(messages, openai.ChatCompletionMessage{
-			Role:    cr.Role,
-			Content: cr.Content,
-		})
-	}
-	// 预备存储新的聊天记录
-	conversationRecordUser := openfish.ConversationRecord{}
-	conversationRecordUser.Content = chatReq.Prompt
-	conversationRecordUser.Role = "user"
-	conversationRecordUser.ConversationId = chatReq.ConversationId
-	conversationRecordUser.CreatedBy = utils.GetUserID(c)
-	// 组装新消息参数
-	messages = append(messages, openai.ChatCompletionMessage{
-		Role:    conversationRecordUser.Role,
-		Content: conversationRecordUser.Content,
-	})
-	// ==================OpenAI调用开始==================
-	ctx := context.Background()
-
-	// =======start 官方接口：更换TOKEN，使用代理=======
-	config := openai.DefaultConfig("TOKEN")
-	// 如果需要代理，请配置代理地址，如不需要可注释或删掉以下代码
-	//config.HTTPClient.Transport = &http.Transport{
-	//	// 设置Transport字段为自定义Transport，包含代理设置
-	//	Proxy: func(req *http.Request) (*url.URL, error) {
-	//		// 设置代理
-	//		proxyURL, err := url.Parse("http://127.0.0.1:7890")
-	//		if err != nil {
-	//			return nil, err
-	//		}
-	//		return proxyURL, nil
-	//	},
-	//}
-	// =======end 官方接口：更换TOKEN，使用代理=======
-
-	// =======start 逆向官网接口：使用逆向工程=======
-	config.BaseURL = "http://127.0.0.1:8080/v1"
-	// =======end 逆向官网接口：使用逆向工程=======
-
-	client := openai.NewClientWithConfig(config)
-	req := openai.ChatCompletionRequest{
-		Model:     openai.GPT3Dot5Turbo0301,
-		MaxTokens: 1000,
-		Messages:  messages,
-		Stream:    true,
-	}
-	defer config.HTTPClient.CloseIdleConnections()
-	stream, err := client.CreateChatCompletionStream(ctx, req)
+	err = conversationService.ChatGPTCompletions(chatReq, c)
 	if err != nil {
-		fmt.Printf("聊天对话异常 error: %v\n", err)
-		return
-	}
-	defer stream.Close()
-
-	var streamResponse string
-	for {
-		respResult, err := stream.Recv()
-		if errors.Is(err, io.EOF) {
-			fmt.Println()
-			fmt.Println("程序调用结束")
-			if streamResponse != "" {
-				// 最后存储新的对话到数据库 提问
-				if err := conversationService.CreateConversationRecord(&conversationRecordUser); err != nil {
-					global.GVA_LOG.Error("用户提问数据写入异常!", zap.Error(err))
-					response.FailWithMessage("系统异常", c)
-					return
-				}
-				// 最后存储新的对话到数据库 回答
-				conversationRecordAI := openfish.ConversationRecord{}
-				conversationRecordAI.Content = streamResponse
-				conversationRecordAI.Role = "assistant"
-				conversationRecordAI.ConversationId = chatReq.ConversationId
-				conversationRecordAI.CreatedBy = utils.GetUserID(c)
-				if err := conversationService.CreateConversationRecord(&conversationRecordAI); err != nil {
-					global.GVA_LOG.Error("AI回答数据写入异常!", zap.Error(err))
-					response.FailWithMessage("系统异常", c)
-					return
-				}
-				// 更新聊天室时间
-				if err := conversationService.UpdateConversationTime(*chatReq.ConversationId); err != nil {
-					global.GVA_LOG.Error("更新聊天室时间异常!", zap.Error(err))
-					response.FailWithMessage("系统异常", c)
-					return
-				}
-			}
-			return
-		}
-
-		if err != nil {
-			return
-		}
-		streamResponse += respResult.Choices[0].Delta.Content
-		server := make(map[string]string)
-		server["content"] = respResult.Choices[0].Delta.Content
-		marshal, _ := json.Marshal(server)
-		sse.Encode(c.Writer, sse.Event{
-			Data: string(marshal),
-		})
-		c.Writer.Flush()
+		c.Header("Content-Type", "application/json")
+		c.Status(500)
 	}
 }
 

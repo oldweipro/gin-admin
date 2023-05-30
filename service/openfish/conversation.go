@@ -1,11 +1,24 @@
 package openfish
 
 import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/gin-contrib/sse"
+	"github.com/gin-gonic/gin"
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/common/request"
+	"github.com/oldweipro/gin-admin/model/common/response"
 	"github.com/oldweipro/gin-admin/model/openfish"
 	openfishReq "github.com/oldweipro/gin-admin/model/openfish/request"
+	"github.com/oldweipro/gin-admin/utils"
+	"github.com/sashabaranov/go-openai"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
+	"io"
+	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -142,4 +155,131 @@ func (conversationService *ConversationService) GetConversationListByUserId(user
 	var conversations []openfish.Conversation
 	err := global.GVA_DB.Model(&openfish.Conversation{}).Where("created_by = ?", userId).Order("updated_at desc").First(&conversations).Error
 	return conversations, err
+}
+
+// ChatGPTCompletions ChatGPT对话方法
+func (conversationService *ConversationService) ChatGPTCompletions(chatReq openfishReq.ChatReq, c *gin.Context) error {
+	tokenCount := len(chatReq.Prompt)
+	// 查询会话记录
+	conversationRecordList, _ := conversationService.GetConversationRecordListWithTokenByConversationId(*chatReq.ConversationId, tokenCount)
+	var messages []openai.ChatCompletionMessage
+	for _, cr := range conversationRecordList {
+		messages = append(messages, openai.ChatCompletionMessage{
+			Role:    cr.Role,
+			Content: cr.Content,
+		})
+	}
+	// 预备存储新的聊天记录
+	conversationRecordUser := openfish.ConversationRecord{}
+	conversationRecordUser.Content = chatReq.Prompt
+	conversationRecordUser.Role = "user"
+	conversationRecordUser.ConversationId = chatReq.ConversationId
+	conversationRecordUser.CreatedBy = utils.GetUserID(c)
+	// 组装新消息参数
+	messages = append(messages, openai.ChatCompletionMessage{
+		Role:    conversationRecordUser.Role,
+		Content: conversationRecordUser.Content,
+	})
+	req := openai.ChatCompletionRequest{
+		Model:     openai.GPT3Dot5Turbo0301,
+		MaxTokens: 1000,
+		Messages:  messages,
+		Stream:    true,
+	}
+	if err := conversationService.ChatOpenAIReverse(&conversationRecordUser, req, c, chatReq); err != nil {
+		if err = conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// ChatOpenAIApiKey 官方接口：更换TOKEN，使用代理
+func (conversationService *ConversationService) ChatOpenAIReverse(conversationRecordUser *openfish.ConversationRecord, req openai.ChatCompletionRequest, c *gin.Context, chatReq openfishReq.ChatReq) error {
+	config := openai.DefaultConfig("OpenAIReverse")
+	config.BaseURL = "http://127.0.0.1:8080/v1"
+	client := openai.NewClientWithConfig(config)
+	ctx := context.Background()
+	stream, err := client.CreateChatCompletionStream(ctx, req)
+	if err != nil {
+		return err
+	}
+	defer config.HTTPClient.CloseIdleConnections()
+	defer stream.Close()
+	return conversationService.ChatStream(stream, conversationRecordUser, c, chatReq)
+}
+
+func (conversationService *ConversationService) ChatOpenAIApiKey(conversationRecordUser *openfish.ConversationRecord, req openai.ChatCompletionRequest, c *gin.Context, chatReq openfishReq.ChatReq) error {
+	config := openai.DefaultConfig("TOKEN")
+	// 如果需要代理，请配置代理地址，如不需要可注释或删掉以下代码
+	config.HTTPClient.Transport = &http.Transport{
+		// 设置Transport字段为自定义Transport，包含代理设置
+		Proxy: func(req *http.Request) (*url.URL, error) {
+			// 设置代理
+			proxyURL, err := url.Parse("http://127.0.0.1:7890")
+			if err != nil {
+				return nil, err
+			}
+			return proxyURL, nil
+		},
+	}
+	client := openai.NewClientWithConfig(config)
+	ctx := context.Background()
+	stream, err := client.CreateChatCompletionStream(ctx, req)
+	if err != nil {
+		return err
+	}
+	defer config.HTTPClient.CloseIdleConnections()
+	defer stream.Close()
+	return conversationService.ChatStream(stream, conversationRecordUser, c, chatReq)
+}
+
+// ChatStream AI对话流处理
+func (conversationService *ConversationService) ChatStream(stream *openai.ChatCompletionStream, conversationRecordUser *openfish.ConversationRecord, c *gin.Context, chatReq openfishReq.ChatReq) error {
+
+	var streamResponse string
+	for {
+		respResult, err := stream.Recv()
+		if errors.Is(err, io.EOF) {
+			fmt.Println("程序调用结束")
+			if streamResponse != "" {
+				// 最后存储新的对话到数据库 提问
+				if err := conversationService.CreateConversationRecord(conversationRecordUser); err != nil {
+					global.GVA_LOG.Error("用户提问数据写入异常!", zap.Error(err))
+					response.FailWithMessage("系统异常", c)
+					return err
+				}
+				// 最后存储新的对话到数据库 回答
+				conversationRecordAI := openfish.ConversationRecord{}
+				conversationRecordAI.Content = streamResponse
+				conversationRecordAI.Role = "assistant"
+				conversationRecordAI.ConversationId = chatReq.ConversationId
+				conversationRecordAI.CreatedBy = utils.GetUserID(c)
+				if err := conversationService.CreateConversationRecord(&conversationRecordAI); err != nil {
+					global.GVA_LOG.Error("AI回答数据写入异常!", zap.Error(err))
+					response.FailWithMessage("系统异常", c)
+					return err
+				}
+				// 更新聊天室时间
+				if err := conversationService.UpdateConversationTime(*chatReq.ConversationId); err != nil {
+					global.GVA_LOG.Error("更新聊天室时间异常!", zap.Error(err))
+					response.FailWithMessage("系统异常", c)
+					return err
+				}
+			}
+			return nil
+		}
+
+		if err != nil {
+			return err
+		}
+		streamResponse += respResult.Choices[0].Delta.Content
+		server := make(map[string]string)
+		server["content"] = respResult.Choices[0].Delta.Content
+		marshal, _ := json.Marshal(server)
+		sse.Encode(c.Writer, sse.Event{
+			Data: string(marshal),
+		})
+		c.Writer.Flush()
+	}
 }
