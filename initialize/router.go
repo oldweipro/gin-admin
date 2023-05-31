@@ -89,10 +89,13 @@ func Routers() *gin.Engine {
 	{
 		openfishRouter := router.RouterGroupApp.Openfish
 		openfishRouter.InitConversationRouter(PrivateGroup)
-		openfishRouter.InitChatTicketRouter(PrivateGroup)
-		openfishRouter.InitWalletsRouter(PrivateGroup)
-		openfishRouter.InitTransactionHistoryRouter(PrivateGroup)
-		openfishRouter.InitProductRouter(PrivateGroup)
+	}
+	{
+		transactionRouter := router.RouterGroupApp.Transaction
+		transactionRouter.InitChatTicketRouter(PrivateGroup)
+		transactionRouter.InitWalletsRouter(PrivateGroup)
+		transactionRouter.InitTransactionHistoryRouter(PrivateGroup)
+		transactionRouter.InitProductRouter(PrivateGroup)
 	}
 
 	global.GVA_LOG.Info("router register success")

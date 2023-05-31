@@ -1,4 +1,4 @@
-package openfish
+package transaction
 
 import (
 	"github.com/gin-gonic/gin"
@@ -13,7 +13,7 @@ type WalletsRouter struct {
 func (s *WalletsRouter) InitWalletsRouter(Router *gin.RouterGroup) {
 	walletsRouter := Router.Group("wallets").Use(middleware.OperationRecord())
 	walletsRouterWithoutRecord := Router.Group("wallets")
-	var walletsApi = v1.ApiGroupApp.OpenfishApiGroup.WalletsApi
+	var walletsApi = v1.ApiGroupApp.TransactionApiGroup.WalletsApi
 	{
 		walletsRouter.POST("createWallets", walletsApi.CreateWallets)             // 新建Wallets
 		walletsRouter.DELETE("deleteWallets", walletsApi.DeleteWallets)           // 删除Wallets

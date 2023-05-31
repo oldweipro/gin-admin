@@ -1,4 +1,4 @@
-package openfish
+package transaction
 
 import (
 	"github.com/gin-gonic/gin"
@@ -13,7 +13,7 @@ type ChatTicketRouter struct {
 func (s *ChatTicketRouter) InitChatTicketRouter(Router *gin.RouterGroup) {
 	chatTicketRouter := Router.Group("chatTicket").Use(middleware.OperationRecord())
 	chatTicketRouterWithoutRecord := Router.Group("chatTicket")
-	var chatTicketApi = v1.ApiGroupApp.OpenfishApiGroup.ChatTicketApi
+	var chatTicketApi = v1.ApiGroupApp.TransactionApiGroup.ChatTicketApi
 	{
 		chatTicketRouter.POST("createChatTicket", chatTicketApi.CreateChatTicket)             // 新建ChatTicket
 		chatTicketRouter.DELETE("deleteChatTicket", chatTicketApi.DeleteChatTicket)           // 删除ChatTicket

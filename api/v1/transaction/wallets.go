@@ -1,12 +1,12 @@
-package openfish
+package transaction
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/common/response"
-	"github.com/oldweipro/gin-admin/model/openfish"
-	openfishReq "github.com/oldweipro/gin-admin/model/openfish/request"
+	"github.com/oldweipro/gin-admin/model/transaction"
+	openfishReq "github.com/oldweipro/gin-admin/model/transaction/request"
 	"github.com/oldweipro/gin-admin/service"
 	"github.com/oldweipro/gin-admin/utils"
 	"go.uber.org/zap"
@@ -15,7 +15,7 @@ import (
 type WalletsApi struct {
 }
 
-var walletsService = service.ServiceGroupApp.OpenfishServiceGroup.WalletsService
+var walletsService = service.ServiceGroupApp.TransactionServiceGroup.WalletsService
 
 // CreateWallets 创建Wallets
 // @Tags Wallets
@@ -27,7 +27,7 @@ var walletsService = service.ServiceGroupApp.OpenfishServiceGroup.WalletsService
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /wallets/createWallets [post]
 func (walletsApi *WalletsApi) CreateWallets(c *gin.Context) {
-	var wallets openfish.Wallets
+	var wallets transaction.Wallets
 	err := c.ShouldBindJSON(&wallets)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -58,7 +58,7 @@ func (walletsApi *WalletsApi) CreateWallets(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /wallets/deleteWallets [delete]
 func (walletsApi *WalletsApi) DeleteWallets(c *gin.Context) {
-	var wallets openfish.Wallets
+	var wallets transaction.Wallets
 	err := c.ShouldBindJSON(&wallets)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -106,7 +106,7 @@ func (walletsApi *WalletsApi) DeleteWalletsByIds(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
 // @Router /wallets/updateWallets [put]
 func (walletsApi *WalletsApi) UpdateWallets(c *gin.Context) {
-	var wallets openfish.Wallets
+	var wallets transaction.Wallets
 	err := c.ShouldBindJSON(&wallets)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -137,7 +137,7 @@ func (walletsApi *WalletsApi) UpdateWallets(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /wallets/findWallets [get]
 func (walletsApi *WalletsApi) FindWallets(c *gin.Context) {
-	var wallets openfish.Wallets
+	var wallets transaction.Wallets
 	err := c.ShouldBindQuery(&wallets)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)

@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	"github.com/oldweipro/gin-admin/model/transaction"
 	"os"
 
 	"github.com/oldweipro/gin-admin/global"
@@ -59,7 +60,17 @@ func RegisterTables() {
 		patrol.Identity{},
 		patrol.Account{},
 		patrol.CertificationRecord{},
-		patrol.Personnel{}, ladder.ServerNode{}, ladder.Inbounds{}, openfish.Conversation{}, openfish.ChatTicket{}, openfish.Wallets{}, openfish.TransactionHistory{}, openfish.Product{},
+		patrol.Personnel{},
+
+		ladder.ServerNode{},
+		ladder.Inbounds{},
+
+		openfish.Conversation{},
+
+		transaction.ChatTicket{},
+		transaction.Wallets{},
+		transaction.TransactionHistory{},
+		transaction.Product{},
 	)
 	if err != nil {
 		global.GVA_LOG.Error("register table failed", zap.Error(err))

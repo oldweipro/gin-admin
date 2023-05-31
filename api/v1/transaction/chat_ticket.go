@@ -1,12 +1,12 @@
-package openfish
+package transaction
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/common/response"
-	"github.com/oldweipro/gin-admin/model/openfish"
-	openfishReq "github.com/oldweipro/gin-admin/model/openfish/request"
+	"github.com/oldweipro/gin-admin/model/transaction"
+	openfishReq "github.com/oldweipro/gin-admin/model/transaction/request"
 	"github.com/oldweipro/gin-admin/service"
 	"github.com/oldweipro/gin-admin/utils"
 	"go.uber.org/zap"
@@ -15,7 +15,7 @@ import (
 type ChatTicketApi struct {
 }
 
-var chatTicketService = service.ServiceGroupApp.OpenfishServiceGroup.ChatTicketService
+var chatTicketService = service.ServiceGroupApp.TransactionServiceGroup.ChatTicketService
 
 // CreateChatTicket 创建ChatTicket
 // @Tags ChatTicket
@@ -27,7 +27,7 @@ var chatTicketService = service.ServiceGroupApp.OpenfishServiceGroup.ChatTicketS
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /chatTicket/createChatTicket [post]
 func (chatTicketApi *ChatTicketApi) CreateChatTicket(c *gin.Context) {
-	var chatTicket openfish.ChatTicket
+	var chatTicket transaction.ChatTicket
 	err := c.ShouldBindJSON(&chatTicket)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -61,7 +61,7 @@ func (chatTicketApi *ChatTicketApi) CreateChatTicket(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /chatTicket/deleteChatTicket [delete]
 func (chatTicketApi *ChatTicketApi) DeleteChatTicket(c *gin.Context) {
-	var chatTicket openfish.ChatTicket
+	var chatTicket transaction.ChatTicket
 	err := c.ShouldBindJSON(&chatTicket)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -111,7 +111,7 @@ func (chatTicketApi *ChatTicketApi) DeleteChatTicketByIds(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
 // @Router /chatTicket/updateChatTicket [put]
 func (chatTicketApi *ChatTicketApi) UpdateChatTicket(c *gin.Context) {
-	var chatTicket openfish.ChatTicket
+	var chatTicket transaction.ChatTicket
 	err := c.ShouldBindJSON(&chatTicket)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -145,7 +145,7 @@ func (chatTicketApi *ChatTicketApi) UpdateChatTicket(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /chatTicket/findChatTicket [get]
 func (chatTicketApi *ChatTicketApi) FindChatTicket(c *gin.Context) {
-	var chatTicket openfish.ChatTicket
+	var chatTicket transaction.ChatTicket
 	err := c.ShouldBindQuery(&chatTicket)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)

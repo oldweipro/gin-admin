@@ -1,5 +1,5 @@
 // 自动生成模板Wallets
-package openfish
+package transaction
 
 import (
 	"github.com/oldweipro/gin-admin/global"

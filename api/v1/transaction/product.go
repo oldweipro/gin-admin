@@ -1,12 +1,12 @@
-package openfish
+package transaction
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/common/response"
-	"github.com/oldweipro/gin-admin/model/openfish"
-	openfishReq "github.com/oldweipro/gin-admin/model/openfish/request"
+	"github.com/oldweipro/gin-admin/model/transaction"
+	openfishReq "github.com/oldweipro/gin-admin/model/transaction/request"
 	"github.com/oldweipro/gin-admin/service"
 	"github.com/oldweipro/gin-admin/utils"
 	"go.uber.org/zap"
@@ -15,7 +15,7 @@ import (
 type ProductApi struct {
 }
 
-var productService = service.ServiceGroupApp.OpenfishServiceGroup.ProductService
+var productService = service.ServiceGroupApp.TransactionServiceGroup.ProductService
 
 // CreateProduct 创建Product
 // @Tags Product
@@ -27,7 +27,7 @@ var productService = service.ServiceGroupApp.OpenfishServiceGroup.ProductService
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /product/createProduct [post]
 func (productApi *ProductApi) CreateProduct(c *gin.Context) {
-	var product openfish.Product
+	var product transaction.Product
 	err := c.ShouldBindJSON(&product)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -59,7 +59,7 @@ func (productApi *ProductApi) CreateProduct(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /product/deleteProduct [delete]
 func (productApi *ProductApi) DeleteProduct(c *gin.Context) {
-	var product openfish.Product
+	var product transaction.Product
 	err := c.ShouldBindJSON(&product)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -107,7 +107,7 @@ func (productApi *ProductApi) DeleteProductByIds(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
 // @Router /product/updateProduct [put]
 func (productApi *ProductApi) UpdateProduct(c *gin.Context) {
-	var product openfish.Product
+	var product transaction.Product
 	err := c.ShouldBindJSON(&product)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -139,7 +139,7 @@ func (productApi *ProductApi) UpdateProduct(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /product/findProduct [get]
 func (productApi *ProductApi) FindProduct(c *gin.Context) {
-	var product openfish.Product
+	var product transaction.Product
 	err := c.ShouldBindQuery(&product)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)

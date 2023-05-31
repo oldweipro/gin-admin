@@ -6,14 +6,16 @@ import (
 	"github.com/oldweipro/gin-admin/api/v1/openfish"
 	"github.com/oldweipro/gin-admin/api/v1/patrol"
 	"github.com/oldweipro/gin-admin/api/v1/system"
+	"github.com/oldweipro/gin-admin/api/v1/transaction"
 )
 
 type ApiGroup struct {
-	SystemApiGroup   system.ApiGroup
-	ExampleApiGroup  example.ApiGroup
-	PatrolApiGroup   patrol.ApiGroup
-	LadderApiGroup   ladder.ApiGroup
-	OpenfishApiGroup openfish.ApiGroup
+	SystemApiGroup      system.ApiGroup
+	ExampleApiGroup     example.ApiGroup
+	PatrolApiGroup      patrol.ApiGroup
+	LadderApiGroup      ladder.ApiGroup
+	OpenfishApiGroup    openfish.ApiGroup
+	TransactionApiGroup transaction.ApiGroup
 }
 
 var ApiGroupApp = new(ApiGroup)

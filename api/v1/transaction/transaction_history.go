@@ -1,12 +1,12 @@
-package openfish
+package transaction
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/common/response"
-	"github.com/oldweipro/gin-admin/model/openfish"
-	openfishReq "github.com/oldweipro/gin-admin/model/openfish/request"
+	"github.com/oldweipro/gin-admin/model/transaction"
+	openfishReq "github.com/oldweipro/gin-admin/model/transaction/request"
 	"github.com/oldweipro/gin-admin/service"
 	"github.com/oldweipro/gin-admin/utils"
 	"go.uber.org/zap"
@@ -15,7 +15,7 @@ import (
 type TransactionHistoryApi struct {
 }
 
-var transactionHistoryService = service.ServiceGroupApp.OpenfishServiceGroup.TransactionHistoryService
+var transactionHistoryService = service.ServiceGroupApp.TransactionServiceGroup.TransactionHistoryService
 
 // CreateTransactionHistory 创建TransactionHistory
 // @Tags TransactionHistory
@@ -27,7 +27,7 @@ var transactionHistoryService = service.ServiceGroupApp.OpenfishServiceGroup.Tra
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /transactionHistory/createTransactionHistory [post]
 func (transactionHistoryApi *TransactionHistoryApi) CreateTransactionHistory(c *gin.Context) {
-	var transactionHistory openfish.TransactionHistory
+	var transactionHistory transaction.TransactionHistory
 	err := c.ShouldBindJSON(&transactionHistory)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -63,7 +63,7 @@ func (transactionHistoryApi *TransactionHistoryApi) CreateTransactionHistory(c *
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /transactionHistory/deleteTransactionHistory [delete]
 func (transactionHistoryApi *TransactionHistoryApi) DeleteTransactionHistory(c *gin.Context) {
-	var transactionHistory openfish.TransactionHistory
+	var transactionHistory transaction.TransactionHistory
 	err := c.ShouldBindJSON(&transactionHistory)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -113,7 +113,7 @@ func (transactionHistoryApi *TransactionHistoryApi) DeleteTransactionHistoryById
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
 // @Router /transactionHistory/updateTransactionHistory [put]
 func (transactionHistoryApi *TransactionHistoryApi) UpdateTransactionHistory(c *gin.Context) {
-	var transactionHistory openfish.TransactionHistory
+	var transactionHistory transaction.TransactionHistory
 	err := c.ShouldBindJSON(&transactionHistory)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -149,7 +149,7 @@ func (transactionHistoryApi *TransactionHistoryApi) UpdateTransactionHistory(c *
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /transactionHistory/findTransactionHistory [get]
 func (transactionHistoryApi *TransactionHistoryApi) FindTransactionHistory(c *gin.Context) {
-	var transactionHistory openfish.TransactionHistory
+	var transactionHistory transaction.TransactionHistory
 	err := c.ShouldBindQuery(&transactionHistory)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)

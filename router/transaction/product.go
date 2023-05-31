@@ -1,4 +1,4 @@
-package openfish
+package transaction
 
 import (
 	"github.com/gin-gonic/gin"
@@ -13,7 +13,7 @@ type ProductRouter struct {
 func (s *ProductRouter) InitProductRouter(Router *gin.RouterGroup) {
 	productRouter := Router.Group("product").Use(middleware.OperationRecord())
 	productRouterWithoutRecord := Router.Group("product")
-	var productApi = v1.ApiGroupApp.OpenfishApiGroup.ProductApi
+	var productApi = v1.ApiGroupApp.TransactionApiGroup.ProductApi
 	{
 		productRouter.POST("createProduct", productApi.CreateProduct)             // 新建Product
 		productRouter.DELETE("deleteProduct", productApi.DeleteProduct)           // 删除Product
