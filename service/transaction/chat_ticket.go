@@ -91,3 +91,20 @@ func (chatTicketService *ChatTicketService) GetChatTicketInfoList(info openfishR
 	err = db.Limit(limit).Offset(offset).Find(&chatTickets).Error
 	return chatTickets, total, err
 }
+
+// HandleValidateChatTicket 验证鱼币兑换码
+func (chatTicketService *ChatTicketService) HandleValidateChatTicket(ticketValue string) (err error) {
+	var chatTicket transaction.ChatTicket
+	err = global.GVA_DB.Where("ticket_value = ? and (expiration_time = 0 or expiration_time > UNIX_TIMESTAMP())", ticketValue).First(&chatTicket).Error
+	if err != nil {
+		// 兑换鱼币
+		err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+			// 更新用户钱包的鱼币
+			// 更新交易记录
+			// 删除鱼币兑换码
+			// nil提交事务
+			return nil
+		})
+	}
+	return
+}

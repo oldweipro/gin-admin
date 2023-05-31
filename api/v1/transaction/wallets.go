@@ -6,7 +6,7 @@ import (
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/common/response"
 	"github.com/oldweipro/gin-admin/model/transaction"
-	openfishReq "github.com/oldweipro/gin-admin/model/transaction/request"
+	transactionReq "github.com/oldweipro/gin-admin/model/transaction/request"
 	"github.com/oldweipro/gin-admin/service"
 	"github.com/oldweipro/gin-admin/utils"
 	"go.uber.org/zap"
@@ -161,7 +161,7 @@ func (walletsApi *WalletsApi) FindWallets(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /wallets/getWalletsList [get]
 func (walletsApi *WalletsApi) GetWalletsList(c *gin.Context) {
-	var pageInfo openfishReq.WalletsSearch
+	var pageInfo transactionReq.WalletsSearch
 	err := c.ShouldBindQuery(&pageInfo)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)

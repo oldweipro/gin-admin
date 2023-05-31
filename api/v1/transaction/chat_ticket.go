@@ -187,3 +187,19 @@ func (chatTicketApi *ChatTicketApi) GetChatTicketList(c *gin.Context) {
 		}, "获取成功", c)
 	}
 }
+
+// HandleValidateChatTicket 验证鱼币兑换码
+func (chatTicketApi *ChatTicketApi) HandleValidateChatTicket(c *gin.Context) {
+	var chatTicket transaction.ChatTicket
+	err := c.ShouldBindQuery(&chatTicket)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	if err := chatTicketService.HandleValidateChatTicket(chatTicket.TicketValue); err != nil {
+		global.GVA_LOG.Error("验证失败!", zap.Error(err))
+		response.FailWithMessage("验证失败", c)
+	} else {
+		response.OkWithMessage("验证成果", c)
+	}
+}
