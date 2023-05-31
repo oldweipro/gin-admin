@@ -70,7 +70,7 @@ func RegisterTables() {
 		transaction.ChatTicket{},
 		transaction.Wallets{},
 		transaction.TransactionHistory{},
-		transaction.Product{},
+		transaction.Product{}, openfish.Feedback{},
 	)
 	if err != nil {
 		global.GVA_LOG.Error("register table failed", zap.Error(err))
