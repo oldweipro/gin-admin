@@ -38,7 +38,7 @@ func RunWindowsServer() {
 	fmt.Printf(`
 	欢迎使用 gin-admin
 	当前版本:v1.0.0
-    加群方式:微信号：oldweipro QQ群：暂无
+    微信: oldweipro
 	默认自动化文档地址:http://127.0.0.1%s/swagger/index.html
 `, address)
 	global.GVA_LOG.Error(s.ListenAndServe().Error())

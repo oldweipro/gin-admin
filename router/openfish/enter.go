@@ -4,4 +4,6 @@ type RouterGroup struct {
 	ConversationRouter
 	ChatTicketRouter
 	WalletsRouter
+	TransactionHistoryRouter
+	ProductRouter
 }

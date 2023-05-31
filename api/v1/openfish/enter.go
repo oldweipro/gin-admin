@@ -4,4 +4,6 @@ type ApiGroup struct {
 	ConversationApi
 	ChatTicketApi
 	WalletsApi
+	TransactionHistoryApi
+	ProductApi
 }
