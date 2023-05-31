@@ -3,6 +3,7 @@ package system
 import (
 	"errors"
 	"fmt"
+	"github.com/oldweipro/gin-admin/model/transaction"
 	"time"
 
 	"github.com/google/uuid"
@@ -30,7 +31,26 @@ func (userService *UserService) Register(u system.SysUser) (userInter system.Sys
 	// 否则 附加uuid 密码hash加密 注册
 	u.Password = utils.BcryptHash(u.Password)
 	u.UUID = uuid.New()
-	err = global.GVA_DB.Create(&u).Error
+	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+		// 注册用户
+		err = tx.Create(&u).Error
+		if err != nil {
+			return err
+		}
+		// 创建钱包
+		var wallets transaction.Wallets
+		wallets.UserId = u.ID
+		fmt.Println("钱包ID: ", wallets.UserId)
+		err = tx.Create(&wallets).Error
+		if err != nil {
+			return err
+		}
+		// nil提交事务
+		return nil
+	})
+	if err != nil {
+		return system.SysUser{}, err
+	}
 	return u, err
 }
 

@@ -246,6 +246,7 @@ func (b *BaseApi) RegisterWithSmsCode(c *gin.Context) {
 	}
 	var authorities []system.SysAuthority
 	authorities = append(authorities, system.SysAuthority{
+		// AI助手角色的ID
 		AuthorityId: 9953,
 	})
 	r.AuthorityId = 9953
