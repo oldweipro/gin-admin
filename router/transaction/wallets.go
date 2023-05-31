@@ -21,7 +21,8 @@ func (s *WalletsRouter) InitWalletsRouter(Router *gin.RouterGroup) {
 		walletsRouter.PUT("updateWallets", walletsApi.UpdateWallets)              // 更新Wallets
 	}
 	{
-		walletsRouterWithoutRecord.GET("findWallets", walletsApi.FindWallets)       // 根据ID获取Wallets
-		walletsRouterWithoutRecord.GET("getWalletsList", walletsApi.GetWalletsList) // 获取Wallets列表
+		walletsRouterWithoutRecord.GET("findWallets", walletsApi.FindWallets)                     // 根据ID获取Wallets
+		walletsRouterWithoutRecord.GET("getWalletsList", walletsApi.GetWalletsList)               // 获取Wallets列表
+		walletsRouterWithoutRecord.GET("getCurrentUserWallets", walletsApi.GetCurrentUserWallets) // 获取当前用户钱包
 	}
 }

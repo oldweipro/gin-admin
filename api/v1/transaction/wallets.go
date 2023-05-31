@@ -179,3 +179,14 @@ func (walletsApi *WalletsApi) GetWalletsList(c *gin.Context) {
 		}, "获取成功", c)
 	}
 }
+
+// GetCurrentUserWallets 获取当前用户钱包
+func (walletsApi *WalletsApi) GetCurrentUserWallets(c *gin.Context) {
+	userID := utils.GetUserID(c)
+	if wallets, err := walletsService.GetCurrentUserWallets(userID); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(wallets, "获取成功", c)
+	}
+}
