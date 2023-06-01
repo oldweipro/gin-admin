@@ -106,20 +106,22 @@ func (chatTicketService *ChatTicketService) HandleValidateChatTicket(ticketValue
 		var srcWalletId uint = 0
 		// 更新交易记录
 		remark := fmt.Sprintf("验证鱼币兑换码: %s;兑换数量: %s", ticketValue, strconv.Itoa(*chatTicket.Amount))
+		balance := *wallets.Balance + *chatTicket.Amount
 		transactionHistory := transaction.TransactionHistory{
-			UserId:       &wallets.UserId,
-			SrcWalletId:  &srcWalletId,
-			DestWalletId: &wallets.ID,
-			TypeEnum:     "deposit",
-			Quantity:     chatTicket.Amount,
-			ProductId:    &chatTicket.ID,
-			Remark:       remark,
-			CreatedBy:    wallets.UserId,
+			UserId:        &wallets.UserId,
+			SrcWalletId:   &srcWalletId,
+			DestWalletId:  &wallets.ID,
+			TypeEnum:      "deposit",
+			Quantity:      chatTicket.Amount,
+			BeforeBalance: wallets.Balance,
+			AfterBalance:  &balance,
+			ProductId:     &chatTicket.ID,
+			Remark:        remark,
+			CreatedBy:     wallets.UserId,
 		}
 		if err = tx.Create(&transactionHistory).Error; err != nil {
 			return err
 		}
-		balance := *wallets.Balance + *chatTicket.Amount
 		// 更新用户钱包的鱼币
 		if err = tx.Model(&transaction.Wallets{}).Where("id = ?", wallets.ID).Update("balance", balance).Error; err != nil {
 			return err
