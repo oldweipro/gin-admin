@@ -1,11 +1,13 @@
 package transaction
 
 import (
+	"fmt"
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/transaction"
 	openfishReq "github.com/oldweipro/gin-admin/model/transaction/request"
 	"gorm.io/gorm"
+	"strconv"
 )
 
 type ChatTicketService struct {
@@ -93,18 +95,44 @@ func (chatTicketService *ChatTicketService) GetChatTicketInfoList(info openfishR
 }
 
 // HandleValidateChatTicket 验证鱼币兑换码
-func (chatTicketService *ChatTicketService) HandleValidateChatTicket(ticketValue string) (err error) {
+func (chatTicketService *ChatTicketService) HandleValidateChatTicket(ticketValue string, wallets *transaction.Wallets) (err error) {
 	var chatTicket transaction.ChatTicket
 	err = global.GVA_DB.Where("ticket_value = ? and (expiration_time = 0 or expiration_time > UNIX_TIMESTAMP())", ticketValue).First(&chatTicket).Error
 	if err != nil {
-		// 兑换鱼币
-		err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
-			// 更新用户钱包的鱼币
-			// 更新交易记录
-			// 删除鱼币兑换码
-			// nil提交事务
-			return nil
-		})
+		return err
 	}
+	// 兑换鱼币
+	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+		var srcWalletId uint = 0
+		// 更新交易记录
+		remark := fmt.Sprintf("验证鱼币兑换码: %s;兑换数量: %s", ticketValue, strconv.Itoa(*chatTicket.Amount))
+		transactionHistory := transaction.TransactionHistory{
+			UserId:       &wallets.UserId,
+			SrcWalletId:  &srcWalletId,
+			DestWalletId: &wallets.ID,
+			TypeEnum:     "deposit",
+			Quantity:     chatTicket.Amount,
+			ProductId:    &chatTicket.ID,
+			Remark:       remark,
+			CreatedBy:    wallets.UserId,
+		}
+		if err = tx.Create(&transactionHistory).Error; err != nil {
+			return err
+		}
+		balance := *wallets.Balance + *chatTicket.Amount
+		// 更新用户钱包的鱼币
+		if err = tx.Model(&transaction.Wallets{}).Where("id = ?", wallets.ID).Update("balance", balance).Error; err != nil {
+			return err
+		}
+		// 删除鱼币兑换码
+		if err = tx.Model(&transaction.ChatTicket{}).Where("id = ?", chatTicket.ID).Update("belong_to", wallets.UserId).Update("deleted_by", chatTicket.CreatedBy).Error; err != nil {
+			return err
+		}
+		if err = tx.Delete(&chatTicket).Error; err != nil {
+			return err
+		}
+		// nil提交事务
+		return nil
+	})
 	return
 }

@@ -191,12 +191,22 @@ func (chatTicketApi *ChatTicketApi) GetChatTicketList(c *gin.Context) {
 // HandleValidateChatTicket 验证鱼币兑换码
 func (chatTicketApi *ChatTicketApi) HandleValidateChatTicket(c *gin.Context) {
 	var chatTicket transaction.ChatTicket
-	err := c.ShouldBindQuery(&chatTicket)
+	err := c.ShouldBindJSON(&chatTicket)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if err := chatTicketService.HandleValidateChatTicket(chatTicket.TicketValue); err != nil {
+	if chatTicket.TicketValue == "" {
+		response.FailWithMessage("请填写鱼币兑换码", c)
+		return
+	}
+	userId := utils.GetUserID(c)
+	wallets, err := walletsService.GetCurrentUserWallets(userId)
+	if err != nil {
+		response.FailWithMessage("账号异常，您的钱包未创建", c)
+		return
+	}
+	if err := chatTicketService.HandleValidateChatTicket(chatTicket.TicketValue, &wallets); err != nil {
 		global.GVA_LOG.Error("验证失败!", zap.Error(err))
 		response.FailWithMessage("验证失败", c)
 	} else {

@@ -70,7 +70,7 @@ func (walletsService *WalletsService) GetWalletsInfoList(info openfishReq.Wallet
 }
 
 // GetCurrentUserWallets 获取当前用户钱包
-func (walletsService *WalletsService) GetCurrentUserWallets(id uint) (wallets transaction.Wallets, err error) {
-	err = global.GVA_DB.Where("user_id = ?", id).First(&wallets).Error
+func (walletsService *WalletsService) GetCurrentUserWallets(userId uint) (wallets transaction.Wallets, err error) {
+	err = global.GVA_DB.Where("user_id = ?", userId).First(&wallets).Error
 	return
 }
