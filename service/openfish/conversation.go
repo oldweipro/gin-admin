@@ -131,7 +131,7 @@ func (conversationService *ConversationService) GetConversationRecordListWithTok
 			ORDER BY created_at desc
 		  ) AS t
 		  WHERE sum <= ?
-		) ORDER BY created_at ASC`
+		) ORDER BY created_at`
 	err := global.GVA_DB.Raw(query, conversationId, 2596-tokenCount).Scan(&conversationRecords).Error
 	return conversationRecords, err
 }
@@ -187,7 +187,9 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 		Stream:    true,
 	}
 	if err := conversationService.ChatOpenAIReverse(&conversationRecordUser, req, c, chatReq); err != nil {
+		global.GVA_LOG.Error("逆向工程调用错误: ", zap.Error(err))
 		if err = conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
+			global.GVA_LOG.Error("OpenAI调用错误: ", zap.Error(err))
 			return err
 		}
 	}
