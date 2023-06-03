@@ -267,7 +267,7 @@ func (userService *UserService) GetUserInfo(uuid uuid.UUID) (user system.SysUser
 //@param: id int
 //@return: err error, user *model.SysUser
 
-func (userService *UserService) FindUserById(id int) (user *system.SysUser, err error) {
+func (userService *UserService) FindUserById(id uint) (user *system.SysUser, err error) {
 	var u system.SysUser
 	err = global.GVA_DB.Where("`id` = ?", id).First(&u).Error
 	return &u, err

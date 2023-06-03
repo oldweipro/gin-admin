@@ -26,7 +26,7 @@ func ErrorToEmail() gin.HandlerFunc {
 			username = claims.Username
 		} else {
 			id, _ := strconv.Atoi(c.Request.Header.Get("x-user-id"))
-			user, err := userService.FindUserById(id)
+			user, err := userService.FindUserById(uint(id))
 			if err != nil {
 				username = "Unknown"
 			}

@@ -26,7 +26,15 @@ type AuthorityMenuApi struct{}
 // @Success   200   {object}  response.Response{data=systemRes.SysMenusResponse,msg=string}  "获取用户动态路由,返回包括系统菜单详情列表"
 // @Router    /menu/getMenu [post]
 func (a *AuthorityMenuApi) GetMenu(c *gin.Context) {
-	menus, err := menuService.GetMenuTree(utils.GetUserAuthorityId(c))
+	// 从数据库获取 AuthorityId，不从缓存获取
+	userID := utils.GetUserID(c)
+	user, userErr := userService.FindUserById(userID)
+	if userErr != nil {
+		global.GVA_LOG.Error("获取菜单时，查询当前用户 AuthorityId 异常", zap.Error(userErr))
+		response.FailWithMessage("账号异常", c)
+		return
+	}
+	menus, err := menuService.GetMenuTree(user.AuthorityId)
 	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
