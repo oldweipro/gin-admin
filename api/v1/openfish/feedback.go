@@ -35,9 +35,7 @@ func (feedbackApi *FeedbackApi) CreateFeedback(c *gin.Context) {
 	}
 	feedback.CreatedBy = utils.GetUserID(c)
 	verify := utils.Rules{
-		"Feedback_text": {utils.NotEmpty()},
-		"User_id":       {utils.NotEmpty()},
-		"Parent_id":     {utils.NotEmpty()},
+		"FeedbackText": {utils.NotEmpty()},
 	}
 	if err := utils.Verify(feedback, verify); err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -175,10 +173,16 @@ func (feedbackApi *FeedbackApi) GetFeedbackList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
+
+	if utils.GetUserAuthorityId(c) != 1 {
+		pageInfo.CreatedBy = utils.GetUserID(c)
+	}
 	if list, total, err := feedbackService.GetFeedbackInfoList(pageInfo); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
+		// list要处理一下，还需要把pid不为0的作为回复组装一下，这个回复再思考一下吧
+		// ReplyText    string `json:"replyText" form:"replyText" gorm:"column:reply_text;comment:回复的文字内容;"`
 		response.OkWithDetailed(response.PageResult{
 			List:     list,
 			Total:    total,

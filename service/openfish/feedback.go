@@ -64,30 +64,28 @@ func (feedbackService *FeedbackService) GetFeedback(id uint) (feedback openfish.
 
 // GetFeedbackInfoList 分页获取Feedback记录
 // Author [piexlmax](https://github.com/piexlmax)
-func (feedbackService *FeedbackService) GetFeedbackInfoList(info openfishReq.FeedbackSearch) (list []openfish.Feedback, total int64, err error) {
+func (feedbackService *FeedbackService) GetFeedbackInfoList(info openfishReq.FeedbackSearch) (list []openfish.FeedbackVo, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
 	db := global.GVA_DB.Model(&openfish.Feedback{})
-	var feedbacks []openfish.Feedback
+	var feedbacks []openfish.FeedbackVo
 	// 如果有条件搜索 下方会自动创建搜索语句
+	if info.CreatedBy != 0 {
+		db = db.Where("feedback.created_by = ?", info.CreatedBy)
+	}
 	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {
-		db = db.Where("created_at BETWEEN ? AND ?", info.StartCreatedAt, info.EndCreatedAt)
+		db = db.Where("feedback.created_at BETWEEN ? AND ?", info.StartCreatedAt, info.EndCreatedAt)
 	}
-	if info.Feedback_text != "" {
-		db = db.Where("feedback_text LIKE ?", "%"+info.Feedback_text+"%")
+	if info.FeedbackText != "" {
+		db = db.Where("feedback.feedback_text LIKE ?", "%"+info.FeedbackText+"%")
 	}
-	if info.User_id != nil {
-		db = db.Where("user_id = ?", info.User_id)
-	}
-	if info.Parent_id != nil {
-		db = db.Where("parent_id = ?", info.Parent_id)
-	}
+	db = db.Where("feedback.parent_id = ?", 0)
 	err = db.Count(&total).Error
 	if err != nil {
 		return
 	}
 
-	err = db.Limit(limit).Offset(offset).Find(&feedbacks).Error
+	err = db.Joins("left join feedback fb on feedback.id=fb.parent_id").Select("feedback.*, fb.feedback_text reply_text").Limit(limit).Offset(offset).Order("created_at desc").Find(&feedbacks).Error
 	return feedbacks, total, err
 }
