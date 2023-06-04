@@ -25,8 +25,53 @@ type ConversationApi struct {
 var conversationService = service.ServiceGroupApp.OpenfishServiceGroup.ConversationService
 
 var userRequestStatus sync.Map
+var userRequestOpenAIDrawingStatus sync.Map
 
-// ChatCompletions 使用第三方库新接口
+// OpenAIDrawing openai作图
+func (conversationApi *ConversationApi) OpenAIDrawing(c *gin.Context) {
+	// 获取用户ID
+	userID := utils.GetUserID(c)
+	// 检查用户的请求状态
+	_, loaded := userRequestOpenAIDrawingStatus.LoadOrStore(userID, true)
+	if loaded {
+		c.JSON(429, gin.H{"msg": "太多请求了"})
+		return
+	}
+
+	defer userRequestOpenAIDrawingStatus.Delete(userID) // 在处理完毕后删除用户的请求状态
+	// 获取参数
+	var chatReq openfishReq.ChatReq
+	err := c.ShouldBindJSON(&chatReq)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	// 校验prompt是否为空
+	if chatReq.Prompt == "" || chatReq.ConversationId == nil {
+		response.FailWithMessage("系统错误，缺少必要参数。", c)
+		global.GVA_LOG.Error("系统错误，缺少必要参数。")
+		return
+	}
+	// md5校验参数
+	str := chatReq.Prompt + "-" + strconv.FormatUint(uint64(*chatReq.ConversationId), 10) + "5eb63bbbe01eeed093cb22bb8f5acdc3"
+	hash := md5.Sum([]byte(str))
+	hexHash := hex.EncodeToString(hash[:])
+	if hexHash != chatReq.Sign {
+		response.FailWithMessage("系统错误，缺少必要参数。", c)
+		return
+	}
+	c.Status(http.StatusOK)
+	c.Header("Content-Type", "text/event-stream")
+	c.Header("Cache-Control", "no-cache")
+	c.Header("Connection", "keep-alive")
+	// AI 作画
+	err = conversationService.OpenAIDrawing(chatReq, c)
+	if err != nil {
+		c.JSON(500, gin.H{"data": "服务器负载，请稍后重试。"})
+	}
+}
+
+// ChatCompletions AI对话
 func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 	// 获取用户ID
 	userID := utils.GetUserID(c)
@@ -93,7 +138,12 @@ func (conversationApi *ConversationApi) CreateConversation(c *gin.Context) {
 	}
 	// conversationId等于空则创建该信息到数据库
 	conversationRecord := openfish.ConversationRecord{}
-	conversationRecord.Content = "我是由开放鱼训练的大型语言模型，请详细描述您的问题。"
+
+	if conversation.ConversationType == 0 {
+		conversationRecord.Content = "我是由开放鱼训练的大型语言模型，请详细描述您的问题。"
+	} else if conversation.ConversationType == 1 {
+		conversationRecord.Content = "我是由开放鱼训练的图像生成模型，请详细描述您的图画。"
+	}
 	conversationRecord.Role = "system"
 	conversationRecord.ConversationId = &conversation.ID
 	conversationRecord.CreatedBy = utils.GetUserID(c)
@@ -266,13 +316,24 @@ func (conversationApi *ConversationApi) GetConversationList(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /conversation/getConversationList [get]
 func (conversationApi *ConversationApi) GetCurrentUserConversationList(c *gin.Context) {
+	var chatReq openfishReq.ChatReq
+	err := c.ShouldBindQuery(&chatReq)
+	if err != nil {
+		response.FailWithMessage("参数错误", c)
+		return
+	}
+	if chatReq.ConversationType == nil {
+		response.FailWithMessage("conversationType不能为空", c)
+		return
+	}
 	userInfo := utils.GetUserInfo(c)
-	conversationList, err := conversationService.GetConversationListByUserId(userInfo.BaseClaims.ID)
+	conversationList, err := conversationService.GetConversationListByUserId(userInfo.BaseClaims.ID, *chatReq.ConversationType)
 
 	if len(conversationList) == 0 {
 		// 创建一个聊天
 		var conversation openfish.Conversation
 		conversation.ConversationName = "新聊天"
+		conversation.ConversationType = *chatReq.ConversationType
 		conversation.CreatedBy = utils.GetUserID(c)
 		if err := conversationService.CreateConversation(&conversation); err != nil {
 			global.GVA_LOG.Error("创建会话失败!", zap.Error(err))
@@ -281,7 +342,11 @@ func (conversationApi *ConversationApi) GetCurrentUserConversationList(c *gin.Co
 		}
 		// conversationId等于空则创建该信息到数据库
 		conversationRecord := openfish.ConversationRecord{}
-		conversationRecord.Content = "我是由开放鱼训练的大型语言模型，请详细描述您的问题。"
+		if *chatReq.ConversationType == 0 {
+			conversationRecord.Content = "我是由开放鱼训练的大型语言模型，请详细描述您的问题。"
+		} else if *chatReq.ConversationType == 1 {
+			conversationRecord.Content = "我是由开放鱼训练的图像生成模型，请详细描述您的图画。"
+		}
 		conversationRecord.Role = "system"
 		conversationRecord.ConversationId = &conversation.ID
 		conversationRecord.CreatedBy = utils.GetUserID(c)

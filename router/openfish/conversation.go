@@ -17,6 +17,7 @@ func (s *ConversationRouter) InitConversationRouter(Router *gin.RouterGroup) {
 	{
 		conversationRouter.POST("createConversation", conversationApi.CreateConversation)             // 新建Conversation
 		conversationRouter.POST("chatCompletions", conversationApi.ChatCompletions)                   // AI对话
+		conversationRouter.POST("openAIDrawing", conversationApi.OpenAIDrawing)                       // AI作图
 		conversationRouter.POST("deleteConversation", conversationApi.DeleteConversation)             // 删除Conversation
 		conversationRouter.DELETE("deleteConversationByIds", conversationApi.DeleteConversationByIds) // 批量删除Conversation
 		conversationRouter.PUT("updateConversation", conversationApi.UpdateConversation)              // 更新Conversation

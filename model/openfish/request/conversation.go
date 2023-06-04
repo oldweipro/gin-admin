@@ -15,9 +15,10 @@ type ConversationSearch struct {
 
 // ChatReq 请求参数列表
 type ChatReq struct {
-	Prompt         string `json:"prompt"`
-	ConversationId *uint  `json:"conversationId"`
-	Sign           string `json:"sign"`
+	Prompt           string `form:"prompt" json:"prompt"`
+	ConversationId   *uint  `form:"conversationId" json:"conversationId"`
+	ConversationType *uint  `form:"conversationType" json:"conversationType"`
+	Sign             string `form:"sign" json:"sign"`
 }
 
 type ConversationDataGroups struct {

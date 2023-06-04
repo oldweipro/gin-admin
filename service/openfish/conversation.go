@@ -19,6 +19,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 )
 
@@ -151,10 +152,55 @@ func (conversationService *ConversationService) GetConversationRecordListByConve
 }
 
 // GetConversationListByUserId 根据用户ID查询会话列表
-func (conversationService *ConversationService) GetConversationListByUserId(userId uint) ([]openfish.Conversation, error) {
+func (conversationService *ConversationService) GetConversationListByUserId(userId uint, conversationType uint) ([]openfish.Conversation, error) {
 	var conversations []openfish.Conversation
-	err := global.GVA_DB.Model(&openfish.Conversation{}).Where("created_by = ?", userId).Order("updated_at desc").First(&conversations).Error
+	err := global.GVA_DB.Model(&openfish.Conversation{}).Where("created_by = ?", userId).Where("conversation_type = ?", conversationType).Order("updated_at desc").First(&conversations).Error
 	return conversations, err
+}
+
+// OpenAIDrawing openai作画
+func (conversationService *ConversationService) OpenAIDrawing(chatReq openfishReq.ChatReq, c *gin.Context) error {
+	fmt.Println("AI作画")
+	config := openai.DefaultConfig("TOKEN")
+	// 如果需要代理，请配置代理地址，如不需要可注释或删掉以下代码
+	config.HTTPClient.Transport = &http.Transport{
+		// 设置Transport字段为自定义Transport，包含代理设置
+		Proxy: func(req *http.Request) (*url.URL, error) {
+			// 设置代理
+			proxyURL, err := url.Parse("http://127.0.0.1:7890")
+			if err != nil {
+				return nil, err
+			}
+			return proxyURL, nil
+		},
+	}
+	client := openai.NewClientWithConfig(config)
+	ctx := context.Background()
+	imageRequest := openai.ImageRequest{
+		Prompt:         chatReq.Prompt,
+		N:              2,
+		Size:           "1024x1024",
+		ResponseFormat: "url",
+		User:           strconv.Itoa(int(utils.GetUserID(c))),
+	}
+	if image, err := client.CreateImage(ctx, imageRequest); err != nil {
+		return err
+	} else {
+		for _, img := range image.Data {
+			fmt.Println(img.URL)
+			// TODO oldwei 图片存入本地或者OSS
+			//fmt.Println(img.B64JSON)
+			server := make(map[string]string)
+			server["content"] = "![](" + img.URL + ")"
+			//server["content"] = "<img src=\"data:image/png;base64," + img.B64JSON + "\" alt=\"图片描述\">"
+			marshal, _ := json.Marshal(server)
+			sse.Encode(c.Writer, sse.Event{
+				Data: string(marshal),
+			})
+			c.Writer.Flush()
+		}
+	}
+	return nil
 }
 
 // ChatGPTCompletions ChatGPT对话方法
