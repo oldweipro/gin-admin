@@ -207,7 +207,7 @@ func (conversationService *ConversationService) OpenAIDrawing(chatReq openfishRe
 			if streamResponse == "" {
 				streamResponse = server["content"]
 			} else {
-				streamResponse = streamResponse + "," + server["content"]
+				streamResponse = streamResponse + "\n\n" + server["content"]
 			}
 		}
 		// 数据存入数据库 预备存储新的聊天记录
