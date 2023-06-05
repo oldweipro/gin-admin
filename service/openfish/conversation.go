@@ -12,6 +12,7 @@ import (
 	"github.com/oldweipro/gin-admin/model/common/response"
 	"github.com/oldweipro/gin-admin/model/openfish"
 	openfishReq "github.com/oldweipro/gin-admin/model/openfish/request"
+	"github.com/oldweipro/gin-admin/service/system"
 	"github.com/oldweipro/gin-admin/utils"
 	"github.com/oldweipro/gin-admin/utils/upload"
 	"github.com/sashabaranov/go-openai"
@@ -26,6 +27,8 @@ import (
 
 type ConversationService struct {
 }
+
+var chatGptService system.ChatGptService
 
 // CreateConversation 创建Conversation记录
 // Author [piexlmax](https://github.com/piexlmax)
@@ -161,8 +164,12 @@ func (conversationService *ConversationService) GetConversationListByUserId(user
 
 // OpenAIDrawing openai作画
 func (conversationService *ConversationService) OpenAIDrawing(chatReq openfishReq.ChatReq, c *gin.Context) error {
-	fmt.Println("AI作画")
-	config := openai.DefaultConfig("TOKEN")
+	sk, err := chatGptService.GetSK()
+	if err != nil {
+		global.GVA_LOG.Error("获取sk失败!", zap.Error(err))
+		return err
+	}
+	config := openai.DefaultConfig(sk.SK)
 	// 如果需要代理，请配置代理地址，如不需要可注释或删掉以下代码
 	config.HTTPClient.Transport = &http.Transport{
 		// 设置Transport字段为自定义Transport，包含代理设置
@@ -299,7 +306,12 @@ func (conversationService *ConversationService) ChatOpenAIReverse(conversationRe
 
 // ChatOpenAIApiKey 官方接口：更换TOKEN，使用代理
 func (conversationService *ConversationService) ChatOpenAIApiKey(conversationRecordUser *openfish.ConversationRecord, req openai.ChatCompletionRequest, c *gin.Context, chatReq openfishReq.ChatReq) error {
-	config := openai.DefaultConfig("TOKEN")
+	sk, err := chatGptService.GetSK()
+	if err != nil {
+		global.GVA_LOG.Error("获取sk失败!", zap.Error(err))
+		return err
+	}
+	config := openai.DefaultConfig(sk.SK)
 	// 如果需要代理，请配置代理地址，如不需要可注释或删掉以下代码
 	config.HTTPClient.Transport = &http.Transport{
 		// 设置Transport字段为自定义Transport，包含代理设置
@@ -330,7 +342,6 @@ func (conversationService *ConversationService) ChatStream(stream *openai.ChatCo
 	for {
 		respResult, err := stream.Recv()
 		if errors.Is(err, io.EOF) {
-			fmt.Println("程序调用结束")
 			if streamResponse != "" {
 				// 最后存储新的对话到数据库 提问
 				if err := conversationService.CreateConversationRecord(conversationRecordUser); err != nil {
