@@ -17,6 +17,11 @@ import (
 
 type TencentCOS struct{}
 
+func (c *TencentCOS) UploadUrl(fileUrl, filename string) (string, string, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 // UploadFile upload file to COS
 func (*TencentCOS) UploadFile(file *multipart.FileHeader) (string, string, error) {
 	client := NewClient()

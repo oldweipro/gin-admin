@@ -13,6 +13,7 @@ import (
 	"github.com/oldweipro/gin-admin/model/openfish"
 	openfishReq "github.com/oldweipro/gin-admin/model/openfish/request"
 	"github.com/oldweipro/gin-admin/utils"
+	"github.com/oldweipro/gin-admin/utils/upload"
 	"github.com/sashabaranov/go-openai"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -178,7 +179,7 @@ func (conversationService *ConversationService) OpenAIDrawing(chatReq openfishRe
 	ctx := context.Background()
 	imageRequest := openai.ImageRequest{
 		Prompt:         chatReq.Prompt,
-		N:              2,
+		N:              1,
 		Size:           "1024x1024",
 		ResponseFormat: "url",
 		User:           strconv.Itoa(int(utils.GetUserID(c))),
@@ -186,18 +187,57 @@ func (conversationService *ConversationService) OpenAIDrawing(chatReq openfishRe
 	if image, err := client.CreateImage(ctx, imageRequest); err != nil {
 		return err
 	} else {
+		streamResponse := ""
 		for _, img := range image.Data {
 			fmt.Println(img.URL)
-			// TODO oldwei 图片存入本地或者OSS
-			//fmt.Println(img.B64JSON)
+			// 图片存入本地或者OSS
+			oss := upload.NewOss()
+			uploadUrl, _, imgErr := oss.UploadUrl(img.URL, "")
+			if imgErr != nil {
+				return imgErr
+			}
+
 			server := make(map[string]string)
-			server["content"] = "![](" + img.URL + ")"
-			//server["content"] = "<img src=\"data:image/png;base64," + img.B64JSON + "\" alt=\"图片描述\">"
+			server["content"] = "![](" + uploadUrl + ")"
 			marshal, _ := json.Marshal(server)
 			sse.Encode(c.Writer, sse.Event{
 				Data: string(marshal),
 			})
 			c.Writer.Flush()
+			if streamResponse == "" {
+				streamResponse = server["content"]
+			} else {
+				streamResponse = streamResponse + "," + server["content"]
+			}
+		}
+		// 数据存入数据库 预备存储新的聊天记录
+		conversationRecordUser := openfish.ConversationRecord{}
+		conversationRecordUser.Content = chatReq.Prompt
+		conversationRecordUser.Role = "user"
+		conversationRecordUser.ConversationId = chatReq.ConversationId
+		conversationRecordUser.CreatedBy = utils.GetUserID(c)
+		// 最后存储新的对话到数据库 提问
+		if err := conversationService.CreateConversationRecord(&conversationRecordUser); err != nil {
+			global.GVA_LOG.Error("用户提问数据写入异常!", zap.Error(err))
+			response.FailWithMessage("系统异常", c)
+			return err
+		}
+		// 最后存储新的对话到数据库 回答
+		conversationRecordAI := openfish.ConversationRecord{}
+		conversationRecordAI.Content = streamResponse
+		conversationRecordAI.Role = "assistant"
+		conversationRecordAI.ConversationId = chatReq.ConversationId
+		conversationRecordAI.CreatedBy = utils.GetUserID(c)
+		if err := conversationService.CreateConversationRecord(&conversationRecordAI); err != nil {
+			global.GVA_LOG.Error("AI回答数据写入异常!", zap.Error(err))
+			response.FailWithMessage("系统异常", c)
+			return err
+		}
+		// 更新聊天室时间
+		if err := conversationService.UpdateConversationTime(*chatReq.ConversationId); err != nil {
+			global.GVA_LOG.Error("更新聊天室时间异常!", zap.Error(err))
+			response.FailWithMessage("系统异常", c)
+			return err
 		}
 	}
 	return nil

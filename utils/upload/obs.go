@@ -12,6 +12,11 @@ var HuaWeiObs = new(Obs)
 
 type Obs struct{}
 
+func (o *Obs) UploadUrl(fileUrl, filename string) (string, string, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func NewHuaWeiObsClient() (client *obs.ObsClient, err error) {
 	return obs.New(global.GVA_CONFIG.HuaWeiObs.AccessKey, global.GVA_CONFIG.HuaWeiObs.SecretKey, global.GVA_CONFIG.HuaWeiObs.Endpoint)
 }

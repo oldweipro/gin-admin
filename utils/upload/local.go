@@ -16,6 +16,11 @@ import (
 
 type Local struct{}
 
+func (l *Local) UploadUrl(fileUrl, filename string) (string, string, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 //@author: [piexlmax](https://github.com/piexlmax)
 //@author: [ccfish86](https://github.com/ccfish86)
 //@author: [SliverHorn](https://github.com/SliverHorn)

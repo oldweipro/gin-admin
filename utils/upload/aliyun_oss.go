@@ -2,7 +2,11 @@ package upload
 
 import (
 	"errors"
+	"fmt"
 	"mime/multipart"
+	"net/http"
+	"net/url"
+	"strings"
 	"time"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
@@ -32,6 +36,53 @@ func (*AliyunOSS) UploadFile(file *multipart.FileHeader) (string, string, error)
 
 	// 上传文件流。
 	err = bucket.PutObject(yunFileTmpPath, f)
+	if err != nil {
+		global.GVA_LOG.Error("function formUploader.Put() Failed", zap.Any("err", err.Error()))
+		return "", "", errors.New("function formUploader.Put() Failed, err:" + err.Error())
+	}
+
+	return global.GVA_CONFIG.AliyunOSS.BucketUrl + "/" + yunFileTmpPath, yunFileTmpPath, nil
+}
+func (*AliyunOSS) UploadUrl(fileUrl, filename string) (string, string, error) {
+	bucket, err := NewBucket()
+	if err != nil {
+		global.GVA_LOG.Error("function AliyunOSS.NewBucket() Failed", zap.Any("err", err.Error()))
+		return "", "", errors.New("function AliyunOSS.NewBucket() Failed, err:" + err.Error())
+	}
+
+	// 创建自定义的http.Client
+	client := &http.Client{
+		Transport: &http.Transport{
+			// 设置Transport字段为自定义Transport，包含代理设置
+			Proxy: func(req *http.Request) (*url.URL, error) {
+				// 设置代理
+				proxyURL, err := url.Parse("http://127.0.0.1:7890")
+				if err != nil {
+					return nil, err
+				}
+				return proxyURL, nil
+			},
+		},
+	}
+
+	// 上传文件流。
+	resp, imgErr := client.Get(fileUrl)
+
+	defer resp.Body.Close()
+	if imgErr != nil {
+		fmt.Println("同步图片下载失败: ", imgErr)
+		return "", "", imgErr
+	}
+
+	// 上传阿里云路径 文件名格式 自己可以改 建议保证唯一性
+	if filename == "" {
+		imgName := strings.Split(fileUrl, "?")[0]
+		tokens := strings.Split(imgName, "/")
+		filename = tokens[len(tokens)-1]
+	}
+	yunFileTmpPath := global.GVA_CONFIG.AliyunOSS.BasePath + "/" + "uploads" + "/" + time.Now().Format("2006-01-02") + "/" + filename
+
+	err = bucket.PutObject(yunFileTmpPath, resp.Body)
 	if err != nil {
 		global.GVA_LOG.Error("function formUploader.Put() Failed", zap.Any("err", err.Error()))
 		return "", "", errors.New("function formUploader.Put() Failed, err:" + err.Error())

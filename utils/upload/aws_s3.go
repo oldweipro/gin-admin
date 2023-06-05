@@ -18,6 +18,11 @@ import (
 
 type AwsS3 struct{}
 
+func (s *AwsS3) UploadUrl(fileUrl, filename string) (string, string, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 //@author: [WqyJh](https://github.com/WqyJh)
 //@object: *AwsS3
 //@function: UploadFile

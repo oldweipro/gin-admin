@@ -11,6 +11,7 @@ import (
 // Author [ccfish86](https://github.com/ccfish86)
 type OSS interface {
 	UploadFile(file *multipart.FileHeader) (string, string, error)
+	UploadUrl(fileUrl, filename string) (string, string, error)
 	DeleteFile(key string) error
 }
 

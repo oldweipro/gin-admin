@@ -9,7 +9,7 @@ import (
 type Feedback struct {
 	global.GVA_MODEL
 	FeedbackText string `json:"feedbackText" form:"feedbackText" gorm:"column:feedback_text;comment:反馈的文字内容;"`
-	ParentId     *int   `json:"parentId" form:"parentId" gorm:"column:parent_id;comment:反馈的上级ID，主要用于回复;"`
+	ParentId     *int   `json:"parentId" form:"parentId" gorm:"default:0;not null;column:parent_id;comment:反馈的上级ID，主要用于回复;"`
 	CreatedBy    uint   `gorm:"column:created_by;comment:创建者"`
 	UpdatedBy    uint   `gorm:"column:updated_by;comment:更新者"`
 	DeletedBy    uint   `gorm:"column:deleted_by;comment:删除者"`
