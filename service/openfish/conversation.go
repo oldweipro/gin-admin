@@ -349,7 +349,7 @@ func (conversationService *ConversationService) ChatStream(stream *openai.ChatCo
 					response.FailWithMessage("系统异常", c)
 					return err
 				}
-				// 最后存储新的对话到数据库 回答
+				// 最后存储新的对话到数据库 回答 TODO 增加token计数
 				conversationRecordAI := openfish.ConversationRecord{}
 				conversationRecordAI.Content = streamResponse
 				conversationRecordAI.Role = "assistant"
