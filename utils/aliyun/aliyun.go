@@ -8,7 +8,6 @@ import (
 	"github.com/oldweipro/gin-admin/global"
 )
 
-// CreateClient
 func CreateClient() (_result *dysmsapi20170525.Client, _err error) {
 	config := &openapi.Config{
 		AccessKeyId:     tea.String(global.GVA_CONFIG.AliyunOSS.AccessKeyId),
