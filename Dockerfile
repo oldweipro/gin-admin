@@ -16,7 +16,7 @@ LABEL MAINTAINER="SliverHorn@sliver_horn@qq.com"
 
 WORKDIR /go/src/github.com/oldweipro/gin-admin
 
-COPY --from=0 /go/src/github.com/oldweipro/gin-admin/server ./
+COPY --from=0 /go/src/github.com/oldweipro/gin-admin ./
 COPY --from=0 /go/src/github.com/oldweipro/gin-admin/resource ./resource/
 COPY --from=0 /go/src/github.com/oldweipro/gin-admin/config.docker.yaml ./
 
