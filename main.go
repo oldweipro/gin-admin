@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"go.uber.org/zap"
 
 	"github.com/oldweipro/gin-admin/core"
@@ -32,7 +33,12 @@ func main() {
 		initialize.RegisterTables() // 初始化表
 		// 程序结束前关闭数据库链接
 		db, _ := global.DB.DB()
-		defer db.Close()
+		defer func(db *sql.DB) {
+			err := db.Close()
+			if err != nil {
+				global.Logger.Error("关闭数据库连接失败", zap.Error(err))
+			}
+		}(db)
 	}
 	core.RunWindowsServer()
 }

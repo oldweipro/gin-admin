@@ -1,6 +1,7 @@
 package upload
 
 import (
+	"go.uber.org/zap"
 	"mime/multipart"
 
 	"github.com/huaweicloud/huaweicloud-sdk-go-obs/obs"
@@ -27,7 +28,12 @@ func (o *Obs) UploadFile(file *multipart.FileHeader) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer open.Close()
+	defer func(open multipart.File) {
+		err := open.Close()
+		if err != nil {
+			global.Logger.Error("上传文件关闭流失败", zap.Error(err))
+		}
+	}(open)
 	filename := file.Filename
 	input := &obs.PutObjectInput{
 		PutObjectBasicInput: obs.PutObjectBasicInput{

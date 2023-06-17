@@ -13,8 +13,11 @@ type ChatGptApi struct{}
 
 func (chat *ChatGptApi) CreateSK(c *gin.Context) {
 	var option sysModel.SysChatGptOption
-	c.ShouldBindJSON(&option)
-	err := chatGptService.CreateSK(option)
+	err := c.ShouldBindJSON(&option)
+	if err != nil {
+		return
+	}
+	err = chatGptService.CreateSK(option)
 	if err != nil {
 		global.Logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败"+err.Error(), c)
@@ -25,8 +28,11 @@ func (chat *ChatGptApi) CreateSK(c *gin.Context) {
 
 func (chat *ChatGptApi) GetSK(c *gin.Context) {
 	var option sysModel.SysChatGptOption
-	c.ShouldBindJSON(&option)
-	_, err := chatGptService.GetSK()
+	err := c.ShouldBindJSON(&option)
+	if err != nil {
+		return
+	}
+	_, err = chatGptService.GetSK()
 	if err != nil {
 		response.OkWithDetailed(gin.H{
 			"ok": false,

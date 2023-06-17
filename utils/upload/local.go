@@ -53,7 +53,12 @@ func (*Local) UploadFile(file *multipart.FileHeader) (string, string, error) {
 		global.Logger.Error("function file.Open() Filed", zap.Any("err", openError.Error()))
 		return "", "", errors.New("function file.Open() Filed, err:" + openError.Error())
 	}
-	defer f.Close() // 创建文件 defer 关闭
+	defer func(f multipart.File) {
+		err := f.Close()
+		if err != nil {
+			global.Logger.Error("创建文件关闭流失败", zap.Error(err))
+		}
+	}(f) // 创建文件 defer 关闭
 
 	out, createErr := os.Create(p)
 	if createErr != nil {
@@ -61,7 +66,12 @@ func (*Local) UploadFile(file *multipart.FileHeader) (string, string, error) {
 
 		return "", "", errors.New("function os.Create() Filed, err:" + createErr.Error())
 	}
-	defer out.Close() // 创建文件 defer 关闭
+	defer func(out *os.File) {
+		err := out.Close()
+		if err != nil {
+			global.Logger.Error("创建文件关闭流失败", zap.Error(err))
+		}
+	}(out) // 创建文件 defer 关闭
 
 	_, copyErr := io.Copy(out, f) // 传输（拷贝）文件
 	if copyErr != nil {

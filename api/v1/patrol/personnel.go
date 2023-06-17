@@ -18,13 +18,19 @@ var personnelService = service.ServiceGroupApp.PatrolServiceGroup.PersonnelServi
 
 // SyncPersonnel 同步人员信息
 func (personnelApi *PersonnelApi) SyncPersonnel(c *gin.Context) {
-	personnelService.SyncPersonnel()
+	err := personnelService.SyncPersonnel()
+	if err != nil {
+		return
+	}
 	response.OkWithMessage("调用成功", c)
 }
 
 // SyncPersonnelImg 同步人员图片信息
 func (personnelApi *PersonnelApi) SyncPersonnelImg(c *gin.Context) {
-	personnelService.SyncPersonnelImg()
+	err := personnelService.SyncPersonnelImg()
+	if err != nil {
+		return
+	}
 	response.OkWithMessage("调用成功", c)
 }
 

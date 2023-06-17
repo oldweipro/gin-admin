@@ -7,19 +7,19 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type writer struct {
+type Writer struct {
 	logger.Writer
 }
 
 // NewWriter writer 构造函数
 // Author [SliverHorn](https://github.com/SliverHorn)
-func NewWriter(w logger.Writer) *writer {
-	return &writer{Writer: w}
+func NewWriter(w logger.Writer) *Writer {
+	return &Writer{Writer: w}
 }
 
 // Printf 格式化打印日志
 // Author [SliverHorn](https://github.com/SliverHorn)
-func (w *writer) Printf(message string, data ...interface{}) {
+func (w *Writer) Printf(message string, data ...interface{}) {
 	var logZap bool
 	switch global.ConfigServer.System.DbType {
 	case "mysql":

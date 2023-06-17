@@ -30,7 +30,12 @@ func (*TencentCOS) UploadFile(file *multipart.FileHeader) (string, string, error
 		global.Logger.Error("function file.Open() Filed", zap.Any("err", openError.Error()))
 		return "", "", errors.New("function file.Open() Filed, err:" + openError.Error())
 	}
-	defer f.Close() // 创建文件 defer 关闭
+	defer func(f multipart.File) {
+		err := f.Close()
+		if err != nil {
+			global.Logger.Error("创建文件关闭流失败", zap.Error(err))
+		}
+	}(f) // 创建文件 defer 关闭
 	fileKey := fmt.Sprintf("%d%s", time.Now().Unix(), file.Filename)
 
 	_, err := client.Object.Put(context.Background(), global.ConfigServer.TencentCOS.PathPrefix+"/"+fileKey, f, nil)
