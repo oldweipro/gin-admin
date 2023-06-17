@@ -44,7 +44,7 @@ func (chatTicketApi *ChatTicketApi) CreateChatTicket(c *gin.Context) {
 		return
 	}
 	if err := chatTicketService.CreateChatTicket(&chatTicket); err != nil {
-		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		global.Logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
@@ -69,7 +69,7 @@ func (chatTicketApi *ChatTicketApi) DeleteChatTicket(c *gin.Context) {
 	}
 	chatTicket.DeletedBy = utils.GetUserID(c)
 	if err := chatTicketService.DeleteChatTicket(chatTicket); err != nil {
-		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		global.Logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -94,7 +94,7 @@ func (chatTicketApi *ChatTicketApi) DeleteChatTicketByIds(c *gin.Context) {
 	}
 	deletedBy := utils.GetUserID(c)
 	if err := chatTicketService.DeleteChatTicketByIds(IDS, deletedBy); err != nil {
-		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
+		global.Logger.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -128,7 +128,7 @@ func (chatTicketApi *ChatTicketApi) UpdateChatTicket(c *gin.Context) {
 		return
 	}
 	if err := chatTicketService.UpdateChatTicket(chatTicket); err != nil {
-		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		global.Logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -152,7 +152,7 @@ func (chatTicketApi *ChatTicketApi) FindChatTicket(c *gin.Context) {
 		return
 	}
 	if rechatTicket, err := chatTicketService.GetChatTicket(chatTicket.ID); err != nil {
-		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"rechatTicket": rechatTicket}, c)
@@ -176,7 +176,7 @@ func (chatTicketApi *ChatTicketApi) GetChatTicketList(c *gin.Context) {
 		return
 	}
 	if list, total, err := chatTicketService.GetChatTicketInfoList(pageInfo); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
 		response.OkWithDetailed(response.PageResult{
@@ -207,7 +207,7 @@ func (chatTicketApi *ChatTicketApi) HandleValidateChatTicket(c *gin.Context) {
 		return
 	}
 	if err := chatTicketService.HandleValidateChatTicket(chatTicket.TicketValue, &wallets); err != nil {
-		global.GVA_LOG.Error("验证失败!", zap.Error(err))
+		global.Logger.Error("验证失败!", zap.Error(err))
 		response.FailWithMessage("验证失败", c)
 	} else {
 		response.OkWithMessage("验证成果", c)

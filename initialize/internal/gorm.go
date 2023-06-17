@@ -35,15 +35,15 @@ func (g *_gorm) Config(prefix string, singular bool) *gorm.Config {
 		Colorful:      true,
 	})
 	var logMode DBBASE
-	switch global.GVA_CONFIG.System.DbType {
+	switch global.ConfigServer.System.DbType {
 	case "mysql":
-		logMode = &global.GVA_CONFIG.Mysql
+		logMode = &global.ConfigServer.Mysql
 	case "pgsql":
-		logMode = &global.GVA_CONFIG.Pgsql
+		logMode = &global.ConfigServer.Pgsql
 	case "oracle":
-		logMode = &global.GVA_CONFIG.Oracle
+		logMode = &global.ConfigServer.Oracle
 	default:
-		logMode = &global.GVA_CONFIG.Mysql
+		logMode = &global.ConfigServer.Mysql
 	}
 
 	switch logMode.GetLogMode() {

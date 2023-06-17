@@ -14,14 +14,14 @@ type FeedbackService struct {
 // CreateFeedback 创建Feedback记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (feedbackService *FeedbackService) CreateFeedback(feedback *openfish.Feedback) (err error) {
-	err = global.GVA_DB.Create(feedback).Error
+	err = global.DB.Create(feedback).Error
 	return err
 }
 
 // DeleteFeedback 删除Feedback记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (feedbackService *FeedbackService) DeleteFeedback(feedback openfish.Feedback) (err error) {
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&openfish.Feedback{}).Where("id = ?", feedback.ID).Update("deleted_by", feedback.DeletedBy).Error; err != nil {
 			return err
 		}
@@ -36,7 +36,7 @@ func (feedbackService *FeedbackService) DeleteFeedback(feedback openfish.Feedbac
 // DeleteFeedbackByIds 批量删除Feedback记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (feedbackService *FeedbackService) DeleteFeedbackByIds(ids request.IdsReq, deleted_by uint) (err error) {
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&openfish.Feedback{}).Where("id in ?", ids.Ids).Update("deleted_by", deleted_by).Error; err != nil {
 			return err
 		}
@@ -51,14 +51,14 @@ func (feedbackService *FeedbackService) DeleteFeedbackByIds(ids request.IdsReq, 
 // UpdateFeedback 更新Feedback记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (feedbackService *FeedbackService) UpdateFeedback(feedback openfish.Feedback) (err error) {
-	err = global.GVA_DB.Save(&feedback).Error
+	err = global.DB.Save(&feedback).Error
 	return err
 }
 
 // GetFeedback 根据id获取Feedback记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (feedbackService *FeedbackService) GetFeedback(id uint) (feedback openfish.Feedback, err error) {
-	err = global.GVA_DB.Where("id = ?", id).First(&feedback).Error
+	err = global.DB.Where("id = ?", id).First(&feedback).Error
 	return
 }
 
@@ -68,7 +68,7 @@ func (feedbackService *FeedbackService) GetFeedbackInfoList(info openfishReq.Fee
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&openfish.Feedback{})
+	db := global.DB.Model(&openfish.Feedback{})
 	var feedbacks []openfish.FeedbackVo
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.CreatedBy != 0 {

@@ -49,7 +49,7 @@ func (conversationApi *ConversationApi) OpenAIDrawing(c *gin.Context) {
 	// 校验prompt是否为空
 	if chatReq.Prompt == "" || chatReq.ConversationId == nil {
 		response.FailWithMessage("系统错误，缺少必要参数。", c)
-		global.GVA_LOG.Error("系统错误，缺少必要参数。")
+		global.Logger.Error("系统错误，缺少必要参数。")
 		return
 	}
 	// md5校验参数
@@ -93,7 +93,7 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 	// 校验prompt是否为空
 	if chatReq.Prompt == "" || chatReq.ConversationId == nil {
 		response.FailWithMessage("系统错误，缺少必要参数。", c)
-		global.GVA_LOG.Error("系统错误，缺少必要参数。")
+		global.Logger.Error("系统错误，缺少必要参数。")
 		return
 	}
 	// md5校验参数
@@ -132,7 +132,7 @@ func (conversationApi *ConversationApi) CreateConversation(c *gin.Context) {
 	}
 	conversation.CreatedBy = utils.GetUserID(c)
 	if err := conversationService.CreateConversation(&conversation); err != nil {
-		global.GVA_LOG.Error("创建会话失败!", zap.Error(err))
+		global.Logger.Error("创建会话失败!", zap.Error(err))
 		response.FailWithMessage("系统异常", c)
 		return
 	}
@@ -148,7 +148,7 @@ func (conversationApi *ConversationApi) CreateConversation(c *gin.Context) {
 	conversationRecord.ConversationId = &conversation.ID
 	conversationRecord.CreatedBy = utils.GetUserID(c)
 	if err := conversationService.CreateConversationRecord(&conversationRecord); err != nil {
-		global.GVA_LOG.Error("AI会话创建失败!", zap.Error(err))
+		global.Logger.Error("AI会话创建失败!", zap.Error(err))
 		response.FailWithMessage("系统异常", c)
 	} else {
 		response.OkWithData(gin.H{"conversationId": conversation.ID}, c)
@@ -173,7 +173,7 @@ func (conversationApi *ConversationApi) DeleteConversation(c *gin.Context) {
 	}
 	conversation.DeletedBy = utils.GetUserID(c)
 	if err := conversationService.DeleteConversation(conversation); err != nil {
-		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		global.Logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -198,7 +198,7 @@ func (conversationApi *ConversationApi) DeleteConversationByIds(c *gin.Context) 
 	}
 	deletedBy := utils.GetUserID(c)
 	if err := conversationService.DeleteConversationByIds(IDS, deletedBy); err != nil {
-		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
+		global.Logger.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -223,7 +223,7 @@ func (conversationApi *ConversationApi) UpdateConversation(c *gin.Context) {
 	}
 	conversation.UpdatedBy = utils.GetUserID(c)
 	if err := conversationService.UpdateConversation(conversation); err != nil {
-		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		global.Logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -246,7 +246,7 @@ func (conversationApi *ConversationApi) UpdateConversationName(c *gin.Context) {
 	getConversation.ConversationName = conversation.ConversationName
 	getConversation.UpdatedBy = utils.GetUserID(c)
 	if err := conversationService.UpdateConversation(getConversation); err != nil {
-		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		global.Logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -270,7 +270,7 @@ func (conversationApi *ConversationApi) FindConversation(c *gin.Context) {
 		return
 	}
 	if reconversation, err := conversationService.GetConversation(conversation.ID); err != nil {
-		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"reconversation": reconversation}, c)
@@ -294,7 +294,7 @@ func (conversationApi *ConversationApi) GetConversationList(c *gin.Context) {
 		return
 	}
 	if list, total, err := conversationService.GetConversationInfoList(pageInfo); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
 		response.OkWithDetailed(response.PageResult{
@@ -336,7 +336,7 @@ func (conversationApi *ConversationApi) GetCurrentUserConversationList(c *gin.Co
 		conversation.ConversationType = *chatReq.ConversationType
 		conversation.CreatedBy = utils.GetUserID(c)
 		if err := conversationService.CreateConversation(&conversation); err != nil {
-			global.GVA_LOG.Error("创建会话失败!", zap.Error(err))
+			global.Logger.Error("创建会话失败!", zap.Error(err))
 			response.FailWithMessage("系统异常", c)
 			return
 		}
@@ -351,7 +351,7 @@ func (conversationApi *ConversationApi) GetCurrentUserConversationList(c *gin.Co
 		conversationRecord.ConversationId = &conversation.ID
 		conversationRecord.CreatedBy = utils.GetUserID(c)
 		if err := conversationService.CreateConversationRecord(&conversationRecord); err != nil {
-			global.GVA_LOG.Error("AI会话创建失败!", zap.Error(err))
+			global.Logger.Error("AI会话创建失败!", zap.Error(err))
 			response.FailWithMessage("系统异常", c)
 			return
 		}

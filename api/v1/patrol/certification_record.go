@@ -55,9 +55,9 @@ func (certificationRecordApi *CertificationRecordApi) CreateCertificationRecord(
 	idRe18 := `^([1-6][1-9]|50)\d{4}(18|19|20)\d{2}((0[1-9])|10|11|12)(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$`
 	idRe15 := `^([1-6][1-9]|50)\d{4}\d{2}((0[1-9])|10|11|12)(([0-2][1-9])|10|20|30|31)\d{3}$`
 	if regexp.MustCompile(idRe18).MatchString(certificationRecord.CertificationIdCard) || regexp.MustCompile(idRe15).MatchString(certificationRecord.CertificationIdCard) {
-		global.GVA_LOG.Info("身份证号码正则校验通过✅")
+		global.Logger.Info("身份证号码正则校验通过✅")
 	} else {
-		global.GVA_LOG.Error("身份证号码正则校验失败")
+		global.Logger.Error("身份证号码正则校验失败")
 		response.FailWithMessage("请输入正确的身份证号", c)
 		return
 	}
@@ -92,10 +92,10 @@ func (certificationRecordApi *CertificationRecordApi) CreateCertificationRecord(
 			} else {
 				certificationRecord.CertificationMsg = "没有账号了"
 				// 没有账号可用了
-				global.GVA_LOG.Error("没有账号可用了!")
+				global.Logger.Error("没有账号可用了!")
 			}
 		}
-		global.GVA_LOG.Info("登陆的账号" + account.AccountName)
+		global.Logger.Info("登陆的账号" + account.AccountName)
 		// 发起认证
 		m, err := certificationRecordApi.CertificationGameApi(certificationRecord.CertificationRealName, certificationRecord.CertificationIdCard, account)
 		if err != nil {
@@ -113,16 +113,16 @@ func (certificationRecordApi *CertificationRecordApi) CreateCertificationRecord(
 		certificationRecord.CertificationMsg = msg
 		jsonStr, _ := json.Marshal(m)
 		certificationRecord.CertificationResult = string(jsonStr)
-		global.GVA_LOG.Info(string(jsonStr))
+		global.Logger.Info(string(jsonStr))
 		if status == 1 {
 			var identity patrol.Identity
 			identity.CreatedBy = utils.GetUserID(c)
 			identity.RealName = certificationRecord.CertificationRealName
 			identity.IdCard = certificationRecord.CertificationIdCard
 			if err := identityService.CreateIdentity(identity); err != nil {
-				global.GVA_LOG.Error("创建失败!", zap.Error(err))
+				global.Logger.Error("创建失败!", zap.Error(err))
 			} else {
-				global.GVA_LOG.Info("实名信息创建成功!")
+				global.Logger.Info("实名信息创建成功!")
 			}
 			response.OkWithMessage(msg, c)
 		} else {
@@ -130,7 +130,7 @@ func (certificationRecordApi *CertificationRecordApi) CreateCertificationRecord(
 		}
 	}
 	if err := certificationRecordService.CreateCertificationRecord(certificationRecord); err != nil {
-		global.GVA_LOG.Error("数据库存储认证记录失败!", zap.Error(err))
+		global.Logger.Error("数据库存储认证记录失败!", zap.Error(err))
 	}
 }
 
@@ -145,16 +145,16 @@ func (certificationRecordApi *CertificationRecordApi) CertificationGameApi(realN
 	resp, err := http.Get("" + params)
 	defer resp.Body.Close()
 	if err != nil {
-		global.GVA_LOG.Error("发起请求失败!", zap.Error(err))
+		global.Logger.Error("发起请求失败!", zap.Error(err))
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		global.GVA_LOG.Error("读取返回结果失败!", zap.Error(err))
+		global.Logger.Error("读取返回结果失败!", zap.Error(err))
 	}
 	m := make(map[string]interface{})
 	err = json.Unmarshal(body, &m)
 	if err != nil {
-		global.GVA_LOG.Error("结果解析错误!", zap.Error(err))
+		global.Logger.Error("结果解析错误!", zap.Error(err))
 	}
 	msg := m["msg"].(string)
 	if strings.Contains(msg, "已锁定") {
@@ -163,7 +163,7 @@ func (certificationRecordApi *CertificationRecordApi) CertificationGameApi(realN
 		account.LoginStatus = &loginStatusLock
 		account.UpdatedBy = 1
 		accountService.UpdateAccount(account)
-		global.GVA_LOG.Error("账号锁定了，把loginStatus状态码设置为2!")
+		global.Logger.Error("账号锁定了，把loginStatus状态码设置为2!")
 		// 当前账号被🔒锁定了，需要登陆一下新的账号了，方便下一次接口调用时可以提供服务
 		gameAccount, b := certificationRecordApi.LoginNewGameAccount()
 		if b {
@@ -177,11 +177,11 @@ func (certificationRecordApi *CertificationRecordApi) CertificationGameApi(realN
 		account.LoginStatus = &loginStatus
 		gameAccount, _ := accountService.LoginGameAccount(account)
 		if gameAccount == "<script type=\"text/javascript\">top.location=\"http:\\/\\/www.9377.com\";</script>" {
-			global.GVA_LOG.Info("登陆已过期的游戏账号成功！")
+			global.Logger.Info("登陆已过期的游戏账号成功！")
 			// 递归一下
 			return certificationRecordApi.CertificationGameApi(realName, idCard, account)
 		} else {
-			global.GVA_LOG.Error("登陆失败!页面返回错误")
+			global.Logger.Error("登陆失败!页面返回错误")
 		}
 	}
 	return m, err
@@ -202,14 +202,14 @@ func (certificationRecordApi *CertificationRecordApi) LoginNewGameAccount() (pat
 		account.LoginStatus = &loginStatus
 		gameAccount, _ := accountService.LoginGameAccount(account)
 		if strings.Contains(gameAccount, "<script type=\"text/javascript\">top.location=\"http:") {
-			global.GVA_LOG.Info("登陆原来可用的游戏账号成功！")
+			global.Logger.Info("登陆原来可用的游戏账号成功！")
 			return account, true
 		} else {
-			global.GVA_LOG.Error("登陆失败!页面返回错误")
+			global.Logger.Error("登陆失败!页面返回错误")
 			return account, false
 		}
 	} else {
-		global.GVA_LOG.Error("😭😭😭是真的没有账号可用了!注册新账号吧！并且给自动登陆上")
+		global.Logger.Error("😭😭😭是真的没有账号可用了!注册新账号吧！并且给自动登陆上")
 		// 没有的话那就给他再造些
 		s := time.Now().Unix()
 		username := "atx" + strconv.FormatInt(s, 10)
@@ -221,7 +221,7 @@ func (certificationRecordApi *CertificationRecordApi) LoginNewGameAccount() (pat
 			accountRegister.LoginStatus = &loginStatus
 			gameAccount, _ := accountService.LoginGameAccount(accountRegister)
 			if strings.Contains(gameAccount, "<script type=\"text/javascript\">top.location=\"http:") {
-				global.GVA_LOG.Info("登陆新注册的游戏账号成功！")
+				global.Logger.Info("登陆新注册的游戏账号成功！")
 				accountResult := patrolReq.AccountSearch{}
 				accountResult.AccountName = username
 				// 获取可用的账号
@@ -232,11 +232,11 @@ func (certificationRecordApi *CertificationRecordApi) LoginNewGameAccount() (pat
 					return patrol.Account{}, false
 				}
 			} else {
-				global.GVA_LOG.Error("登陆失败!页面返回错误")
+				global.Logger.Error("登陆失败!页面返回错误")
 				return patrol.Account{}, false
 			}
 		}
-		global.GVA_LOG.Error("注册账号发生错误🙅❌!")
+		global.Logger.Error("注册账号发生错误🙅❌!")
 		return patrol.Account{}, false
 	}
 }
@@ -246,7 +246,7 @@ func (certificationRecordApi *CertificationRecordApi) RegisterMember(username st
 		"&userid="+username+"&NAME=&password="+username+"&ID_CARD_NUMBER=&js_callback=requestCallback", nil)
 	if err != nil {
 		// handle err
-		global.GVA_LOG.Error("请求报错了!")
+		global.Logger.Error("请求报错了!")
 	}
 	req.Header.Set("Accept", "*/*")
 	req.Header.Set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
@@ -263,14 +263,14 @@ func (certificationRecordApi *CertificationRecordApi) RegisterMember(username st
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		// handle err
-		global.GVA_LOG.Error("注册失败了!")
+		global.Logger.Error("注册失败了!")
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	v := string(body)
-	global.GVA_LOG.Info("注册游戏账号结果！" + v)
+	global.Logger.Info("注册游戏账号结果！" + v)
 	if strings.Contains(v, "game_login.php?game=wz&server=1917&username=atx") {
-		global.GVA_LOG.Info("注册成功")
+		global.Logger.Info("注册成功")
 		return true
 	}
 	return false
@@ -294,7 +294,7 @@ func (certificationRecordApi *CertificationRecordApi) DeleteCertificationRecord(
 	}
 	certificationRecord.DeletedBy = utils.GetUserID(c)
 	if err := certificationRecordService.DeleteCertificationRecord(certificationRecord); err != nil {
-		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		global.Logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -319,7 +319,7 @@ func (certificationRecordApi *CertificationRecordApi) DeleteCertificationRecordB
 	}
 	deletedBy := utils.GetUserID(c)
 	if err := certificationRecordService.DeleteCertificationRecordByIds(IDS, deletedBy); err != nil {
-		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
+		global.Logger.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -352,7 +352,7 @@ func (certificationRecordApi *CertificationRecordApi) UpdateCertificationRecord(
 		return
 	}
 	if err := certificationRecordService.UpdateCertificationRecord(certificationRecord); err != nil {
-		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		global.Logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -376,7 +376,7 @@ func (certificationRecordApi *CertificationRecordApi) FindCertificationRecord(c 
 		return
 	}
 	if recertificationRecord, err := certificationRecordService.GetCertificationRecord(certificationRecord.ID); err != nil {
-		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"recertificationRecord": recertificationRecord}, c)
@@ -400,7 +400,7 @@ func (certificationRecordApi *CertificationRecordApi) GetCertificationRecordList
 		return
 	}
 	if list, total, err := certificationRecordService.GetCertificationRecordInfoList(pageInfo); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
 		response.OkWithDetailed(response.PageResult{

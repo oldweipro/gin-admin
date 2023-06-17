@@ -42,7 +42,7 @@ func (feedbackApi *FeedbackApi) CreateFeedback(c *gin.Context) {
 		return
 	}
 	if err := feedbackService.CreateFeedback(&feedback); err != nil {
-		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		global.Logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
@@ -67,7 +67,7 @@ func (feedbackApi *FeedbackApi) DeleteFeedback(c *gin.Context) {
 	}
 	feedback.DeletedBy = utils.GetUserID(c)
 	if err := feedbackService.DeleteFeedback(feedback); err != nil {
-		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		global.Logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -92,7 +92,7 @@ func (feedbackApi *FeedbackApi) DeleteFeedbackByIds(c *gin.Context) {
 	}
 	deletedBy := utils.GetUserID(c)
 	if err := feedbackService.DeleteFeedbackByIds(IDS, deletedBy); err != nil {
-		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
+		global.Logger.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -126,7 +126,7 @@ func (feedbackApi *FeedbackApi) UpdateFeedback(c *gin.Context) {
 		return
 	}
 	if err := feedbackService.UpdateFeedback(feedback); err != nil {
-		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		global.Logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -150,7 +150,7 @@ func (feedbackApi *FeedbackApi) FindFeedback(c *gin.Context) {
 		return
 	}
 	if refeedback, err := feedbackService.GetFeedback(feedback.ID); err != nil {
-		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"refeedback": refeedback}, c)
@@ -178,7 +178,7 @@ func (feedbackApi *FeedbackApi) GetFeedbackList(c *gin.Context) {
 		pageInfo.CreatedBy = utils.GetUserID(c)
 	}
 	if list, total, err := feedbackService.GetFeedbackInfoList(pageInfo); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
 		// list要处理一下，还需要把pid不为0的作为回复组装一下，这个回复再思考一下吧

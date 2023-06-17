@@ -42,7 +42,7 @@ func (productApi *ProductApi) CreateProduct(c *gin.Context) {
 		return
 	}
 	if err := productService.CreateProduct(&product); err != nil {
-		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		global.Logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
@@ -66,7 +66,7 @@ func (productApi *ProductApi) DeleteProduct(c *gin.Context) {
 		return
 	}
 	if err := productService.DeleteProduct(product); err != nil {
-		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		global.Logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -90,7 +90,7 @@ func (productApi *ProductApi) DeleteProductByIds(c *gin.Context) {
 		return
 	}
 	if err := productService.DeleteProductByIds(IDS); err != nil {
-		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
+		global.Logger.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -122,7 +122,7 @@ func (productApi *ProductApi) UpdateProduct(c *gin.Context) {
 		return
 	}
 	if err := productService.UpdateProduct(product); err != nil {
-		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		global.Logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -146,7 +146,7 @@ func (productApi *ProductApi) FindProduct(c *gin.Context) {
 		return
 	}
 	if reproduct, err := productService.GetProduct(product.ID); err != nil {
-		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"reproduct": reproduct}, c)
@@ -170,7 +170,7 @@ func (productApi *ProductApi) GetProductList(c *gin.Context) {
 		return
 	}
 	if list, total, err := productService.GetProductInfoList(pageInfo); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
 		response.OkWithDetailed(response.PageResult{

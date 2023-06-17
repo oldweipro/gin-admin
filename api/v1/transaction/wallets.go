@@ -41,7 +41,7 @@ func (walletsApi *WalletsApi) CreateWallets(c *gin.Context) {
 		return
 	}
 	if err := walletsService.CreateWallets(&wallets); err != nil {
-		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		global.Logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
@@ -65,7 +65,7 @@ func (walletsApi *WalletsApi) DeleteWallets(c *gin.Context) {
 		return
 	}
 	if err := walletsService.DeleteWallets(wallets); err != nil {
-		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		global.Logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -89,7 +89,7 @@ func (walletsApi *WalletsApi) DeleteWalletsByIds(c *gin.Context) {
 		return
 	}
 	if err := walletsService.DeleteWalletsByIds(IDS); err != nil {
-		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
+		global.Logger.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -120,7 +120,7 @@ func (walletsApi *WalletsApi) UpdateWallets(c *gin.Context) {
 		return
 	}
 	if err := walletsService.UpdateWallets(wallets); err != nil {
-		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		global.Logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -144,7 +144,7 @@ func (walletsApi *WalletsApi) FindWallets(c *gin.Context) {
 		return
 	}
 	if rewallets, err := walletsService.GetWallets(wallets.ID); err != nil {
-		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"rewallets": rewallets}, c)
@@ -168,7 +168,7 @@ func (walletsApi *WalletsApi) GetWalletsList(c *gin.Context) {
 		return
 	}
 	if list, total, err := walletsService.GetWalletsInfoList(pageInfo); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
 		response.OkWithDetailed(response.PageResult{
@@ -184,7 +184,7 @@ func (walletsApi *WalletsApi) GetWalletsList(c *gin.Context) {
 func (walletsApi *WalletsApi) GetCurrentUserWallets(c *gin.Context) {
 	userID := utils.GetUserID(c)
 	if wallets, err := walletsService.GetCurrentUserWallets(userID); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
 		response.OkWithDetailed(wallets, "获取成功", c)

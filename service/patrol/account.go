@@ -19,14 +19,14 @@ type AccountService struct {
 // CreateAccount 创建Account记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (accountService *AccountService) CreateAccount(account patrol.Account) (err error) {
-	err = global.GVA_DB.Create(&account).Error
+	err = global.DB.Create(&account).Error
 	return err
 }
 
 // DeleteAccount 删除Account记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (accountService *AccountService) DeleteAccount(account patrol.Account) (err error) {
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&patrol.Account{}).Where("id = ?", account.ID).Update("deleted_by", account.DeletedBy).Error; err != nil {
 			return err
 		}
@@ -41,7 +41,7 @@ func (accountService *AccountService) DeleteAccount(account patrol.Account) (err
 // DeleteAccountByIds 批量删除Account记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (accountService *AccountService) DeleteAccountByIds(ids request.IdsReq, deleted_by uint) (err error) {
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&patrol.Account{}).Where("id in ?", ids.Ids).Update("deleted_by", deleted_by).Error; err != nil {
 			return err
 		}
@@ -56,14 +56,14 @@ func (accountService *AccountService) DeleteAccountByIds(ids request.IdsReq, del
 // UpdateAccount 更新Account记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (accountService *AccountService) UpdateAccount(account patrol.Account) (err error) {
-	err = global.GVA_DB.Save(&account).Error
+	err = global.DB.Save(&account).Error
 	return err
 }
 
 // GetAccount 根据id获取Account记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (accountService *AccountService) GetAccount(id uint) (account patrol.Account, err error) {
-	err = global.GVA_DB.Where("id = ?", id).First(&account).Error
+	err = global.DB.Where("id = ?", id).First(&account).Error
 	return
 }
 
@@ -73,7 +73,7 @@ func (accountService *AccountService) GetAccountInfoList(info patrolReq.AccountS
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&patrol.Account{})
+	db := global.DB.Model(&patrol.Account{})
 	var accounts []patrol.Account
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {
@@ -113,13 +113,13 @@ func (accountService *AccountService) LoginGameAccount(account patrol.Account) (
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	bodyResult := string(body)
-	global.GVA_LOG.Info("登陆游戏账号返回结果: " + bodyResult)
+	global.Logger.Info("登陆游戏账号返回结果: " + bodyResult)
 	if err != nil {
 		// handle error
-		global.GVA_LOG.Error("登陆失败!", zap.Error(err))
+		global.Logger.Error("登陆失败!", zap.Error(err))
 	}
 	if err := accountService.UpdateAccount(account); err != nil {
-		global.GVA_LOG.Error("登陆失败,数据库更新失败!", zap.Error(err))
+		global.Logger.Error("登陆失败,数据库更新失败!", zap.Error(err))
 		return bodyResult, err
 	}
 	return bodyResult, err

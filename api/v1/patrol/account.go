@@ -43,7 +43,7 @@ func (accountApi *AccountApi) CreateAccount(c *gin.Context) {
 		return
 	}
 	if err := accountService.CreateAccount(account); err != nil {
-		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		global.Logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
@@ -68,7 +68,7 @@ func (accountApi *AccountApi) DeleteAccount(c *gin.Context) {
 	}
 	account.DeletedBy = utils.GetUserID(c)
 	if err := accountService.DeleteAccount(account); err != nil {
-		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		global.Logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -93,7 +93,7 @@ func (accountApi *AccountApi) DeleteAccountByIds(c *gin.Context) {
 	}
 	deletedBy := utils.GetUserID(c)
 	if err := accountService.DeleteAccountByIds(IDS, deletedBy); err != nil {
-		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
+		global.Logger.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -125,7 +125,7 @@ func (accountApi *AccountApi) UpdateAccount(c *gin.Context) {
 		return
 	}
 	if err := accountService.UpdateAccount(account); err != nil {
-		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		global.Logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -149,7 +149,7 @@ func (accountApi *AccountApi) FindAccount(c *gin.Context) {
 		return
 	}
 	if reaccount, err := accountService.GetAccount(account.ID); err != nil {
-		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"reaccount": reaccount}, c)
@@ -173,7 +173,7 @@ func (accountApi *AccountApi) GetAccountList(c *gin.Context) {
 		return
 	}
 	if list, total, err := accountService.GetAccountInfoList(pageInfo); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
 		response.OkWithDetailed(response.PageResult{

@@ -15,15 +15,15 @@ import (
 func Timer() {
 	//var certificationRecordApi = v1.ApiGroupApp.PatrolApiGroup.CertificationRecordApi
 	//var personnelService = service.ServiceGroupApp.PatrolServiceGroup.PersonnelService
-	if global.GVA_CONFIG.Timer.Start {
-		for i := range global.GVA_CONFIG.Timer.Detail {
+	if global.ConfigServer.Timer.Start {
+		for i := range global.ConfigServer.Timer.Detail {
 			go func(detail config.Detail) {
 				var option []cron.Option
-				if global.GVA_CONFIG.Timer.WithSeconds {
+				if global.ConfigServer.Timer.WithSeconds {
 					option = append(option, cron.WithSeconds())
 				}
-				_, err := global.GVA_Timer.AddTaskByFunc("ClearDB", global.GVA_CONFIG.Timer.Spec, func() {
-					err := utils.ClearTable(global.GVA_DB, detail.TableName, detail.CompareField, detail.Interval)
+				_, err := global.Timer.AddTaskByFunc("ClearDB", global.ConfigServer.Timer.Spec, func() {
+					err := utils.ClearTable(global.DB, detail.TableName, detail.CompareField, detail.Interval)
 					if err != nil {
 						fmt.Println("timer error:", err)
 					}
@@ -31,12 +31,12 @@ func Timer() {
 				if err != nil {
 					fmt.Println("add timer error:", err)
 				}
-			}(global.GVA_CONFIG.Timer.Detail[i])
+			}(global.ConfigServer.Timer.Detail[i])
 		}
 		// 每天重置被锁定的账号：account表中loginStatus重置为0
 		//_, err := global.GVA_Timer.AddTaskByFunc("ResetGameAccount", "0 3 * * *", func() {
 		//	// 重置所有account表中login_status=0，current_calls=0
-		//	global.GVA_DB.Exec("UPDATE account SET login_status=0, current_calls=0 WHERE deleted_by=0")
+		//	global.DB.Exec("UPDATE account SET login_status=0, current_calls=0 WHERE deleted_by=0")
 		//	// 登陆其中一个账号
 		//	//certificationRecordApi.LoginNewGameAccount()
 		//	fmt.Println("每天重置被锁定的账号,定时任务执行完毕")

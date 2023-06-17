@@ -16,14 +16,14 @@ type ChatTicketService struct {
 // CreateChatTicket 创建ChatTicket记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (chatTicketService *ChatTicketService) CreateChatTicket(chatTicket *transaction.ChatTicket) (err error) {
-	err = global.GVA_DB.Create(chatTicket).Error
+	err = global.DB.Create(chatTicket).Error
 	return err
 }
 
 // DeleteChatTicket 删除ChatTicket记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (chatTicketService *ChatTicketService) DeleteChatTicket(chatTicket transaction.ChatTicket) (err error) {
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&transaction.ChatTicket{}).Where("id = ?", chatTicket.ID).Update("deleted_by", chatTicket.DeletedBy).Error; err != nil {
 			return err
 		}
@@ -38,7 +38,7 @@ func (chatTicketService *ChatTicketService) DeleteChatTicket(chatTicket transact
 // DeleteChatTicketByIds 批量删除ChatTicket记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (chatTicketService *ChatTicketService) DeleteChatTicketByIds(ids request.IdsReq, deleted_by uint) (err error) {
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&transaction.ChatTicket{}).Where("id in ?", ids.Ids).Update("deleted_by", deleted_by).Error; err != nil {
 			return err
 		}
@@ -53,14 +53,14 @@ func (chatTicketService *ChatTicketService) DeleteChatTicketByIds(ids request.Id
 // UpdateChatTicket 更新ChatTicket记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (chatTicketService *ChatTicketService) UpdateChatTicket(chatTicket transaction.ChatTicket) (err error) {
-	err = global.GVA_DB.Save(&chatTicket).Error
+	err = global.DB.Save(&chatTicket).Error
 	return err
 }
 
 // GetChatTicket 根据id获取ChatTicket记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (chatTicketService *ChatTicketService) GetChatTicket(id uint) (chatTicket transaction.ChatTicket, err error) {
-	err = global.GVA_DB.Where("id = ?", id).First(&chatTicket).Error
+	err = global.DB.Where("id = ?", id).First(&chatTicket).Error
 	return
 }
 
@@ -70,7 +70,7 @@ func (chatTicketService *ChatTicketService) GetChatTicketInfoList(info openfishR
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&transaction.ChatTicket{})
+	db := global.DB.Model(&transaction.ChatTicket{})
 	var chatTickets []transaction.ChatTicket
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {
@@ -97,12 +97,12 @@ func (chatTicketService *ChatTicketService) GetChatTicketInfoList(info openfishR
 // HandleValidateChatTicket 验证鱼币兑换码
 func (chatTicketService *ChatTicketService) HandleValidateChatTicket(ticketValue string, wallets *transaction.Wallets) (err error) {
 	var chatTicket transaction.ChatTicket
-	err = global.GVA_DB.Where("ticket_value = ? and (expiration_time = 0 or expiration_time > UNIX_TIMESTAMP())", ticketValue).First(&chatTicket).Error
+	err = global.DB.Where("ticket_value = ? and (expiration_time = 0 or expiration_time > UNIX_TIMESTAMP())", ticketValue).First(&chatTicket).Error
 	if err != nil {
 		return err
 	}
 	// 兑换鱼币
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		var srcWalletId uint = 0
 		// 更新交易记录
 		remark := fmt.Sprintf("验证鱼币兑换码: %s;兑换数量: %s", ticketValue, strconv.Itoa(*chatTicket.Amount))

@@ -45,7 +45,7 @@ func (serverNodeApi *ServerNodeApi) CreateServerNode(c *gin.Context) {
 		return
 	}
 	if err := serverNodeService.CreateServerNode(&serverNode); err != nil {
-		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		global.Logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
@@ -70,7 +70,7 @@ func (serverNodeApi *ServerNodeApi) DeleteServerNode(c *gin.Context) {
 	}
 	serverNode.DeletedBy = utils.GetUserID(c)
 	if err := serverNodeService.DeleteServerNode(serverNode); err != nil {
-		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		global.Logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -95,7 +95,7 @@ func (serverNodeApi *ServerNodeApi) DeleteServerNodeByIds(c *gin.Context) {
 	}
 	deletedBy := utils.GetUserID(c)
 	if err := serverNodeService.DeleteServerNodeByIds(IDS, deletedBy); err != nil {
-		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
+		global.Logger.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -130,7 +130,7 @@ func (serverNodeApi *ServerNodeApi) UpdateServerNode(c *gin.Context) {
 		return
 	}
 	if err := serverNodeService.UpdateServerNode(serverNode); err != nil {
-		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		global.Logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -154,7 +154,7 @@ func (serverNodeApi *ServerNodeApi) FindServerNode(c *gin.Context) {
 		return
 	}
 	if reserverNode, err := serverNodeService.GetServerNode(serverNode.ID); err != nil {
-		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"reserverNode": reserverNode}, c)
@@ -178,7 +178,7 @@ func (serverNodeApi *ServerNodeApi) GetServerNodeList(c *gin.Context) {
 		return
 	}
 	if list, total, err := serverNodeService.GetServerNodeInfoList(pageInfo); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
 		response.OkWithDetailed(response.PageResult{

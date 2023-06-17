@@ -43,7 +43,7 @@ func (patrolSiteApi *PatrolSiteApi) CreatePatrolSite(c *gin.Context) {
 		return
 	}
 	if err := patrolSiteService.CreatePatrolSite(patrolSite); err != nil {
-		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		global.Logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
@@ -68,7 +68,7 @@ func (patrolSiteApi *PatrolSiteApi) DeletePatrolSite(c *gin.Context) {
 	}
 	patrolSite.DeletedBy = utils.GetUserID(c)
 	if err := patrolSiteService.DeletePatrolSite(patrolSite); err != nil {
-		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		global.Logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -93,7 +93,7 @@ func (patrolSiteApi *PatrolSiteApi) DeletePatrolSiteByIds(c *gin.Context) {
 	}
 	deletedBy := utils.GetUserID(c)
 	if err := patrolSiteService.DeletePatrolSiteByIds(IDS, deletedBy); err != nil {
-		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
+		global.Logger.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -126,7 +126,7 @@ func (patrolSiteApi *PatrolSiteApi) UpdatePatrolSite(c *gin.Context) {
 		return
 	}
 	if err := patrolSiteService.UpdatePatrolSite(patrolSite); err != nil {
-		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		global.Logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -150,7 +150,7 @@ func (patrolSiteApi *PatrolSiteApi) FindPatrolSite(c *gin.Context) {
 		return
 	}
 	if repatrolSite, err := patrolSiteService.GetPatrolSite(patrolSite.ID); err != nil {
-		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"repatrolSite": repatrolSite}, c)
@@ -174,7 +174,7 @@ func (patrolSiteApi *PatrolSiteApi) GetPatrolSiteList(c *gin.Context) {
 		return
 	}
 	if list, total, err := patrolSiteService.GetPatrolSiteInfoList(pageInfo); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
 		response.OkWithDetailed(response.PageResult{

@@ -46,7 +46,7 @@ func (transactionHistoryApi *TransactionHistoryApi) CreateTransactionHistory(c *
 		return
 	}
 	if err := transactionHistoryService.CreateTransactionHistory(&transactionHistory); err != nil {
-		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		global.Logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
@@ -71,7 +71,7 @@ func (transactionHistoryApi *TransactionHistoryApi) DeleteTransactionHistory(c *
 	}
 	transactionHistory.DeletedBy = utils.GetUserID(c)
 	if err := transactionHistoryService.DeleteTransactionHistory(transactionHistory); err != nil {
-		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		global.Logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -96,7 +96,7 @@ func (transactionHistoryApi *TransactionHistoryApi) DeleteTransactionHistoryById
 	}
 	deletedBy := utils.GetUserID(c)
 	if err := transactionHistoryService.DeleteTransactionHistoryByIds(IDS, deletedBy); err != nil {
-		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
+		global.Logger.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -132,7 +132,7 @@ func (transactionHistoryApi *TransactionHistoryApi) UpdateTransactionHistory(c *
 		return
 	}
 	if err := transactionHistoryService.UpdateTransactionHistory(transactionHistory); err != nil {
-		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		global.Logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -156,7 +156,7 @@ func (transactionHistoryApi *TransactionHistoryApi) FindTransactionHistory(c *gi
 		return
 	}
 	if retransactionHistory, err := transactionHistoryService.GetTransactionHistory(transactionHistory.ID); err != nil {
-		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"retransactionHistory": retransactionHistory}, c)
@@ -180,7 +180,7 @@ func (transactionHistoryApi *TransactionHistoryApi) GetTransactionHistoryList(c 
 		return
 	}
 	if list, total, err := transactionHistoryService.GetTransactionHistoryInfoList(pageInfo); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
 		response.OkWithDetailed(response.PageResult{

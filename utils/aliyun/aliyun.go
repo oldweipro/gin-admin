@@ -10,8 +10,8 @@ import (
 
 func CreateClient() (_result *dysmsapi20170525.Client, _err error) {
 	config := &openapi.Config{
-		AccessKeyId:     tea.String(global.GVA_CONFIG.AliyunOSS.AccessKeyId),
-		AccessKeySecret: tea.String(global.GVA_CONFIG.AliyunOSS.AccessKeySecret),
+		AccessKeyId:     tea.String(global.ConfigServer.AliyunOSS.AccessKeyId),
+		AccessKeySecret: tea.String(global.ConfigServer.AliyunOSS.AccessKeySecret),
 	}
 	// 访问的域名
 	config.Endpoint = tea.String("dysmsapi.aliyuncs.com")
@@ -28,8 +28,8 @@ func GetSmsCode(mobile string, code string) (_err error) {
 
 	sendSmsRequest := &dysmsapi20170525.SendSmsRequest{
 		PhoneNumbers:  tea.String(mobile),
-		SignName:      tea.String(global.GVA_CONFIG.AliyunOSS.SignName),
-		TemplateCode:  tea.String(global.GVA_CONFIG.AliyunOSS.TemplateCode),
+		SignName:      tea.String(global.ConfigServer.AliyunOSS.SignName),
+		TemplateCode:  tea.String(global.ConfigServer.AliyunOSS.TemplateCode),
 		TemplateParam: tea.String("{\"code\":\"" + code + "\"}"),
 	}
 	runtime := &util.RuntimeOptions{}
@@ -44,7 +44,7 @@ func GetSmsCode(mobile string, code string) (_err error) {
 		if _err != nil {
 			return _err
 		}
-		global.GVA_LOG.Info("aliyun: " + str.String())
+		global.Logger.Info("aliyun: " + str.String())
 		return nil
 	}()
 

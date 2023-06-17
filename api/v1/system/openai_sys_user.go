@@ -26,7 +26,7 @@ func (b *BaseApi) OpenFishLogin(c *gin.Context) {
 	var l request.OpenFishLogin
 	err := c.ShouldBindJSON(&l)
 	key := c.ClientIP()
-	global.GVA_LOG.Info("登陆手机号: " + l.Phone)
+	global.Logger.Info("登陆手机号: " + l.Phone)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
@@ -38,8 +38,8 @@ func (b *BaseApi) OpenFishLogin(c *gin.Context) {
 	}
 
 	// 判断验证码是否开启
-	openCaptcha := global.GVA_CONFIG.Captcha.OpenCaptcha               // 是否开启防爆次数
-	openCaptchaTimeOut := global.GVA_CONFIG.Captcha.OpenCaptchaTimeOut // 缓存超时时间
+	openCaptcha := global.ConfigServer.Captcha.OpenCaptcha               // 是否开启防爆次数
+	openCaptchaTimeOut := global.ConfigServer.Captcha.OpenCaptchaTimeOut // 缓存超时时间
 	v, ok := global.BlackCache.Get(key)
 	if !ok {
 		global.BlackCache.Set(key, 1, time.Second*time.Duration(openCaptchaTimeOut))
@@ -59,14 +59,14 @@ func (b *BaseApi) OpenFishLogin(c *gin.Context) {
 			u := &system.SysUser{Username: l.Phone, NickName: l.Phone, Password: "123456", HeaderImg: "", AuthorityId: 9953, Authorities: authorities, Enable: 1, Phone: l.Phone}
 			*sysUser, err = userService.Register(*u)
 			if err != nil {
-				global.GVA_LOG.Error("注册失败!", zap.Error(err))
+				global.Logger.Error("注册失败!", zap.Error(err))
 				response.FailWithDetailed(systemRes.SysUserResponse{User: *sysUser}, "注册失败", c)
 				return
 			}
 		}
 
 		if sysUser.Enable != 1 {
-			global.GVA_LOG.Error("登陆失败! 用户被禁止登录!")
+			global.Logger.Error("登陆失败! 用户被禁止登录!")
 			// 验证码次数+1
 			global.BlackCache.Increment(key, 1)
 			response.FailWithMessage("用户被禁止登录", c)
@@ -85,8 +85,8 @@ func (b *BaseApi) SmsCode(c *gin.Context) {
 	var s request.SmsCode
 	err := c.ShouldBindJSON(&s)
 
-	openCaptcha := global.GVA_CONFIG.Captcha.OpenCaptcha               // 是否开启防爆次数
-	openCaptchaTimeOut := global.GVA_CONFIG.Captcha.OpenCaptchaTimeOut // 缓存超时时间
+	openCaptcha := global.ConfigServer.Captcha.OpenCaptcha               // 是否开启防爆次数
+	openCaptchaTimeOut := global.ConfigServer.Captcha.OpenCaptchaTimeOut // 缓存超时时间
 	key := c.ClientIP()
 	v, ok := global.BlackCache.Get(key)
 	if !ok {
@@ -100,7 +100,7 @@ func (b *BaseApi) SmsCode(c *gin.Context) {
 	rand.Seed(uint64(time.Now().UnixNano()))
 	verificationCode := fmt.Sprintf("%06d", rand.Intn(1000000))
 	global.Cache.Set(s.Mobile, verificationCode, time.Second*time.Duration(openCaptchaTimeOut))
-	global.GVA_LOG.Info(s.Mobile + " 验证码: " + verificationCode)
+	global.Logger.Info(s.Mobile + " 验证码: " + verificationCode)
 	// 发短信 阿里云依赖
 	err = aliyun.GetSmsCode(s.Mobile, verificationCode)
 	if err != nil {
@@ -109,7 +109,7 @@ func (b *BaseApi) SmsCode(c *gin.Context) {
 	}
 
 	if err != nil {
-		global.GVA_LOG.Error("验证码获取失败!", zap.Error(err))
+		global.Logger.Error("验证码获取失败!", zap.Error(err))
 		response.FailWithMessage("验证码获取失败", c)
 		return
 	}

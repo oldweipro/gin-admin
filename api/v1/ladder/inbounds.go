@@ -37,7 +37,7 @@ func (inboundsApi *InboundsApi) CreateInbounds(c *gin.Context) {
 	}
 	inbounds.CreatedBy = utils.GetUserID(c)
 	if err := inboundsService.CreateInbounds(&inbounds); err != nil {
-		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		global.Logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
@@ -62,7 +62,7 @@ func (inboundsApi *InboundsApi) DeleteInbounds(c *gin.Context) {
 	}
 	inbounds.DeletedBy = utils.GetUserID(c)
 	if err := inboundsService.DeleteInbounds(inbounds); err != nil {
-		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		global.Logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -87,7 +87,7 @@ func (inboundsApi *InboundsApi) DeleteInboundsByIds(c *gin.Context) {
 	}
 	deletedBy := utils.GetUserID(c)
 	if err := inboundsService.DeleteInboundsByIds(IDS, deletedBy); err != nil {
-		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
+		global.Logger.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -112,7 +112,7 @@ func (inboundsApi *InboundsApi) UpdateInbounds(c *gin.Context) {
 	}
 	inbounds.UpdatedBy = utils.GetUserID(c)
 	if err := inboundsService.UpdateInbounds(inbounds); err != nil {
-		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		global.Logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -136,7 +136,7 @@ func (inboundsApi *InboundsApi) FindInbounds(c *gin.Context) {
 		return
 	}
 	if reinbounds, err := inboundsService.GetInbounds(inbounds.ID); err != nil {
-		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"reinbounds": reinbounds}, c)
@@ -154,12 +154,12 @@ func (inboundsApi *InboundsApi) FindInboundsLink(c *gin.Context) {
 	userInfo := utils.GetUserInfo(c)
 	// 查询服务器信息
 	if serverNode, err := serverNodeService.GetServerNode(*inbounds.Sid); err != nil {
-		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		// 查询节点信息
 		if inboundsLink, err := inboundsService.GetInboundsLink(*userInfo, *inbounds.Sid); err != nil {
-			global.GVA_LOG.Error("查询失败!", zap.Error(err))
+			global.Logger.Error("查询失败!", zap.Error(err))
 			response.FailWithMessage("查询失败", c)
 		} else {
 			vMessLink := make(map[string]interface{})
@@ -195,7 +195,7 @@ func (inboundsApi *InboundsApi) SetInboundsLink(c *gin.Context) {
 	userInfo := utils.GetUserInfo(c)
 	// 更新节点信息
 	if err := inboundsService.SetInboundsLink(*userInfo, inbounds); err != nil {
-		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithMessage("重置成功", c)
@@ -219,7 +219,7 @@ func (inboundsApi *InboundsApi) GetInboundsList(c *gin.Context) {
 		return
 	}
 	if list, total, err := inboundsService.GetInboundsInfoList(pageInfo); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
 		response.OkWithDetailed(response.PageResult{

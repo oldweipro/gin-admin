@@ -13,35 +13,35 @@ type ProductService struct {
 // CreateProduct 创建Product记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (productService *ProductService) CreateProduct(product *transaction.Product) (err error) {
-	err = global.GVA_DB.Create(product).Error
+	err = global.DB.Create(product).Error
 	return err
 }
 
 // DeleteProduct 删除Product记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (productService *ProductService) DeleteProduct(product transaction.Product) (err error) {
-	err = global.GVA_DB.Delete(&product).Error
+	err = global.DB.Delete(&product).Error
 	return err
 }
 
 // DeleteProductByIds 批量删除Product记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (productService *ProductService) DeleteProductByIds(ids request.IdsReq) (err error) {
-	err = global.GVA_DB.Delete(&[]transaction.Product{}, "id in ?", ids.Ids).Error
+	err = global.DB.Delete(&[]transaction.Product{}, "id in ?", ids.Ids).Error
 	return err
 }
 
 // UpdateProduct 更新Product记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (productService *ProductService) UpdateProduct(product transaction.Product) (err error) {
-	err = global.GVA_DB.Save(&product).Error
+	err = global.DB.Save(&product).Error
 	return err
 }
 
 // GetProduct 根据id获取Product记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (productService *ProductService) GetProduct(id uint) (product transaction.Product, err error) {
-	err = global.GVA_DB.Where("id = ?", id).First(&product).Error
+	err = global.DB.Where("id = ?", id).First(&product).Error
 	return
 }
 
@@ -51,7 +51,7 @@ func (productService *ProductService) GetProductInfoList(info openfishReq.Produc
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&transaction.Product{})
+	db := global.DB.Model(&transaction.Product{})
 	var products []transaction.Product
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {

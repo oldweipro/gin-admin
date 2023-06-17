@@ -26,14 +26,14 @@ type InboundsService struct {
 // CreateInbounds 创建Inbounds记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (inboundsService *InboundsService) CreateInbounds(inbounds *ladder.Inbounds) (err error) {
-	err = global.GVA_DB.Create(inbounds).Error
+	err = global.DB.Create(inbounds).Error
 	return err
 }
 
 // DeleteInbounds 删除Inbounds记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (inboundsService *InboundsService) DeleteInbounds(inbounds ladder.Inbounds) (err error) {
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&ladder.Inbounds{}).Where("id = ?", inbounds.ID).Update("deleted_by", inbounds.DeletedBy).Error; err != nil {
 			return err
 		}
@@ -48,7 +48,7 @@ func (inboundsService *InboundsService) DeleteInbounds(inbounds ladder.Inbounds)
 // DeleteInboundsByIds 批量删除Inbounds记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (inboundsService *InboundsService) DeleteInboundsByIds(ids request.IdsReq, deleted_by uint) (err error) {
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&ladder.Inbounds{}).Where("id in ?", ids.Ids).Update("deleted_by", deleted_by).Error; err != nil {
 			return err
 		}
@@ -63,23 +63,23 @@ func (inboundsService *InboundsService) DeleteInboundsByIds(ids request.IdsReq, 
 // UpdateInbounds 更新Inbounds记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (inboundsService *InboundsService) UpdateInbounds(inbounds ladder.Inbounds) (err error) {
-	err = global.GVA_DB.Save(&inbounds).Error
+	err = global.DB.Save(&inbounds).Error
 	return err
 }
 
 // GetInbounds 根据id获取Inbounds记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (inboundsService *InboundsService) GetInbounds(id uint) (inbounds ladder.Inbounds, err error) {
-	err = global.GVA_DB.Where("id = ?", id).First(&inbounds).Error
+	err = global.DB.Where("id = ?", id).First(&inbounds).Error
 	return
 }
 
 func (inboundsService *InboundsService) GetInboundsLink(userInfo systemReq.CustomClaims, sid uint) (inbounds ladder.Inbounds, err error) {
-	if err = global.GVA_DB.Where("uid = ? and sid = ?", userInfo.BaseClaims.ID, sid).First(&inbounds).Error; err != nil {
+	if err = global.DB.Where("uid = ? and sid = ?", userInfo.BaseClaims.ID, sid).First(&inbounds).Error; err != nil {
 		// 如果入站链接不存在，则创建链接
 		inbounds.Sid = &sid
 		if err = inboundsService.CreateServerNodeInboundsLink(userInfo, &inbounds); err != nil {
-			global.GVA_LOG.Error("远程服务器创建链接失败: ", zap.Error(err))
+			global.Logger.Error("远程服务器创建链接失败: ", zap.Error(err))
 		} else {
 			err = inboundsService.CreateInbounds(&inbounds)
 		}
@@ -88,16 +88,16 @@ func (inboundsService *InboundsService) GetInboundsLink(userInfo systemReq.Custo
 }
 
 func (inboundsService *InboundsService) SetInboundsLink(userInfo systemReq.CustomClaims, inbounds ladder.Inbounds) (err error) {
-	if err = global.GVA_DB.Where("uid = ? and sid = ?", userInfo.BaseClaims.ID, *inbounds.Sid).First(&inbounds).Error; err != nil {
+	if err = global.DB.Where("uid = ? and sid = ?", userInfo.BaseClaims.ID, *inbounds.Sid).First(&inbounds).Error; err != nil {
 		// 如果入站链接不存在，则创建链接，防止还没生成链接有人就点重置按钮导致数据库查不出来而报错
 		if err := inboundsService.CreateServerNodeInboundsLink(userInfo, &inbounds); err != nil {
-			global.GVA_LOG.Error("远程服务器创建链接失败: ", zap.Error(err))
+			global.Logger.Error("远程服务器创建链接失败: ", zap.Error(err))
 		} else {
 			err = inboundsService.CreateInbounds(&inbounds)
 		}
 	} else {
 		if err := inboundsService.CreateServerNodeInboundsLink(userInfo, &inbounds); err != nil {
-			global.GVA_LOG.Error("远程服务器创建链接失败: ", zap.Error(err))
+			global.Logger.Error("远程服务器创建链接失败: ", zap.Error(err))
 		} else {
 			err = inboundsService.UpdateInbounds(inbounds)
 		}
@@ -109,7 +109,7 @@ func (inboundsService *InboundsService) SetInboundsLink(userInfo systemReq.Custo
 func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo systemReq.CustomClaims, inbounds *ladder.Inbounds) (err error) {
 	// 查询服务器信息
 	var serverNode ladder.ServerNode
-	global.GVA_DB.Where("id = ?", *inbounds.Sid).First(&serverNode)
+	global.DB.Where("id = ?", *inbounds.Sid).First(&serverNode)
 
 	up := 0
 	down := 0
@@ -238,7 +238,7 @@ func (inboundsService *InboundsService) GetInboundsInfoList(info ladderReq.Inbou
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&ladder.Inbounds{})
+	db := global.DB.Model(&ladder.Inbounds{})
 	var inboundss []ladder.Inbounds
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {

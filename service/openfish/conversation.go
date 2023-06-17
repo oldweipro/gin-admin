@@ -33,21 +33,21 @@ var chatGptService system.ChatGptService
 // CreateConversation 创建Conversation记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) CreateConversation(conversation *openfish.Conversation) (err error) {
-	err = global.GVA_DB.Create(conversation).Error
+	err = global.DB.Create(conversation).Error
 	return err
 }
 
 // CreateConversationRecord 创建ConversationRecord记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) CreateConversationRecord(conversationRecord *openfish.ConversationRecord) (err error) {
-	err = global.GVA_DB.Create(conversationRecord).Error
+	err = global.DB.Create(conversationRecord).Error
 	return err
 }
 
 // DeleteConversation 删除Conversation记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) DeleteConversation(conversation openfish.Conversation) (err error) {
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&openfish.Conversation{}).Where("id = ?", conversation.ID).Update("deleted_by", conversation.DeletedBy).Error; err != nil {
 			return err
 		}
@@ -62,7 +62,7 @@ func (conversationService *ConversationService) DeleteConversation(conversation 
 // DeleteConversationByIds 批量删除Conversation记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) DeleteConversationByIds(ids request.IdsReq, deleted_by uint) (err error) {
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&openfish.Conversation{}).Where("id in ?", ids.Ids).Update("deleted_by", deleted_by).Error; err != nil {
 			return err
 		}
@@ -77,21 +77,21 @@ func (conversationService *ConversationService) DeleteConversationByIds(ids requ
 // UpdateConversation 更新Conversation记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) UpdateConversation(conversation openfish.Conversation) (err error) {
-	err = global.GVA_DB.Save(&conversation).Error
+	err = global.DB.Save(&conversation).Error
 	return err
 }
 
 // UpdateConversationTime 更新Conversation时间
 // Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) UpdateConversationTime(id uint) (err error) {
-	err = global.GVA_DB.Model(&openfish.Conversation{}).Where("id = ?", id).Update("updated_at", time.Now()).Error
+	err = global.DB.Model(&openfish.Conversation{}).Where("id = ?", id).Update("updated_at", time.Now()).Error
 	return err
 }
 
 // GetConversation 根据id获取Conversation记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) GetConversation(id uint) (conversation openfish.Conversation, err error) {
-	err = global.GVA_DB.Where("id = ?", id).First(&conversation).Error
+	err = global.DB.Where("id = ?", id).First(&conversation).Error
 	return
 }
 
@@ -101,7 +101,7 @@ func (conversationService *ConversationService) GetConversationInfoList(info ope
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&openfish.Conversation{})
+	db := global.DB.Model(&openfish.Conversation{})
 	var conversations []openfish.Conversation
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {
@@ -137,28 +137,28 @@ func (conversationService *ConversationService) GetConversationRecordListWithTok
 		  ) AS t
 		  WHERE sum <= ?
 		) ORDER BY created_at`
-	err := global.GVA_DB.Raw(query, conversationId, 2596-tokenCount).Scan(&conversationRecords).Error
+	err := global.DB.Raw(query, conversationId, 2596-tokenCount).Scan(&conversationRecords).Error
 	return conversationRecords, err
 }
 
 // GetConversationRecordListByUserId 根据用户ID查询会话列表及会话信息列表
 func (conversationService *ConversationService) GetConversationRecordListByUserId(userId uint) ([]openfish.ConversationRecord, error) {
 	var conversationRecords []openfish.ConversationRecord
-	err := global.GVA_DB.Model(&openfish.ConversationRecord{}).Where("conversation_id IN (SELECT id FROM conversation WHERE created_by = ?)", userId).Order("created_at asc").Find(&conversationRecords).Error
+	err := global.DB.Model(&openfish.ConversationRecord{}).Where("conversation_id IN (SELECT id FROM conversation WHERE created_by = ?)", userId).Order("created_at asc").Find(&conversationRecords).Error
 	return conversationRecords, err
 }
 
 // GetConversationRecordListByConversationId 根据conversationId查询会话信息列表
 func (conversationService *ConversationService) GetConversationRecordListByConversationId(conversationId uint) ([]openfish.ConversationRecord, error) {
 	var conversationRecords []openfish.ConversationRecord
-	err := global.GVA_DB.Model(&openfish.ConversationRecord{}).Where("conversation_id = ?", conversationId).Order("created_at asc").Find(&conversationRecords).Error
+	err := global.DB.Model(&openfish.ConversationRecord{}).Where("conversation_id = ?", conversationId).Order("created_at asc").Find(&conversationRecords).Error
 	return conversationRecords, err
 }
 
 // GetConversationListByUserId 根据用户ID查询会话列表
 func (conversationService *ConversationService) GetConversationListByUserId(userId uint, conversationType uint) ([]openfish.Conversation, error) {
 	var conversations []openfish.Conversation
-	err := global.GVA_DB.Model(&openfish.Conversation{}).Where("created_by = ?", userId).Where("conversation_type = ?", conversationType).Order("updated_at desc").First(&conversations).Error
+	err := global.DB.Model(&openfish.Conversation{}).Where("created_by = ?", userId).Where("conversation_type = ?", conversationType).Order("updated_at desc").First(&conversations).Error
 	return conversations, err
 }
 
@@ -166,7 +166,7 @@ func (conversationService *ConversationService) GetConversationListByUserId(user
 func (conversationService *ConversationService) OpenAIDrawing(chatReq openfishReq.ChatReq, c *gin.Context) error {
 	sk, err := chatGptService.GetSK()
 	if err != nil {
-		global.GVA_LOG.Error("获取sk失败!", zap.Error(err))
+		global.Logger.Error("获取sk失败!", zap.Error(err))
 		return err
 	}
 	config := openai.DefaultConfig(sk.SK)
@@ -225,7 +225,7 @@ func (conversationService *ConversationService) OpenAIDrawing(chatReq openfishRe
 		conversationRecordUser.CreatedBy = utils.GetUserID(c)
 		// 最后存储新的对话到数据库 提问
 		if err := conversationService.CreateConversationRecord(&conversationRecordUser); err != nil {
-			global.GVA_LOG.Error("用户提问数据写入异常!", zap.Error(err))
+			global.Logger.Error("用户提问数据写入异常!", zap.Error(err))
 			response.FailWithMessage("系统异常", c)
 			return err
 		}
@@ -236,13 +236,13 @@ func (conversationService *ConversationService) OpenAIDrawing(chatReq openfishRe
 		conversationRecordAI.ConversationId = chatReq.ConversationId
 		conversationRecordAI.CreatedBy = utils.GetUserID(c)
 		if err := conversationService.CreateConversationRecord(&conversationRecordAI); err != nil {
-			global.GVA_LOG.Error("AI回答数据写入异常!", zap.Error(err))
+			global.Logger.Error("AI回答数据写入异常!", zap.Error(err))
 			response.FailWithMessage("系统异常", c)
 			return err
 		}
 		// 更新聊天室时间
 		if err := conversationService.UpdateConversationTime(*chatReq.ConversationId); err != nil {
-			global.GVA_LOG.Error("更新聊天室时间异常!", zap.Error(err))
+			global.Logger.Error("更新聊天室时间异常!", zap.Error(err))
 			response.FailWithMessage("系统异常", c)
 			return err
 		}
@@ -280,9 +280,9 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 		Stream:    true,
 	}
 	if err := conversationService.ChatOpenAIReverse(&conversationRecordUser, req, c, chatReq); err != nil {
-		global.GVA_LOG.Error("逆向工程调用错误: ", zap.Error(err))
+		global.Logger.Error("逆向工程调用错误: ", zap.Error(err))
 		if err = conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
-			global.GVA_LOG.Error("OpenAI调用错误: ", zap.Error(err))
+			global.Logger.Error("OpenAI调用错误: ", zap.Error(err))
 			return err
 		}
 	}
@@ -308,7 +308,7 @@ func (conversationService *ConversationService) ChatOpenAIReverse(conversationRe
 func (conversationService *ConversationService) ChatOpenAIApiKey(conversationRecordUser *openfish.ConversationRecord, req openai.ChatCompletionRequest, c *gin.Context, chatReq openfishReq.ChatReq) error {
 	sk, err := chatGptService.GetSK()
 	if err != nil {
-		global.GVA_LOG.Error("获取sk失败!", zap.Error(err))
+		global.Logger.Error("获取sk失败!", zap.Error(err))
 		return err
 	}
 	config := openai.DefaultConfig(sk.SK)
@@ -345,7 +345,7 @@ func (conversationService *ConversationService) ChatStream(stream *openai.ChatCo
 			if streamResponse != "" {
 				// 最后存储新的对话到数据库 提问
 				if err := conversationService.CreateConversationRecord(conversationRecordUser); err != nil {
-					global.GVA_LOG.Error("用户提问数据写入异常!", zap.Error(err))
+					global.Logger.Error("用户提问数据写入异常!", zap.Error(err))
 					response.FailWithMessage("系统异常", c)
 					return err
 				}
@@ -356,13 +356,13 @@ func (conversationService *ConversationService) ChatStream(stream *openai.ChatCo
 				conversationRecordAI.ConversationId = chatReq.ConversationId
 				conversationRecordAI.CreatedBy = utils.GetUserID(c)
 				if err := conversationService.CreateConversationRecord(&conversationRecordAI); err != nil {
-					global.GVA_LOG.Error("AI回答数据写入异常!", zap.Error(err))
+					global.Logger.Error("AI回答数据写入异常!", zap.Error(err))
 					response.FailWithMessage("系统异常", c)
 					return err
 				}
 				// 更新聊天室时间
 				if err := conversationService.UpdateConversationTime(*chatReq.ConversationId); err != nil {
-					global.GVA_LOG.Error("更新聊天室时间异常!", zap.Error(err))
+					global.Logger.Error("更新聊天室时间异常!", zap.Error(err))
 					response.FailWithMessage("系统异常", c)
 					return err
 				}

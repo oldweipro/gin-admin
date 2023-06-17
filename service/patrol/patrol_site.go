@@ -14,14 +14,14 @@ type PatrolSiteService struct {
 // CreatePatrolSite 创建PatrolSite记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (patrolSiteService *PatrolSiteService) CreatePatrolSite(patrolSite patrol.PatrolSite) (err error) {
-	err = global.GVA_DB.Create(&patrolSite).Error
+	err = global.DB.Create(&patrolSite).Error
 	return err
 }
 
 // DeletePatrolSite 删除PatrolSite记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (patrolSiteService *PatrolSiteService) DeletePatrolSite(patrolSite patrol.PatrolSite) (err error) {
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&patrol.PatrolSite{}).Where("id = ?", patrolSite.ID).Update("deleted_by", patrolSite.DeletedBy).Error; err != nil {
 			return err
 		}
@@ -36,7 +36,7 @@ func (patrolSiteService *PatrolSiteService) DeletePatrolSite(patrolSite patrol.P
 // DeletePatrolSiteByIds 批量删除PatrolSite记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (patrolSiteService *PatrolSiteService) DeletePatrolSiteByIds(ids request.IdsReq, deleted_by uint) (err error) {
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&patrol.PatrolSite{}).Where("id in ?", ids.Ids).Update("deleted_by", deleted_by).Error; err != nil {
 			return err
 		}
@@ -51,14 +51,14 @@ func (patrolSiteService *PatrolSiteService) DeletePatrolSiteByIds(ids request.Id
 // UpdatePatrolSite 更新PatrolSite记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (patrolSiteService *PatrolSiteService) UpdatePatrolSite(patrolSite patrol.PatrolSite) (err error) {
-	err = global.GVA_DB.Save(&patrolSite).Error
+	err = global.DB.Save(&patrolSite).Error
 	return err
 }
 
 // GetPatrolSite 根据id获取PatrolSite记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (patrolSiteService *PatrolSiteService) GetPatrolSite(id uint) (patrolSite patrol.PatrolSite, err error) {
-	err = global.GVA_DB.Where("id = ?", id).First(&patrolSite).Error
+	err = global.DB.Where("id = ?", id).First(&patrolSite).Error
 	return
 }
 
@@ -68,7 +68,7 @@ func (patrolSiteService *PatrolSiteService) GetPatrolSiteInfoList(info patrolReq
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&patrol.PatrolSite{})
+	db := global.DB.Model(&patrol.PatrolSite{})
 	var patrolSites []patrol.PatrolSite
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {

@@ -23,7 +23,7 @@ type PersonnelService struct {
 // Author [oldweipro](https://github.com/oldweipro)
 func (personnelService *PersonnelService) SyncPersonnel() (err error) {
 	// 创建db
-	db := global.GVA_DB.Model(&patrol.Personnel{})
+	db := global.DB.Model(&patrol.Personnel{})
 	// 查询当前数据库的记录数
 	var count int64
 	db.Count(&count)
@@ -90,7 +90,7 @@ func getPersonnel(pageNum, pageSize int64) patrolReq.PersonnelQueryResult {
 // Author [oldweipro](https://github.com/oldweipro)
 func (personnelService *PersonnelService) SyncPersonnelImg() (err error) {
 	// 创建db
-	db := global.GVA_DB.Model(&patrol.Personnel{})
+	db := global.DB.Model(&patrol.Personnel{})
 	var personnels []patrol.Personnel
 	err = db.Select("person_url").Find(&personnels).Error
 	// 循环数据
@@ -144,35 +144,35 @@ func (personnelService *PersonnelService) SyncPersonnelImg() (err error) {
 // CreatePersonnel 创建Personnel记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (personnelService *PersonnelService) CreatePersonnel(personnel patrol.Personnel) (err error) {
-	err = global.GVA_DB.Create(&personnel).Error
+	err = global.DB.Create(&personnel).Error
 	return err
 }
 
 // DeletePersonnel 删除Personnel记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (personnelService *PersonnelService) DeletePersonnel(personnel patrol.Personnel) (err error) {
-	err = global.GVA_DB.Delete(&personnel).Error
+	err = global.DB.Delete(&personnel).Error
 	return err
 }
 
 // DeletePersonnelByIds 批量删除Personnel记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (personnelService *PersonnelService) DeletePersonnelByIds(ids request.IdsReq) (err error) {
-	err = global.GVA_DB.Delete(&[]patrol.Personnel{}, "id in ?", ids.Ids).Error
+	err = global.DB.Delete(&[]patrol.Personnel{}, "id in ?", ids.Ids).Error
 	return err
 }
 
 // UpdatePersonnel 更新Personnel记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (personnelService *PersonnelService) UpdatePersonnel(personnel patrol.Personnel) (err error) {
-	err = global.GVA_DB.Save(&personnel).Error
+	err = global.DB.Save(&personnel).Error
 	return err
 }
 
 // GetPersonnel 根据id获取Personnel记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (personnelService *PersonnelService) GetPersonnel(id uint) (personnel patrol.Personnel, err error) {
-	err = global.GVA_DB.Where("id = ?", id).First(&personnel).Error
+	err = global.DB.Where("id = ?", id).First(&personnel).Error
 	return
 }
 
@@ -182,7 +182,7 @@ func (personnelService *PersonnelService) GetPersonnelInfoList(info patrolReq.Pe
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&patrol.Personnel{})
+	db := global.DB.Model(&patrol.Personnel{})
 	var personnels []patrol.Personnel
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {

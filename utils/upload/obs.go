@@ -18,7 +18,7 @@ func (o *Obs) UploadUrl(fileUrl, filename string) (string, string, error) {
 }
 
 func NewHuaWeiObsClient() (client *obs.ObsClient, err error) {
-	return obs.New(global.GVA_CONFIG.HuaWeiObs.AccessKey, global.GVA_CONFIG.HuaWeiObs.SecretKey, global.GVA_CONFIG.HuaWeiObs.Endpoint)
+	return obs.New(global.ConfigServer.HuaWeiObs.AccessKey, global.ConfigServer.HuaWeiObs.SecretKey, global.ConfigServer.HuaWeiObs.Endpoint)
 }
 
 func (o *Obs) UploadFile(file *multipart.FileHeader) (string, string, error) {
@@ -32,7 +32,7 @@ func (o *Obs) UploadFile(file *multipart.FileHeader) (string, string, error) {
 	input := &obs.PutObjectInput{
 		PutObjectBasicInput: obs.PutObjectBasicInput{
 			ObjectOperationInput: obs.ObjectOperationInput{
-				Bucket: global.GVA_CONFIG.HuaWeiObs.Bucket,
+				Bucket: global.ConfigServer.HuaWeiObs.Bucket,
 				Key:    filename,
 			},
 			ContentType: file.Header.Get("content-type"),
@@ -50,7 +50,7 @@ func (o *Obs) UploadFile(file *multipart.FileHeader) (string, string, error) {
 	if err != nil {
 		return "", "", errors.Wrap(err, "文件上传失败!")
 	}
-	filepath := global.GVA_CONFIG.HuaWeiObs.Path + "/" + filename
+	filepath := global.ConfigServer.HuaWeiObs.Path + "/" + filename
 	return filepath, filename, err
 }
 
@@ -60,7 +60,7 @@ func (o *Obs) DeleteFile(key string) error {
 		return errors.Wrap(err, "获取华为对象存储对象失败!")
 	}
 	input := &obs.DeleteObjectInput{
-		Bucket: global.GVA_CONFIG.HuaWeiObs.Bucket,
+		Bucket: global.ConfigServer.HuaWeiObs.Bucket,
 		Key:    key,
 	}
 	var output *obs.DeleteObjectOutput
