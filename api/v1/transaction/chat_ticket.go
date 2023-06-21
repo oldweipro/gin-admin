@@ -213,3 +213,30 @@ func (chatTicketApi *ChatTicketApi) HandleValidateChatTicket(c *gin.Context) {
 		response.OkWithMessage("验证成果", c)
 	}
 }
+
+// CheckIn 签到
+func (chatTicketApi *ChatTicketApi) CheckIn(c *gin.Context) {
+	// 查询当天是否已签到
+	userId := utils.GetUserID(c)
+	count, err := historyService.GetTodayTransactionHistoryByCurrentUser(userId)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	if count > 0 {
+		response.FailWithMessage("今日已签到", c)
+		return
+	}
+	wallets, err := walletsService.GetCurrentUserWallets(userId)
+	if err != nil {
+		response.FailWithMessage("账号异常，您的钱包未创建", c)
+		return
+	}
+	// 增加签到记录和金额
+	if err := chatTicketService.HandleCheckIn(&wallets); err != nil {
+		global.Logger.Error("签到失败!", zap.Error(err))
+		response.FailWithMessage("签到失败", c)
+	} else {
+		response.OkWithMessage("签到成功", c)
+	}
+}

@@ -3,6 +3,6 @@ package transaction
 type ApiGroup struct {
 	ChatTicketApi
 	WalletsApi
-	TransactionHistoryApi
+	HistoryApi
 	ProductApi
 }

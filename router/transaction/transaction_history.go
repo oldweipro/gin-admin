@@ -13,7 +13,7 @@ type TransactionHistoryRouter struct {
 func (s *TransactionHistoryRouter) InitTransactionHistoryRouter(Router *gin.RouterGroup) {
 	transactionHistoryRouter := Router.Group("transactionHistory").Use(middleware.OperationRecord())
 	transactionHistoryRouterWithoutRecord := Router.Group("transactionHistory")
-	var transactionHistoryApi = v1.ApiGroupApp.TransactionApiGroup.TransactionHistoryApi
+	var transactionHistoryApi = v1.ApiGroupApp.TransactionApiGroup.HistoryApi
 	{
 		transactionHistoryRouter.POST("createTransactionHistory", transactionHistoryApi.CreateTransactionHistory)             // 新建TransactionHistory
 		transactionHistoryRouter.DELETE("deleteTransactionHistory", transactionHistoryApi.DeleteTransactionHistory)           // 删除TransactionHistory

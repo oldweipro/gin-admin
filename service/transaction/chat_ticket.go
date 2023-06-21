@@ -138,3 +138,39 @@ func (chatTicketService *ChatTicketService) HandleValidateChatTicket(ticketValue
 	})
 	return
 }
+
+func (chatTicketService *ChatTicketService) HandleCheckIn(wallets *transaction.Wallets) (err error) {
+	err = global.DB.Transaction(func(tx *gorm.DB) error {
+		// 系统账户
+		var srcWalletId uint = 0
+		// 数量
+		var amount = 1
+		// 签到获得鱼币
+		var fishCoin = 1
+		// 更新交易记录
+		remark := "每日签到"
+		balance := *wallets.Balance + fishCoin
+		transactionHistory := transaction.TransactionHistory{
+			UserId:        &wallets.UserId,
+			SrcWalletId:   &srcWalletId,
+			DestWalletId:  &wallets.ID,
+			TypeEnum:      "checkin",
+			Quantity:      &amount,
+			BeforeBalance: wallets.Balance,
+			AfterBalance:  &balance,
+			ProductId:     &srcWalletId,
+			Remark:        remark,
+			CreatedBy:     wallets.UserId,
+		}
+		if err = tx.Create(&transactionHistory).Error; err != nil {
+			return err
+		}
+		// 更新用户钱包的鱼币
+		if err = tx.Model(&transaction.Wallets{}).Where("id = ?", wallets.ID).Update("balance", balance).Error; err != nil {
+			return err
+		}
+		// nil提交事务
+		return nil
+	})
+	return
+}

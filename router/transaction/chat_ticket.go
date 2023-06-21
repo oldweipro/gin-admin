@@ -15,6 +15,7 @@ func (s *ChatTicketRouter) InitChatTicketRouter(Router *gin.RouterGroup) {
 	chatTicketRouterWithoutRecord := Router.Group("chatTicket")
 	var chatTicketApi = v1.ApiGroupApp.TransactionApiGroup.ChatTicketApi
 	{
+		chatTicketRouter.POST("checkIn", chatTicketApi.CheckIn)                                  // 每日签到
 		chatTicketRouter.POST("createChatTicket", chatTicketApi.CreateChatTicket)                // 新建ChatTicket
 		chatTicketRouter.PUT("handleValidateChatTicket", chatTicketApi.HandleValidateChatTicket) // 验证鱼币兑换码
 		chatTicketRouter.DELETE("deleteChatTicket", chatTicketApi.DeleteChatTicket)              // 删除ChatTicket
