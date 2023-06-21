@@ -144,7 +144,7 @@ func (chatTicketService *ChatTicketService) HandleCheckIn(wallets *transaction.W
 		// 系统账户
 		var srcWalletId uint = 0
 		// 数量
-		var amount = 1
+		var quantity = 1
 		// 签到获得鱼币
 		var fishCoin = 1
 		// 更新交易记录
@@ -155,7 +155,8 @@ func (chatTicketService *ChatTicketService) HandleCheckIn(wallets *transaction.W
 			SrcWalletId:   &srcWalletId,
 			DestWalletId:  &wallets.ID,
 			TypeEnum:      "checkin",
-			Quantity:      &amount,
+			Quantity:      &quantity,
+			Amount:        &fishCoin,
 			BeforeBalance: wallets.Balance,
 			AfterBalance:  &balance,
 			ProductId:     &srcWalletId,
