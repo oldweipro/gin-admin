@@ -189,3 +189,23 @@ func (serverNodeApi *ServerNodeApi) GetServerNodeList(c *gin.Context) {
 		}, "获取成功", c)
 	}
 }
+
+func (serverNodeApi *ServerNodeApi) GetServerNodeLessList(c *gin.Context) {
+	var pageInfo ladderReq.ServerNodeSearch
+	err := c.ShouldBindQuery(&pageInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	if list, total, err := serverNodeService.GetServerNodeLessInfoList(pageInfo); err != nil {
+		global.Logger.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:     list,
+			Total:    total,
+			Page:     pageInfo.Page,
+			PageSize: pageInfo.PageSize,
+		}, "获取成功", c)
+	}
+}

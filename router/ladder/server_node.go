@@ -21,7 +21,8 @@ func (s *ServerNodeRouter) InitServerNodeRouter(Router *gin.RouterGroup) {
 		serverNodeRouter.PUT("updateServerNode", serverNodeApi.UpdateServerNode)              // 更新ServerNode
 	}
 	{
-		serverNodeRouterWithoutRecord.GET("findServerNode", serverNodeApi.FindServerNode)       // 根据ID获取ServerNode
-		serverNodeRouterWithoutRecord.GET("getServerNodeList", serverNodeApi.GetServerNodeList) // 获取ServerNode列表
+		serverNodeRouterWithoutRecord.GET("findServerNode", serverNodeApi.FindServerNode)               // 根据ID获取ServerNode
+		serverNodeRouterWithoutRecord.GET("getServerNodeList", serverNodeApi.GetServerNodeList)         // 获取ServerNode列表
+		serverNodeRouterWithoutRecord.GET("getServerNodeLessList", serverNodeApi.GetServerNodeLessList) // 获取ServerNodeLess列表
 	}
 }

@@ -66,7 +66,6 @@ func (serverNodeService *ServerNodeService) GetServerNode(id uint) (serverNode l
 }
 
 // GetServerNodeInfoList 分页获取ServerNode记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (serverNodeService *ServerNodeService) GetServerNodeInfoList(info ladderReq.ServerNodeSearch) (list []ladder.ServerNode, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
@@ -84,6 +83,27 @@ func (serverNodeService *ServerNodeService) GetServerNodeInfoList(info ladderReq
 	}
 
 	err = db.Limit(limit).Offset(offset).Find(&serverNodes).Error
+	return serverNodes, total, err
+}
+
+// GetServerNodeLessInfoList 分页获取ServerNode记录，过滤掉敏感信息
+func (serverNodeService *ServerNodeService) GetServerNodeLessInfoList(info ladderReq.ServerNodeSearch) (list []ladder.ServerNode, total int64, err error) {
+	limit := info.PageSize
+	offset := info.PageSize * (info.Page - 1)
+	// 创建db
+	db := global.DB.Model(&ladder.ServerNode{})
+	var serverNodes []ladder.ServerNode
+	// 如果有条件搜索 下方会自动创建搜索语句
+	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {
+		db = db.Where("created_at BETWEEN ? AND ?", info.StartCreatedAt, info.EndCreatedAt)
+	}
+	db = db.Where("server_status = 1")
+	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
+
+	err = db.Select("ID", "bandwidth", "region", "describe").Limit(limit).Offset(offset).Find(&serverNodes).Error
 	return serverNodes, total, err
 }
 
