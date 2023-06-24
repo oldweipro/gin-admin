@@ -12,6 +12,7 @@ import (
 type OSS interface {
 	UploadFile(file *multipart.FileHeader) (string, string, error)
 	UploadUrl(fileUrl, filename string) (string, string, error)
+	UploadBase64(base64Str, filename string) (string, string, error)
 	DeleteFile(key string) error
 }
 

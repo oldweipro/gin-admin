@@ -21,6 +21,10 @@ func (c *TencentCOS) UploadUrl(fileUrl, filename string) (string, string, error)
 	//TODO implement me
 	panic("implement me")
 }
+func (c *TencentCOS) UploadBase64(base64Str, filename string) (string, string, error) {
+	//TODO implement me
+	panic("implement me")
+}
 
 // UploadFile upload file to COS
 func (*TencentCOS) UploadFile(file *multipart.FileHeader) (string, string, error) {

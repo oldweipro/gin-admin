@@ -1,6 +1,7 @@
 package system
 
 import (
+	"github.com/oldweipro/gin-admin/utils/upload"
 	"strconv"
 	"time"
 
@@ -504,6 +505,13 @@ func (b *BaseApi) SetSelfInfo(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
+	// 图片存入本地或者OSS
+	oss := upload.NewOss()
+	uploadUrl, _, imgErr := oss.UploadBase64(user.HeaderImg, "")
+	if imgErr != nil {
+		return
+	}
+	user.HeaderImg = uploadUrl
 	user.ID = utils.GetUserID(c)
 	err = userService.SetSelfInfo(system.SysUser{
 		GVA_MODEL: global.GVA_MODEL{
@@ -511,10 +519,6 @@ func (b *BaseApi) SetSelfInfo(c *gin.Context) {
 		},
 		NickName:  user.NickName,
 		HeaderImg: user.HeaderImg,
-		Phone:     user.Phone,
-		Email:     user.Email,
-		SideMode:  user.SideMode,
-		Enable:    user.Enable,
 	})
 	if err != nil {
 		global.Logger.Error("设置失败!", zap.Error(err))

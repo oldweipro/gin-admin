@@ -17,6 +17,10 @@ func (o *Obs) UploadUrl(fileUrl, filename string) (string, string, error) {
 	//TODO implement me
 	panic("implement me")
 }
+func (o *Obs) UploadBase64(base64Str, filename string) (string, string, error) {
+	//TODO implement me
+	panic("implement me")
+}
 
 func NewHuaWeiObsClient() (client *obs.ObsClient, err error) {
 	return obs.New(global.ConfigServer.HuaWeiObs.AccessKey, global.ConfigServer.HuaWeiObs.SecretKey, global.ConfigServer.HuaWeiObs.Endpoint)

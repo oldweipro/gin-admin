@@ -1,8 +1,11 @@
 package upload
 
 import (
+	"bytes"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -85,7 +88,7 @@ func (*AliyunOSS) UploadUrl(fileUrl, filename string) (string, string, error) {
 		tokens := strings.Split(imgName, "/")
 		filename = tokens[len(tokens)-1]
 	}
-	yunFileTmpPath := global.ConfigServer.AliyunOSS.BasePath + "/" + "uploads" + "/" + time.Now().Format("2006-01-02") + "/" + filename
+	yunFileTmpPath := global.ConfigServer.AliyunOSS.BasePath + "/uploads/" + time.Now().Format("2006-01-02") + "/" + filename
 
 	err = bucket.PutObject(yunFileTmpPath, resp.Body)
 	if err != nil {
@@ -94,6 +97,41 @@ func (*AliyunOSS) UploadUrl(fileUrl, filename string) (string, string, error) {
 	}
 
 	return global.ConfigServer.AliyunOSS.BucketUrl + "/" + yunFileTmpPath, yunFileTmpPath, nil
+}
+
+func (*AliyunOSS) UploadBase64(base64Str, filename string) (string, string, error) {
+	bucket, err := NewBucket()
+	if err != nil {
+		global.Logger.Error("function AliyunOSS.NewBucket() Failed", zap.Any("err", err.Error()))
+		return "", "", errors.New("function AliyunOSS.NewBucket() Failed, err:" + err.Error())
+	}
+
+	// 上传阿里云路径 文件名格式 自己可以改 建议保证唯一性
+	if filename == "" {
+		filename = uuid.NewString()
+	}
+	yunFileTmpPath := global.ConfigServer.AliyunOSS.BasePath + "/avatar/" + time.Now().Format("2006-01-02") + "/" + filename
+	base64Data := extractBase64Data(base64Str)
+	imageData, err := base64.StdEncoding.DecodeString(base64Data)
+	if err != nil {
+		fmt.Println("Error reading Base64 image data:", err)
+		return "", "", errors.New("function imageData, err := os.ReadFile(base64Str) Failed, err:" + err.Error())
+	}
+	err = bucket.PutObject(yunFileTmpPath, bytes.NewReader(imageData))
+	if err != nil {
+		global.Logger.Error("function formUploader.Put() Failed", zap.Any("err", err.Error()))
+		return "", "", errors.New("function formUploader.Put() Failed, err:" + err.Error())
+	}
+
+	return global.ConfigServer.AliyunOSS.BucketUrl + "/" + yunFileTmpPath, yunFileTmpPath, nil
+}
+
+func extractBase64Data(data string) string {
+	parts := strings.SplitN(data, ",", 2)
+	if len(parts) == 2 {
+		return parts[1]
+	}
+	return data
 }
 
 func (*AliyunOSS) DeleteFile(key string) error {

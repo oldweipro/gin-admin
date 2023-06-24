@@ -22,6 +22,10 @@ func (s *AwsS3) UploadUrl(fileUrl, filename string) (string, string, error) {
 	//TODO implement me
 	panic("implement me")
 }
+func (s *AwsS3) UploadBase64(base64Str, filename string) (string, string, error) {
+	//TODO implement me
+	panic("implement me")
+}
 
 //@author: [WqyJh](https://github.com/WqyJh)
 //@object: *AwsS3
