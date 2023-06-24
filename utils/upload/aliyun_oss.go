@@ -110,7 +110,8 @@ func (*AliyunOSS) UploadBase64(base64Str, filename string) (string, string, erro
 	if filename == "" {
 		filename = uuid.NewString()
 	}
-	yunFileTmpPath := global.ConfigServer.AliyunOSS.BasePath + "/avatar/" + time.Now().Format("2006-01-02") + "/" + filename
+	fileType := getFileType(base64Str)
+	yunFileTmpPath := global.ConfigServer.AliyunOSS.BasePath + "/avatar/" + time.Now().Format("2006-01-02") + "/" + filename + "." + fileType
 	base64Data := extractBase64Data(base64Str)
 	imageData, err := base64.StdEncoding.DecodeString(base64Data)
 	if err != nil {
@@ -132,6 +133,14 @@ func extractBase64Data(data string) string {
 		return parts[1]
 	}
 	return data
+}
+
+func getFileType(data string) string {
+	parts := strings.SplitN(data, ";", 2)
+	if len(parts) == 2 {
+		return strings.TrimPrefix(parts[0], "data:image/")
+	}
+	return ""
 }
 
 func (*AliyunOSS) DeleteFile(key string) error {
