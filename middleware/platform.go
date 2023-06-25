@@ -11,8 +11,11 @@ var secretKeyService = service.ServiceGroupApp.OpenfishServiceGroup.SecretKeySer
 
 func PlatformOpenApiSkAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if c.Request.URL.Path == "/v1/chat/completions" && (c.Request.Method == "OPTIONS" || c.Request.Method == "options") {
+			c.Next()
+		}
 		sk := c.Request.Header.Get("Authorization")
-		if sk == "" {
+		if sk == "" || sk[:6] != "Bearer" {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": map[string]string{
 					"message": "未获得sk或非法访问",
@@ -24,6 +27,7 @@ func PlatformOpenApiSkAuth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		sk = sk[7:]
 		key, err := secretKeyService.GetSecretKeyBySk(sk)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{
