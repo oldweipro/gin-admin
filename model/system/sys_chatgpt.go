@@ -1,5 +1,7 @@
 package system
 
+import "github.com/oldweipro/gin-admin/global"
+
 type ChatGpt struct {
 	DBName string `json:"dbname,omitempty"`
 	Chat   string `json:"chat,omitempty"`
@@ -7,7 +9,12 @@ type ChatGpt struct {
 }
 
 type SysChatGptOption struct {
+	global.GVA_MODEL
 	SK string `json:"sk"`
+}
+
+func (SysChatGptOption) TableName() string {
+	return "sys_chat_gpt_option"
 }
 
 type ChatField struct {
