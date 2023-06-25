@@ -5,6 +5,7 @@ import (
 	"github.com/oldweipro/gin-admin/api/v1/ladder"
 	"github.com/oldweipro/gin-admin/api/v1/openfish"
 	"github.com/oldweipro/gin-admin/api/v1/patrol"
+	"github.com/oldweipro/gin-admin/api/v1/platform"
 	"github.com/oldweipro/gin-admin/api/v1/system"
 	"github.com/oldweipro/gin-admin/api/v1/transaction"
 )
@@ -14,6 +15,7 @@ type ApiGroup struct {
 	ExampleApiGroup     example.ApiGroup
 	PatrolApiGroup      patrol.ApiGroup
 	LadderApiGroup      ladder.ApiGroup
+	PlatformApiGroup    platform.ApiGroup
 	OpenfishApiGroup    openfish.ApiGroup
 	TransactionApiGroup transaction.ApiGroup
 }

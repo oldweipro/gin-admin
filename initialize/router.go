@@ -53,6 +53,9 @@ func Routers() *gin.Engine {
 	}
 	PrivateGroup := Router.Group(global.ConfigServer.System.RouterPrefix)
 	PrivateGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler())
+
+	PlatformGroup := Router.Group(global.ConfigServer.System.RouterPrefix)
+	PlatformGroup.Use(middleware.PlatformOpenApiSkAuth())
 	{
 		systemRouter.InitApiRouter(PrivateGroup, PublicGroup)    // 注册功能api路由
 		systemRouter.InitJwtRouter(PublicGroup)                  // jwt相关路由
@@ -98,6 +101,11 @@ func Routers() *gin.Engine {
 		transactionRouter.InitWalletsRouter(PrivateGroup)
 		transactionRouter.InitTransactionHistoryRouter(PrivateGroup)
 		transactionRouter.InitProductRouter(PrivateGroup)
+	}
+
+	{
+		platformRouter := router.RouterGroupApp.Platform
+		platformRouter.InitPlatformRouter(PlatformGroup)
 	}
 
 	global.Logger.Info("router register success")

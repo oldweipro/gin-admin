@@ -57,6 +57,12 @@ func (secretKeyService *SecretKeyService) GetSecretKey(id uint) (secretKey openf
 	return
 }
 
+// GetSecretKeyBySk 根据sk获取SecretKey记录
+func (secretKeyService *SecretKeyService) GetSecretKeyBySk(sk string) (secretKey openfish.SecretKey, err error) {
+	err = global.DB.Where("sk = ? and status = 1", sk).First(&secretKey).Error
+	return
+}
+
 // GetSecretKeyInfoList 分页获取SecretKey记录
 func (secretKeyService *SecretKeyService) GetSecretKeyInfoList(info openfishReq.SecretKeySearch) (list []openfish.SecretKey, total int64, err error) {
 	limit := info.PageSize
