@@ -172,7 +172,8 @@ func (secretKeyApi *SecretKeyApi) GetSecretKeyList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if list, total, err := secretKeyService.GetSecretKeyInfoList(pageInfo); err != nil {
+	pageInfo.UserId = utils.GetUserID(c)
+	if list, total, err := secretKeyService.GetSecretKeyInfoLessList(pageInfo); err != nil {
 		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {

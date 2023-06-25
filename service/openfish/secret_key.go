@@ -85,3 +85,27 @@ func (secretKeyService *SecretKeyService) GetSecretKeyInfoList(info openfishReq.
 	err = db.Limit(limit).Offset(offset).Find(&secretKeys).Error
 	return secretKeys, total, err
 }
+
+// GetSecretKeyInfoLessList 分页获取SecretKey记录
+func (secretKeyService *SecretKeyService) GetSecretKeyInfoLessList(info openfishReq.SecretKeySearch) (list []openfish.SecretKey, total int64, err error) {
+	limit := info.PageSize
+	offset := info.PageSize * (info.Page - 1)
+	// 创建db
+	db := global.DB.Model(&openfish.SecretKey{})
+	var secretKeys []openfish.SecretKey
+	// 如果有条件搜索 下方会自动创建搜索语句
+	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {
+		db = db.Where("created_at BETWEEN ? AND ?", info.StartCreatedAt, info.EndCreatedAt)
+	}
+	if info.Sk != "" {
+		db = db.Where("sk = ?", info.Sk)
+	}
+	db = db.Where("user_id = ?", info.UserId)
+	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
+
+	err = db.Limit(limit).Offset(offset).Find(&secretKeys).Error
+	return secretKeys, total, err
+}
