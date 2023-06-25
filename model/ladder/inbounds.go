@@ -9,12 +9,12 @@ import (
 type Inbounds struct {
 	global.GVA_MODEL
 	ClientId       string `json:"clientId" form:"clientId" gorm:"column:client_id;comment:vmess协议客户端id，也就是密码;"`
-	Up             *int   `json:"up" form:"up" gorm:"column:up;comment:上行流量;size:64;"`
-	Down           *int   `json:"down" form:"down" gorm:"column:down;comment:下行流量;size:64;"`
-	Total          *int   `json:"total" form:"total" gorm:"column:total;comment:流量限制，0:无限制;size:64;"`
+	Up             *int64 `json:"up" form:"up" gorm:"column:up;comment:上行流量;size:64;"`
+	Down           *int64 `json:"down" form:"down" gorm:"column:down;comment:下行流量;size:64;"`
+	Total          *int64 `json:"total" form:"total" gorm:"column:total;comment:流量限制，0:无限制;size:64;"`
 	Remark         string `json:"remark" form:"remark" gorm:"column:remark;comment:入站规则名称;"`
 	Enable         *bool  `json:"enable" form:"enable" gorm:"column:enable;comment:是否启用;"`
-	ExpiryTime     *int   `json:"expiryTime" form:"expiryTime" gorm:"column:expiry_time;comment:是一个13位的时间戳;size:13;"`
+	ExpiryTime     *int64 `json:"expiryTime" form:"expiryTime" gorm:"column:expiry_time;comment:是一个13位的时间戳;size:13;"`
 	Port           string `json:"port" form:"port" gorm:"column:port;comment:端口;size:12;"`
 	Protocol       string `json:"protocol" form:"protocol" gorm:"column:protocol;comment:协议;"`
 	Settings       string `json:"settings" form:"settings" gorm:"column:settings;comment:基本信息;size:500;"`

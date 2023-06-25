@@ -12,6 +12,7 @@ import (
 	"github.com/oldweipro/gin-admin/model/ladder"
 	ladderReq "github.com/oldweipro/gin-admin/model/ladder/request"
 	systemReq "github.com/oldweipro/gin-admin/model/system/request"
+	systemService "github.com/oldweipro/gin-admin/service/system"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"math/rand"
@@ -22,6 +23,8 @@ import (
 
 type InboundsService struct {
 }
+
+var userService systemService.UserService
 
 // CreateInbounds 创建Inbounds记录
 func (inboundsService *InboundsService) CreateInbounds(inbounds *ladder.Inbounds) (err error) {
@@ -105,12 +108,15 @@ func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo sy
 	// 查询服务器信息
 	var serverNode ladder.ServerNode
 	global.DB.Where("id = ?", *inbounds.Sid).First(&serverNode)
-
-	up := 0
-	down := 0
-	total := 0
+	user, err := userService.FindUserById(userInfo.BaseClaims.ID)
+	if err != nil {
+		return
+	}
+	var up int64 = 0
+	var down int64 = 0
+	var total int64 = 0
 	enable := true
-	expiryTime := 0
+	expiryTime := user.LadderExpire
 	// 判断一下，如果有数据就不重置了
 	if inbounds.Up == nil {
 		inbounds.Up = &up
@@ -129,12 +135,12 @@ func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo sy
 	// 👇组装请求参数
 	queryParams := make(map[string]string)
 	queryParams["id"] = strconv.Itoa(int(*inbounds.Uid))
-	queryParams["up"] = strconv.Itoa(*inbounds.Up)
-	queryParams["down"] = strconv.Itoa(*inbounds.Down)
-	queryParams["total"] = strconv.Itoa(*inbounds.Total)
+	queryParams["up"] = strconv.FormatInt(*inbounds.Up, 10)
+	queryParams["down"] = strconv.FormatInt(*inbounds.Down, 10)
+	queryParams["total"] = strconv.FormatInt(*inbounds.Total, 10)
 	queryParams["remark"] = inbounds.Remark
 	queryParams["enable"] = "true"
-	queryParams["expiryTime"] = strconv.Itoa(*inbounds.ExpiryTime)
+	queryParams["expiryTime"] = strconv.FormatInt(*inbounds.ExpiryTime, 10)
 	queryParams["listen"] = ""
 	rand.Seed(time.Now().UnixNano())
 	r := rand.Intn(40000) + 20000
