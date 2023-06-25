@@ -13,6 +13,7 @@ func PlatformOpenApiSkAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.URL.Path == "/v1/chat/completions" && (c.Request.Method == "OPTIONS" || c.Request.Method == "options") {
 			c.Next()
+			return
 		}
 		sk := c.Request.Header.Get("Authorization")
 		if sk == "" || sk[:6] != "Bearer" {
