@@ -15,14 +15,12 @@ type ServerNodeService struct {
 }
 
 // CreateServerNode 创建ServerNode记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (serverNodeService *ServerNodeService) CreateServerNode(serverNode *ladder.ServerNode) (err error) {
 	err = global.DB.Create(serverNode).Error
 	return err
 }
 
 // DeleteServerNode 删除ServerNode记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (serverNodeService *ServerNodeService) DeleteServerNode(serverNode ladder.ServerNode) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&ladder.ServerNode{}).Where("id = ?", serverNode.ID).Update("deleted_by", serverNode.DeletedBy).Error; err != nil {
@@ -37,7 +35,6 @@ func (serverNodeService *ServerNodeService) DeleteServerNode(serverNode ladder.S
 }
 
 // DeleteServerNodeByIds 批量删除ServerNode记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (serverNodeService *ServerNodeService) DeleteServerNodeByIds(ids request.IdsReq, deleted_by uint) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&ladder.ServerNode{}).Where("id in ?", ids.Ids).Update("deleted_by", deleted_by).Error; err != nil {
@@ -52,14 +49,12 @@ func (serverNodeService *ServerNodeService) DeleteServerNodeByIds(ids request.Id
 }
 
 // UpdateServerNode 更新ServerNode记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (serverNodeService *ServerNodeService) UpdateServerNode(serverNode ladder.ServerNode) (err error) {
 	err = global.DB.Save(&serverNode).Error
 	return err
 }
 
 // GetServerNode 根据id获取ServerNode记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (serverNodeService *ServerNodeService) GetServerNode(id uint) (serverNode ladder.ServerNode, err error) {
 	err = global.DB.Where("id = ?", id).First(&serverNode).Error
 	return
@@ -76,7 +71,6 @@ func (serverNodeService *ServerNodeService) GetServerNodeInfoList(info ladderReq
 	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {
 		db = db.Where("created_at BETWEEN ? AND ?", info.StartCreatedAt, info.EndCreatedAt)
 	}
-	db = db.Where("server_status = 1")
 	err = db.Count(&total).Error
 	if err != nil {
 		return

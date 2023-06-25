@@ -31,21 +31,18 @@ type ConversationService struct {
 var chatGptService system.ChatGptService
 
 // CreateConversation 创建Conversation记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) CreateConversation(conversation *openfish.Conversation) (err error) {
 	err = global.DB.Create(conversation).Error
 	return err
 }
 
 // CreateConversationRecord 创建ConversationRecord记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) CreateConversationRecord(conversationRecord *openfish.ConversationRecord) (err error) {
 	err = global.DB.Create(conversationRecord).Error
 	return err
 }
 
 // DeleteConversation 删除Conversation记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) DeleteConversation(conversation openfish.Conversation) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&openfish.Conversation{}).Where("id = ?", conversation.ID).Update("deleted_by", conversation.DeletedBy).Error; err != nil {
@@ -60,7 +57,6 @@ func (conversationService *ConversationService) DeleteConversation(conversation 
 }
 
 // DeleteConversationByIds 批量删除Conversation记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) DeleteConversationByIds(ids request.IdsReq, deleted_by uint) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&openfish.Conversation{}).Where("id in ?", ids.Ids).Update("deleted_by", deleted_by).Error; err != nil {
@@ -75,28 +71,24 @@ func (conversationService *ConversationService) DeleteConversationByIds(ids requ
 }
 
 // UpdateConversation 更新Conversation记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) UpdateConversation(conversation openfish.Conversation) (err error) {
 	err = global.DB.Save(&conversation).Error
 	return err
 }
 
 // UpdateConversationTime 更新Conversation时间
-// Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) UpdateConversationTime(id uint) (err error) {
 	err = global.DB.Model(&openfish.Conversation{}).Where("id = ?", id).Update("updated_at", time.Now()).Error
 	return err
 }
 
 // GetConversation 根据id获取Conversation记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) GetConversation(id uint) (conversation openfish.Conversation, err error) {
 	err = global.DB.Where("id = ?", id).First(&conversation).Error
 	return
 }
 
 // GetConversationInfoList 分页获取Conversation记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (conversationService *ConversationService) GetConversationInfoList(info openfishReq.ConversationSearch) (list []openfish.Conversation, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)

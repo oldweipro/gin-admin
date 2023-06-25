@@ -15,9 +15,7 @@ import (
 	_ "github.com/oldweipro/gin-admin/packfile"
 )
 
-// Viper //
-// 优先级: 命令行 > 环境变量 > 默认值
-// Author [SliverHorn](https://github.com/SliverHorn)
+// Viper 优先级: 命令行 > 环境变量 > 默认值
 func Viper(path ...string) *viper.Viper {
 	var config string
 

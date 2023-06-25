@@ -142,42 +142,36 @@ func (personnelService *PersonnelService) SyncPersonnelImg() (err error) {
 }
 
 // CreatePersonnel 创建Personnel记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (personnelService *PersonnelService) CreatePersonnel(personnel patrol.Personnel) (err error) {
 	err = global.DB.Create(&personnel).Error
 	return err
 }
 
 // DeletePersonnel 删除Personnel记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (personnelService *PersonnelService) DeletePersonnel(personnel patrol.Personnel) (err error) {
 	err = global.DB.Delete(&personnel).Error
 	return err
 }
 
 // DeletePersonnelByIds 批量删除Personnel记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (personnelService *PersonnelService) DeletePersonnelByIds(ids request.IdsReq) (err error) {
 	err = global.DB.Delete(&[]patrol.Personnel{}, "id in ?", ids.Ids).Error
 	return err
 }
 
 // UpdatePersonnel 更新Personnel记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (personnelService *PersonnelService) UpdatePersonnel(personnel patrol.Personnel) (err error) {
 	err = global.DB.Save(&personnel).Error
 	return err
 }
 
 // GetPersonnel 根据id获取Personnel记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (personnelService *PersonnelService) GetPersonnel(id uint) (personnel patrol.Personnel, err error) {
 	err = global.DB.Where("id = ?", id).First(&personnel).Error
 	return
 }
 
 // GetPersonnelInfoList 分页获取Personnel记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (personnelService *PersonnelService) GetPersonnelInfoList(info patrolReq.PersonnelSearch) (list []patrol.Personnel, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)

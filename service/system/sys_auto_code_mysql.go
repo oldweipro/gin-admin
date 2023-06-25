@@ -10,8 +10,6 @@ var AutoCodeMysql = new(autoCodeMysql)
 type autoCodeMysql struct{}
 
 // GetDB 获取数据库的所有数据库名
-// Author [piexlmax](https://github.com/piexlmax)
-// Author [SliverHorn](https://github.com/SliverHorn)
 func (s *autoCodeMysql) GetDB(businessDB string) (data []response.Db, err error) {
 	var entities []response.Db
 	sql := "SELECT SCHEMA_NAME AS `database` FROM INFORMATION_SCHEMA.SCHEMATA;"
@@ -24,8 +22,6 @@ func (s *autoCodeMysql) GetDB(businessDB string) (data []response.Db, err error)
 }
 
 // GetTables 获取数据库的所有表名
-// Author [piexlmax](https://github.com/piexlmax)
-// Author [SliverHorn](https://github.com/SliverHorn)
 func (s *autoCodeMysql) GetTables(businessDB string, dbName string) (data []response.Table, err error) {
 	var entities []response.Table
 	sql := `select table_name as table_name from information_schema.tables where table_schema = ?`
@@ -39,8 +35,6 @@ func (s *autoCodeMysql) GetTables(businessDB string, dbName string) (data []resp
 }
 
 // GetColumn 获取指定数据库和指定数据表的所有字段名,类型值等
-// Author [piexlmax](https://github.com/piexlmax)
-// Author [SliverHorn](https://github.com/SliverHorn)
 func (s *autoCodeMysql) GetColumn(businessDB string, tableName string, dbName string) (data []response.Column, err error) {
 	var entities []response.Column
 	sql := `

@@ -24,14 +24,12 @@ type InboundsService struct {
 }
 
 // CreateInbounds 创建Inbounds记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (inboundsService *InboundsService) CreateInbounds(inbounds *ladder.Inbounds) (err error) {
 	err = global.DB.Create(inbounds).Error
 	return err
 }
 
 // DeleteInbounds 删除Inbounds记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (inboundsService *InboundsService) DeleteInbounds(inbounds ladder.Inbounds) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&ladder.Inbounds{}).Where("id = ?", inbounds.ID).Update("deleted_by", inbounds.DeletedBy).Error; err != nil {
@@ -46,7 +44,6 @@ func (inboundsService *InboundsService) DeleteInbounds(inbounds ladder.Inbounds)
 }
 
 // DeleteInboundsByIds 批量删除Inbounds记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (inboundsService *InboundsService) DeleteInboundsByIds(ids request.IdsReq, deleted_by uint) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&ladder.Inbounds{}).Where("id in ?", ids.Ids).Update("deleted_by", deleted_by).Error; err != nil {
@@ -61,14 +58,12 @@ func (inboundsService *InboundsService) DeleteInboundsByIds(ids request.IdsReq, 
 }
 
 // UpdateInbounds 更新Inbounds记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (inboundsService *InboundsService) UpdateInbounds(inbounds ladder.Inbounds) (err error) {
 	err = global.DB.Save(&inbounds).Error
 	return err
 }
 
 // GetInbounds 根据id获取Inbounds记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (inboundsService *InboundsService) GetInbounds(id uint) (inbounds ladder.Inbounds, err error) {
 	err = global.DB.Where("id = ?", id).First(&inbounds).Error
 	return
@@ -233,7 +228,6 @@ func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo sy
 }
 
 // GetInboundsInfoList 分页获取Inbounds记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (inboundsService *InboundsService) GetInboundsInfoList(info ladderReq.InboundsSearch) (list []ladder.Inbounds, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)

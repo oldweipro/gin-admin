@@ -28,8 +28,6 @@ var AutoCodeHistoryServiceApp = new(AutoCodeHistoryService)
 
 // CreateAutoCodeHistory 创建代码生成器历史记录
 // RouterPath : RouterPath@RouterString;RouterPath2@RouterString2
-// Author [SliverHorn](https://github.com/SliverHorn)
-// Author [songzhibin97](https://github.com/songzhibin97)
 func (autoCodeHistoryService *AutoCodeHistoryService) CreateAutoCodeHistory(meta, structName, structCNName, autoCodePath string, injectionMeta string, tableName string, apiIds string, Package string) error {
 	return global.DB.Create(&system.SysAutoCodeHistory{
 		Package:       Package,
@@ -44,16 +42,12 @@ func (autoCodeHistoryService *AutoCodeHistoryService) CreateAutoCodeHistory(meta
 }
 
 // First 根据id获取代码生成器历史的数据
-// Author [SliverHorn](https://github.com/SliverHorn)
-// Author [songzhibin97](https://github.com/songzhibin97)
 func (autoCodeHistoryService *AutoCodeHistoryService) First(info *request.GetById) (string, error) {
 	var meta string
 	return meta, global.DB.Model(system.SysAutoCodeHistory{}).Select("request_meta").Where("id = ?", info.Uint()).First(&meta).Error
 }
 
 // Repeat 检测重复
-// Author [SliverHorn](https://github.com/SliverHorn)
-// Author [songzhibin97](https://github.com/songzhibin97)
 func (autoCodeHistoryService *AutoCodeHistoryService) Repeat(businessDB, structName, Package string) bool {
 	var count int64
 	global.DB.Model(&system.SysAutoCodeHistory{}).Where("business_db = ? and struct_name = ? and package = ? and flag = 0", businessDB, structName, Package).Count(&count)
@@ -61,8 +55,6 @@ func (autoCodeHistoryService *AutoCodeHistoryService) Repeat(businessDB, structN
 }
 
 // RollBack 回滚
-// Author [SliverHorn](https://github.com/SliverHorn)
-// Author [songzhibin97](https://github.com/songzhibin97)
 func (autoCodeHistoryService *AutoCodeHistoryService) RollBack(info *systemReq.RollBack) error {
 	md := system.SysAutoCodeHistory{}
 	if err := global.DB.Where("id = ?", info.ID).First(&md).Error; err != nil {
@@ -129,15 +121,11 @@ func (autoCodeHistoryService *AutoCodeHistoryService) RollBack(info *systemReq.R
 }
 
 // Delete 删除历史数据
-// Author [SliverHorn](https://github.com/SliverHorn)
-// Author [songzhibin97](https://github.com/songzhibin97)
 func (autoCodeHistoryService *AutoCodeHistoryService) Delete(info *request.GetById) error {
 	return global.DB.Where("id = ?", info.Uint()).Delete(&system.SysAutoCodeHistory{}).Error
 }
 
 // GetList 获取系统历史数据
-// Author [SliverHorn](https://github.com/SliverHorn)
-// Author [songzhibin97](https://github.com/songzhibin97)
 func (autoCodeHistoryService *AutoCodeHistoryService) GetList(info request.PageInfo) (list []response.AutoCodeHistory, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)

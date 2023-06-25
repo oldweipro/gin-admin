@@ -11,42 +11,36 @@ type WalletsService struct {
 }
 
 // CreateWallets 创建Wallets记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (walletsService *WalletsService) CreateWallets(wallets *transaction.Wallets) (err error) {
 	err = global.DB.Create(wallets).Error
 	return err
 }
 
 // DeleteWallets 删除Wallets记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (walletsService *WalletsService) DeleteWallets(wallets transaction.Wallets) (err error) {
 	err = global.DB.Delete(&wallets).Error
 	return err
 }
 
 // DeleteWalletsByIds 批量删除Wallets记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (walletsService *WalletsService) DeleteWalletsByIds(ids request.IdsReq) (err error) {
 	err = global.DB.Delete(&[]transaction.Wallets{}, "id in ?", ids.Ids).Error
 	return err
 }
 
 // UpdateWallets 更新Wallets记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (walletsService *WalletsService) UpdateWallets(wallets transaction.Wallets) (err error) {
 	err = global.DB.Save(&wallets).Error
 	return err
 }
 
 // GetWallets 根据id获取Wallets记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (walletsService *WalletsService) GetWallets(id uint) (wallets transaction.Wallets, err error) {
 	err = global.DB.Where("id = ?", id).First(&wallets).Error
 	return
 }
 
 // GetWalletsInfoList 分页获取Wallets记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (walletsService *WalletsService) GetWalletsInfoList(info openfishReq.WalletsSearch) (list []transaction.Wallets, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)

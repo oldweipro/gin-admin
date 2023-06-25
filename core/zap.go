@@ -11,7 +11,6 @@ import (
 )
 
 // Zap 获取 zap.Logger
-// Author [SliverHorn](https://github.com/SliverHorn)
 func Zap() (logger *zap.Logger) {
 	if ok, _ := utils.PathExists(global.ConfigServer.Zap.Director); !ok { // 判断是否有Director文件夹
 		fmt.Printf("create %v directory\n", global.ConfigServer.Zap.Director)

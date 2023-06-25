@@ -40,7 +40,6 @@ func (i *InitDB) PgsqlEmptyDsn() string {
 }
 
 // ToMysqlConfig 转换 config.Mysql
-// Author [SliverHorn](https://github.com/SliverHorn)
 func (i *InitDB) ToMysqlConfig() config.Mysql {
 	return config.Mysql{
 		GeneralDB: config.GeneralDB{
@@ -58,7 +57,6 @@ func (i *InitDB) ToMysqlConfig() config.Mysql {
 }
 
 // ToPgsqlConfig 转换 config.Pgsql
-// Author [SliverHorn](https://github.com/SliverHorn)
 func (i *InitDB) ToPgsqlConfig() config.Pgsql {
 	return config.Pgsql{
 		GeneralDB: config.GeneralDB{

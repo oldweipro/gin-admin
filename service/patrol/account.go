@@ -17,14 +17,12 @@ type AccountService struct {
 }
 
 // CreateAccount 创建Account记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (accountService *AccountService) CreateAccount(account patrol.Account) (err error) {
 	err = global.DB.Create(&account).Error
 	return err
 }
 
 // DeleteAccount 删除Account记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (accountService *AccountService) DeleteAccount(account patrol.Account) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&patrol.Account{}).Where("id = ?", account.ID).Update("deleted_by", account.DeletedBy).Error; err != nil {
@@ -39,7 +37,6 @@ func (accountService *AccountService) DeleteAccount(account patrol.Account) (err
 }
 
 // DeleteAccountByIds 批量删除Account记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (accountService *AccountService) DeleteAccountByIds(ids request.IdsReq, deleted_by uint) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&patrol.Account{}).Where("id in ?", ids.Ids).Update("deleted_by", deleted_by).Error; err != nil {
@@ -54,21 +51,18 @@ func (accountService *AccountService) DeleteAccountByIds(ids request.IdsReq, del
 }
 
 // UpdateAccount 更新Account记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (accountService *AccountService) UpdateAccount(account patrol.Account) (err error) {
 	err = global.DB.Save(&account).Error
 	return err
 }
 
 // GetAccount 根据id获取Account记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (accountService *AccountService) GetAccount(id uint) (account patrol.Account, err error) {
 	err = global.DB.Where("id = ?", id).First(&account).Error
 	return
 }
 
 // GetAccountInfoList 分页获取Account记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (accountService *AccountService) GetAccountInfoList(info patrolReq.AccountSearch) (list []patrol.Account, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)

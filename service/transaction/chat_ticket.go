@@ -14,14 +14,12 @@ type ChatTicketService struct {
 }
 
 // CreateChatTicket 创建ChatTicket记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (chatTicketService *ChatTicketService) CreateChatTicket(chatTicket *transaction.ChatTicket) (err error) {
 	err = global.DB.Create(chatTicket).Error
 	return err
 }
 
 // DeleteChatTicket 删除ChatTicket记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (chatTicketService *ChatTicketService) DeleteChatTicket(chatTicket transaction.ChatTicket) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&transaction.ChatTicket{}).Where("id = ?", chatTicket.ID).Update("deleted_by", chatTicket.DeletedBy).Error; err != nil {
@@ -36,7 +34,6 @@ func (chatTicketService *ChatTicketService) DeleteChatTicket(chatTicket transact
 }
 
 // DeleteChatTicketByIds 批量删除ChatTicket记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (chatTicketService *ChatTicketService) DeleteChatTicketByIds(ids request.IdsReq, deleted_by uint) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&transaction.ChatTicket{}).Where("id in ?", ids.Ids).Update("deleted_by", deleted_by).Error; err != nil {
@@ -51,21 +48,18 @@ func (chatTicketService *ChatTicketService) DeleteChatTicketByIds(ids request.Id
 }
 
 // UpdateChatTicket 更新ChatTicket记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (chatTicketService *ChatTicketService) UpdateChatTicket(chatTicket transaction.ChatTicket) (err error) {
 	err = global.DB.Save(&chatTicket).Error
 	return err
 }
 
 // GetChatTicket 根据id获取ChatTicket记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (chatTicketService *ChatTicketService) GetChatTicket(id uint) (chatTicket transaction.ChatTicket, err error) {
 	err = global.DB.Where("id = ?", id).First(&chatTicket).Error
 	return
 }
 
 // GetChatTicketInfoList 分页获取ChatTicket记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (chatTicketService *ChatTicketService) GetChatTicketInfoList(info openfishReq.ChatTicketSearch) (list []transaction.ChatTicket, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)

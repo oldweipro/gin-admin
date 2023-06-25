@@ -12,14 +12,12 @@ type CertificationRecordService struct {
 }
 
 // CreateCertificationRecord 创建CertificationRecord记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (certificationRecordService *CertificationRecordService) CreateCertificationRecord(certificationRecord patrol.CertificationRecord) (err error) {
 	err = global.DB.Create(&certificationRecord).Error
 	return err
 }
 
 // DeleteCertificationRecord 删除CertificationRecord记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (certificationRecordService *CertificationRecordService) DeleteCertificationRecord(certificationRecord patrol.CertificationRecord) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&patrol.CertificationRecord{}).Where("id = ?", certificationRecord.ID).Update("deleted_by", certificationRecord.DeletedBy).Error; err != nil {
@@ -34,7 +32,6 @@ func (certificationRecordService *CertificationRecordService) DeleteCertificatio
 }
 
 // DeleteCertificationRecordByIds 批量删除CertificationRecord记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (certificationRecordService *CertificationRecordService) DeleteCertificationRecordByIds(ids request.IdsReq, deleted_by uint) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&patrol.CertificationRecord{}).Where("id in ?", ids.Ids).Update("deleted_by", deleted_by).Error; err != nil {
@@ -49,21 +46,18 @@ func (certificationRecordService *CertificationRecordService) DeleteCertificatio
 }
 
 // UpdateCertificationRecord 更新CertificationRecord记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (certificationRecordService *CertificationRecordService) UpdateCertificationRecord(certificationRecord patrol.CertificationRecord) (err error) {
 	err = global.DB.Save(&certificationRecord).Error
 	return err
 }
 
 // GetCertificationRecord 根据id获取CertificationRecord记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (certificationRecordService *CertificationRecordService) GetCertificationRecord(id uint) (certificationRecord patrol.CertificationRecord, err error) {
 	err = global.DB.Where("id = ?", id).First(&certificationRecord).Error
 	return
 }
 
 // GetCertificationRecordInfoList 分页获取CertificationRecord记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (certificationRecordService *CertificationRecordService) GetCertificationRecordInfoList(info patrolReq.CertificationRecordSearch) (list []patrol.CertificationRecord, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
