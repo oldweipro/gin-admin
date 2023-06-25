@@ -2,14 +2,12 @@ package initialize
 
 import (
 	"fmt"
-	//v1 "github.com/oldweipro/gin-admin/api/v1"
-	"github.com/oldweipro/gin-admin/service"
-
-	"github.com/robfig/cron/v3"
-
 	"github.com/oldweipro/gin-admin/config"
 	"github.com/oldweipro/gin-admin/global"
+	//v1 "github.com/oldweipro/gin-admin/api/v1"
+	"github.com/oldweipro/gin-admin/service"
 	"github.com/oldweipro/gin-admin/utils"
+	"github.com/robfig/cron/v3"
 )
 
 func Timer() {
