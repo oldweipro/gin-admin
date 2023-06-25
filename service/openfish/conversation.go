@@ -161,6 +161,11 @@ func (conversationService *ConversationService) OpenAIDrawing(chatReq openfishRe
 		global.Logger.Error("获取sk失败!", zap.Error(err))
 		return err
 	}
+	// 更新openai sk
+	sk.UpdatedAt = time.Now()
+	if err := chatGptService.UpdateSK(sk); err != nil {
+		global.Logger.Error("更新openai sk失败!", zap.Error(err))
+	}
 	config := openai.DefaultConfig(sk.SK)
 	// 如果需要代理，请配置代理地址，如不需要可注释或删掉以下代码
 	config.HTTPClient.Transport = &http.Transport{
@@ -302,6 +307,11 @@ func (conversationService *ConversationService) ChatOpenAIApiKey(conversationRec
 	if err != nil {
 		global.Logger.Error("获取sk失败!", zap.Error(err))
 		return err
+	}
+	// 更新openai sk
+	sk.UpdatedAt = time.Now()
+	if err := chatGptService.UpdateSK(sk); err != nil {
+		global.Logger.Error("更新openai sk失败!", zap.Error(err))
 	}
 	config := openai.DefaultConfig(sk.SK)
 	// 如果需要代理，请配置代理地址，如不需要可注释或删掉以下代码

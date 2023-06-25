@@ -26,8 +26,12 @@ func (chat *ChatGptService) CreateSK(option system.SysChatGptOption) error {
 }
 
 func (chat *ChatGptService) GetSK() (option system.SysChatGptOption, err error) {
-	err = global.DB.First(&option).Error
+	err = global.DB.Order("updated_at").First(&option).Error
 	return
+}
+
+func (chat *ChatGptService) UpdateSK(option system.SysChatGptOption) error {
+	return global.DB.Save(&option).Error
 }
 
 func (chat *ChatGptService) DeleteSK() error {
