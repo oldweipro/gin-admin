@@ -90,6 +90,7 @@ func Routers() *gin.Engine {
 		openfishRouter := router.RouterGroupApp.Openfish
 		openfishRouter.InitConversationRouter(PrivateGroup)
 		openfishRouter.InitFeedbackRouter(PrivateGroup)
+		openfishRouter.InitSecretKeyRouter(PrivateGroup)
 	}
 	{
 		transactionRouter := router.RouterGroupApp.Transaction
