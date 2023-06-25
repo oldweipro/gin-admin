@@ -1,14 +1,15 @@
 package ladder
 
 import (
-	"fmt"
 	"github.com/go-resty/resty/v2"
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/ladder"
 	ladderReq "github.com/oldweipro/gin-admin/model/ladder/request"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"strconv"
+	"time"
 )
 
 type ServerNodeService struct {
@@ -60,6 +61,15 @@ func (serverNodeService *ServerNodeService) GetServerNode(id uint) (serverNode l
 	return
 }
 
+// GetServerNodeList 获取ServerNode所有记录
+func (serverNodeService *ServerNodeService) GetServerNodeList() (list []ladder.ServerNode, err error) {
+	// 创建db
+	db := global.DB.Model(&ladder.ServerNode{})
+	var serverNodes []ladder.ServerNode
+	err = db.Find(&serverNodes).Error
+	return serverNodes, err
+}
+
 // GetServerNodeInfoList 分页获取ServerNode记录
 func (serverNodeService *ServerNodeService) GetServerNodeInfoList(info ladderReq.ServerNodeSearch) (list []ladder.ServerNode, total int64, err error) {
 	limit := info.PageSize
@@ -102,7 +112,7 @@ func (serverNodeService *ServerNodeService) GetServerNodeLessInfoList(info ladde
 }
 
 // ServerNodeLogin 处理登陆获取cookie
-func (serverNodeService *ServerNodeService) ServerNodeLogin(serverNode ladder.ServerNode) {
+func (serverNodeService *ServerNodeService) ServerNodeLogin(serverNode ladder.ServerNode) (err error) {
 	loginFormData := make(map[string]string)
 	loginFormData["username"] = serverNode.Username
 	loginFormData["password"] = serverNode.Password
@@ -111,9 +121,23 @@ func (serverNodeService *ServerNodeService) ServerNodeLogin(serverNode ladder.Se
 		SetFormData(loginFormData).
 		Post("http://" + serverNode.ServerHost + ":" + strconv.Itoa(*serverNode.ServerPort) + "/login")
 	if err != nil {
-		fmt.Println(err)
+		global.Logger.Error(serverNode.ServerHost+"登录梯子失败:", zap.Error(err))
+		return
 	}
+	global.Logger.Info("返回的结果:", zap.String("response", resp.String()))
 	serverNode.Cookie = resp.Cookies()[0].Value
-	fmt.Println(serverNode.Cookie)
-	serverNodeService.UpdateServerNode(serverNode)
+	serverNode.UpdatedAt = time.Now()
+	err = serverNodeService.UpdateServerNode(serverNode)
+	return
+}
+
+func (serverNodeService *ServerNodeService) SyncLadderCookie() (err error) {
+	list, err := serverNodeService.GetServerNodeList()
+	for _, node := range list {
+		err = serverNodeService.ServerNodeLogin(node)
+		if err != nil {
+			return
+		}
+	}
+	return
 }

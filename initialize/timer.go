@@ -3,7 +3,7 @@ package initialize
 import (
 	"fmt"
 	//v1 "github.com/oldweipro/gin-admin/api/v1"
-	//"github.com/oldweipro/gin-admin/service"
+	"github.com/oldweipro/gin-admin/service"
 
 	"github.com/robfig/cron/v3"
 
@@ -15,6 +15,7 @@ import (
 func Timer() {
 	//var certificationRecordApi = v1.ApiGroupApp.PatrolApiGroup.CertificationRecordApi
 	//var personnelService = service.ServiceGroupApp.PatrolServiceGroup.PersonnelService
+	var serverNodeService = service.ServiceGroupApp.LadderServiceGroup.ServerNodeService
 	if global.ConfigServer.Timer.Start {
 		for i := range global.ConfigServer.Timer.Detail {
 			go func(detail config.Detail) {
@@ -66,5 +67,16 @@ func Timer() {
 		//if err != nil {
 		//	fmt.Println("添加每天同步人员数据定时任务 error:", err)
 		//}
+
+		// 每周一开始同步
+		_, err := global.Timer.AddTaskByFunc("SyncLadderCookie", "0 0 * * MON", func() {
+			err := serverNodeService.SyncLadderCookie()
+			if err != nil {
+				fmt.Println("定时任务【同步梯子cookie】失败")
+			}
+		})
+		if err != nil {
+			fmt.Println("添加每天【同步梯子cookie】定时任务 error:", err)
+		}
 	}
 }
