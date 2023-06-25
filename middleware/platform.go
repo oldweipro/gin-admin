@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/oldweipro/gin-admin/service"
 	"net/http"
@@ -12,7 +11,6 @@ var secretKeyService = service.ServiceGroupApp.OpenfishServiceGroup.SecretKeySer
 
 func PlatformOpenApiSkAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fmt.Println("中间件调用")
 		sk := c.Request.Header.Get("Authorization")
 		if sk == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
