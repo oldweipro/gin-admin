@@ -111,6 +111,31 @@ func (conversationService *ConversationService) GetConversationInfoList(info ope
 	return conversations, total, err
 }
 
+func (conversationService *ConversationService) GetConversationRecordList(info openfishReq.ConversationRecordSearch) (list []openfish.ConversationRecord, total int64, err error) {
+	limit := info.PageSize
+	offset := info.PageSize * (info.Page - 1)
+	// 创建db
+	db := global.DB.Model(&openfish.ConversationRecord{})
+	var conversationRecords []openfish.ConversationRecord
+	// 如果有条件搜索 下方会自动创建搜索语句
+	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {
+		db = db.Where("created_at BETWEEN ? AND ?", info.StartCreatedAt, info.EndCreatedAt)
+	}
+	if info.CreatedBy != 0 {
+		db = db.Where("created_by = ?", info.CreatedBy)
+	}
+	if info.Content != "" {
+		db = db.Where("content like ?", "%"+info.Content+"%")
+	}
+	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
+
+	err = db.Limit(limit).Offset(offset).Find(&conversationRecords).Error
+	return conversationRecords, total, err
+}
+
 // GetConversationRecordListWithTokenByConversationId 根据pid查询会话信息列表
 // error: error, status code: 400, message: This model's maximum context length is 4097 tokens. However, your messages resulted in 6301 tokens. Please reduce the length of the messages.
 func (conversationService *ConversationService) GetConversationRecordListWithTokenByConversationId(conversationId uint, tokenCount int) ([]openfish.ConversationRecord, error) {

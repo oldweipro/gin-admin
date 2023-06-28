@@ -461,3 +461,23 @@ func (conversationApi *ConversationApi) GetCurrentUserConversationList(c *gin.Co
 	resultData["activeConversationId"] = reConversationList[0]["uuid"]
 	response.OkWithDetailed(resultData, "获取成功", c)
 }
+
+func (conversationApi *ConversationApi) GetConversationRecordList(c *gin.Context) {
+	var pageInfo openfishReq.ConversationRecordSearch
+	err := c.ShouldBindQuery(&pageInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	if list, total, err := conversationService.GetConversationRecordList(pageInfo); err != nil {
+		global.Logger.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:     list,
+			Total:    total,
+			Page:     pageInfo.Page,
+			PageSize: pageInfo.PageSize,
+		}, "获取成功", c)
+	}
+}

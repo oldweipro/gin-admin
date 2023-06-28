@@ -13,6 +13,13 @@ type ConversationSearch struct {
 	request.PageInfo
 }
 
+type ConversationRecordSearch struct {
+	openfish.ConversationRecord
+	StartCreatedAt *time.Time `json:"startCreatedAt" form:"startCreatedAt"`
+	EndCreatedAt   *time.Time `json:"endCreatedAt" form:"endCreatedAt"`
+	request.PageInfo
+}
+
 // ChatReq 请求参数列表
 type ChatReq struct {
 	Prompt           string `form:"prompt" json:"prompt"`

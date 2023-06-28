@@ -55,15 +55,26 @@ func OperationRecord() gin.HandlerFunc {
 			}
 			body, _ = json.Marshal(&m)
 		}
-		claims, _ := utils.GetClaims(c)
-		if claims.BaseClaims.ID != 0 {
-			userId = int(claims.BaseClaims.ID)
-		} else {
-			id, err := strconv.Atoi(c.Request.Header.Get("x-user-id"))
+		sk := c.Request.Header.Get("Authorization")
+		if sk != "" && sk[7:] != "" {
+			// 查询数据库获得user信息
+			sk = sk[7:]
+			key, err := secretKeyService.GetSecretKeyBySk(sk)
 			if err != nil {
 				userId = 0
 			}
-			userId = id
+			userId = int(key.CreatedBy)
+		} else {
+			claims, _ := utils.GetClaims(c)
+			if claims.BaseClaims.ID != 0 {
+				userId = int(claims.BaseClaims.ID)
+			} else {
+				id, err := strconv.Atoi(c.Request.Header.Get("x-user-id"))
+				if err != nil {
+					userId = 0
+				}
+				userId = id
+			}
 		}
 		record := system.SysOperationRecord{
 			Ip:     c.ClientIP(),

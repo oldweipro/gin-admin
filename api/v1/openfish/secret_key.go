@@ -36,7 +36,6 @@ func (secretKeyApi *SecretKeyApi) CreateSecretKey(c *gin.Context) {
 		return
 	}
 	secretKey.CreatedBy = utils.GetUserID(c)
-	secretKey.UserId = utils.GetUserID(c)
 	secretKey.Sk = "sk-" + strings.ReplaceAll(uuid.NewString(), "-", "") + strings.ReplaceAll(uuid.NewString(), "-", "")[:16]
 	if err := secretKeyService.CreateSecretKey(&secretKey); err != nil {
 		global.Logger.Error("创建失败!", zap.Error(err))
@@ -172,7 +171,7 @@ func (secretKeyApi *SecretKeyApi) GetSecretKeyList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	pageInfo.UserId = utils.GetUserID(c)
+	pageInfo.CreatedBy = utils.GetUserID(c)
 	if list, total, err := secretKeyService.GetSecretKeyInfoLessList(pageInfo); err != nil {
 		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)

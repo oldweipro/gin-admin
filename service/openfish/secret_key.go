@@ -100,7 +100,7 @@ func (secretKeyService *SecretKeyService) GetSecretKeyInfoLessList(info openfish
 	if info.Sk != "" {
 		db = db.Where("sk = ?", info.Sk)
 	}
-	db = db.Where("user_id = ?", info.UserId)
+	db = db.Where("created_by = ?", info.CreatedBy)
 	err = db.Count(&total).Error
 	if err != nil {
 		return

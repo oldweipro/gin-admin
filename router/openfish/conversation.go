@@ -26,6 +26,7 @@ func (s *ConversationRouter) InitConversationRouter(Router *gin.RouterGroup) {
 	{
 		conversationRouterWithoutRecord.GET("findConversation", conversationApi.FindConversation)                             // 根据ID获取Conversation
 		conversationRouterWithoutRecord.GET("getConversationList", conversationApi.GetConversationList)                       // 获取Conversation列表
+		conversationRouterWithoutRecord.GET("getConversationRecordList", conversationApi.GetConversationRecordList)           // 获取ConversationRecord列表
 		conversationRouterWithoutRecord.GET("getCurrentUserConversationList", conversationApi.GetCurrentUserConversationList) // 获取当前用户聊天列表
 	}
 }
