@@ -2,8 +2,9 @@ package platform
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/oldweipro/chatgpt2api"
 	"github.com/oldweipro/gin-admin/service"
+	"net/http/httputil"
+	"net/url"
 	"sync"
 )
 
@@ -29,7 +30,18 @@ func (o *OpenApi) ForwardChatCompletionsApi(c *gin.Context) {
 		return
 	}
 	defer userRequestStatus.Delete(userID) // 在处理完毕后删除用户的请求状态
-	chatgpt2api.Nightmare(c, "http://127.0.0.1:7890")
+	// 创建目标URL
+	targetURL := "http://127.0.0.1:8080" // 更改为您实际的目标服务URL
+
+	// 创建反向代理器
+	target, _ := url.Parse(targetURL)
+	proxy := httputil.NewSingleHostReverseProxy(target)
+
+	// 更改请求头中的Host字段
+	c.Request.Host = target.Host
+
+	// 进行反向代理
+	proxy.ServeHTTP(c.Writer, c.Request)
 }
 
 func (o *OpenApi) ForwardOptionsChatCompletionsApi(c *gin.Context) {
