@@ -4,4 +4,5 @@ type ApiGroup struct {
 	ConversationApi
 	FeedbackApi
 	SecretKeyApi
+	PromptApi
 }

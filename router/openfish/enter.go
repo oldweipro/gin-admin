@@ -4,4 +4,5 @@ type RouterGroup struct {
 	ConversationRouter
 	FeedbackRouter
 	SecretKeyRouter
+	PromptRouter
 }

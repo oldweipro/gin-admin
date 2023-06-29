@@ -94,6 +94,8 @@ func Routers() *gin.Engine {
 		openfishRouter.InitConversationRouter(PrivateGroup)
 		openfishRouter.InitFeedbackRouter(PrivateGroup)
 		openfishRouter.InitSecretKeyRouter(PrivateGroup)
+		openfishRouter.InitPromptRouter(PrivateGroup)
+
 	}
 	{
 		transactionRouter := router.RouterGroupApp.Transaction
