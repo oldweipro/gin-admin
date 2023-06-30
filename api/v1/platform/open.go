@@ -26,7 +26,12 @@ func (o *OpenApi) ForwardChatCompletionsApi(c *gin.Context) {
 	// 检查用户的请求状态
 	_, loaded := userRequestStatus.LoadOrStore(userID, true)
 	if loaded {
-		c.JSON(429, gin.H{"msg": "太多请求了"})
+		c.JSON(429, gin.H{"error": map[string]interface{}{
+			"message": "您的请求过多，系统限制并发请求为1",
+			"type":    "requests",
+			"param":   nil,
+			"code":    nil,
+		}})
 		return
 	}
 	defer userRequestStatus.Delete(userID) // 在处理完毕后删除用户的请求状态
