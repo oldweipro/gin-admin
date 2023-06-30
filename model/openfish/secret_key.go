@@ -7,7 +7,7 @@ import (
 
 // SecretKey 结构体
 type SecretKey struct {
-	global.GVA_MODEL
+	global.Model
 	Sk        string `json:"sk" form:"sk" gorm:"column:sk;comment:密钥;"`
 	SkName    string `json:"skName" form:"skName" gorm:"column:sk_name;comment:密钥名字;not null;default:'sk';"`
 	Expire    *int64 `json:"expire" form:"expire" gorm:"column:expire;comment:过期时间;not null;default:0;"`

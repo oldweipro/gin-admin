@@ -7,7 +7,7 @@ import (
 
 // PatrolTask 结构体
 type PatrolTask struct {
-	global.GVA_MODEL
+	global.Model
 	TaskName         string `json:"taskName" form:"taskName" gorm:"column:task_name;comment:任务名称;"`
 	TaskItemIdList   string `json:"taskItemIdList" form:"taskItemIdList" gorm:"column:task_item_id_list;comment:任务内容项列表;"`
 	PatrolTimes      *int   `json:"patrolTimes" form:"patrolTimes" gorm:"column:patrol_times;comment:巡检次数;"`

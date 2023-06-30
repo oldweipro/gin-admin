@@ -7,7 +7,7 @@ import (
 
 // ServerNode 结构体
 type ServerNode struct {
-	global.GVA_MODEL
+	global.Model
 	ServerName   string `json:"serverName" form:"serverName" gorm:"column:server_name;comment:服务器节点名称;"`
 	ServerHost   string `json:"serverHost" form:"serverHost" gorm:"column:server_host;comment:服务器主机地址;"`
 	ServerPort   *int   `json:"serverPort" form:"serverPort" gorm:"column:server_port;comment:服务器端口;"`

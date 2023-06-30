@@ -7,7 +7,7 @@ import (
 
 // Inbounds 结构体
 type Inbounds struct {
-	global.GVA_MODEL
+	global.Model
 	ClientId       string `json:"clientId" form:"clientId" gorm:"column:client_id;comment:vmess协议客户端id，也就是密码;"`
 	Up             *int64 `json:"up" form:"up" gorm:"column:up;comment:上行流量;size:64;"`
 	Down           *int64 `json:"down" form:"down" gorm:"column:down;comment:下行流量;size:64;"`

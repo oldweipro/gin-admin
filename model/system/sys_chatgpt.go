@@ -9,7 +9,7 @@ type ChatGpt struct {
 }
 
 type SysChatGptOption struct {
-	global.GVA_MODEL
+	global.Model
 	SK string `json:"sk"`
 }
 

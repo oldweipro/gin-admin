@@ -2,12 +2,9 @@ package initialize
 
 import (
 	"fmt"
-	"github.com/oldweipro/gin-admin/config"
 	"github.com/oldweipro/gin-admin/global"
 	//v1 "github.com/oldweipro/gin-admin/api/v1"
 	"github.com/oldweipro/gin-admin/service"
-	"github.com/oldweipro/gin-admin/utils"
-	"github.com/robfig/cron/v3"
 )
 
 func Timer() {
@@ -15,23 +12,23 @@ func Timer() {
 	//var personnelService = service.ServiceGroupApp.PatrolServiceGroup.PersonnelService
 	var serverNodeService = service.ServiceGroupApp.LadderServiceGroup.ServerNodeService
 	if global.ConfigServer.Timer.Start {
-		for i := range global.ConfigServer.Timer.Detail {
-			go func(detail config.Detail) {
-				var option []cron.Option
-				if global.ConfigServer.Timer.WithSeconds {
-					option = append(option, cron.WithSeconds())
-				}
-				_, err := global.Timer.AddTaskByFunc("ClearDB", global.ConfigServer.Timer.Spec, func() {
-					err := utils.ClearTable(global.DB, detail.TableName, detail.CompareField, detail.Interval)
-					if err != nil {
-						fmt.Println("timer error:", err)
-					}
-				}, option...)
-				if err != nil {
-					fmt.Println("add timer error:", err)
-				}
-			}(global.ConfigServer.Timer.Detail[i])
-		}
+		//for i := range global.ConfigServer.Timer.Detail {
+		//	go func(detail config.Detail) {
+		//		var option []cron.Option
+		//		if global.ConfigServer.Timer.WithSeconds {
+		//			option = append(option, cron.WithSeconds())
+		//		}
+		//		_, err := global.Timer.AddTaskByFunc("ClearDB", global.ConfigServer.Timer.Spec, func() {
+		//			err := utils.ClearTable(global.DB, detail.TableName, detail.CompareField, detail.Interval)
+		//			if err != nil {
+		//				fmt.Println("timer error:", err)
+		//			}
+		//		}, option...)
+		//		if err != nil {
+		//			fmt.Println("add timer error:", err)
+		//		}
+		//	}(global.ConfigServer.Timer.Detail[i])
+		//}
 		// 每天重置被锁定的账号：account表中loginStatus重置为0
 		//_, err := global.GVA_Timer.AddTaskByFunc("ResetGameAccount", "0 3 * * *", func() {
 		//	// 重置所有account表中login_status=0，current_calls=0

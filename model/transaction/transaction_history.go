@@ -7,7 +7,7 @@ import (
 
 // TransactionHistory 结构体
 type TransactionHistory struct {
-	global.GVA_MODEL
+	global.Model
 	UserId        *uint  `json:"userId" form:"userId" gorm:"column:user_id;comment:与用户表中的UserID字段相关联，表示进行交易的用户;"`
 	SrcWalletId   *uint  `json:"srcWalletId" form:"srcWalletId" gorm:"column:src_wallet_id;comment:与钱包表中的WalletID字段相关联，表示交易源钱包。如果钱包ID为0，则视为系统钱包;"`
 	DestWalletId  *uint  `json:"destWalletId" form:"destWalletId" gorm:"column:dest_wallet_id;comment:与钱包表中的WalletID字段相关联，表示交易目标钱包。如果钱包ID为0，则视为系统钱包;"`

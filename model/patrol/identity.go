@@ -7,7 +7,7 @@ import (
 
 // Identity 结构体
 type Identity struct {
-	global.GVA_MODEL
+	global.Model
 	IdCard    string `json:"id_card" form:"id_card" gorm:"column:id_card;comment:身份证;"`
 	RealName  string `json:"real_name" form:"real_name" gorm:"column:real_name;comment:真实姓名;"`
 	CreatedBy uint   `gorm:"column:created_by;comment:创建者"`

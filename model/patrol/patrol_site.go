@@ -7,7 +7,7 @@ import (
 
 // PatrolSite 结构体
 type PatrolSite struct {
-	global.GVA_MODEL
+	global.Model
 	SiteName        string `json:"siteName" form:"siteName" gorm:"column:site_name;comment:点位名称;"`
 	SitePositioning string `json:"sitePositioning" form:"sitePositioning" gorm:"column:site_positioning;comment:地点定位;"`
 	DeptId          *int   `json:"deptId" form:"deptId" gorm:"column:dept_id;comment:所属部门;"`

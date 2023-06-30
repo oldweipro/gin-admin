@@ -7,7 +7,7 @@ import (
 
 // Account 结构体
 type Account struct {
-	global.GVA_MODEL
+	global.Model
 	AccountName  string `json:"accountName" form:"accountName" gorm:"column:account_name;comment:9377游戏的用户名和密码;"`
 	LoginStatus  *int   `json:"loginStatus" gorm:"default:0;column:login_status;comment:登陆状态;"`
 	CurrentCalls *int   `json:"currentCalls" gorm:"default:0;column:current_calls;comment:当前调用次数，每天12点清0;"`

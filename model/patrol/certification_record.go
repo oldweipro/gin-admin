@@ -7,7 +7,7 @@ import (
 
 // CertificationRecord 结构体
 type CertificationRecord struct {
-	global.GVA_MODEL
+	global.Model
 	CertificationIdCard   string `json:"certificationIdCard" form:"certification_id_card" gorm:"column:certification_id_card;comment:认证身份ID;"`
 	CertificationRealName string `json:"certificationRealName" form:"certification_real_name" gorm:"column:certification_real_name;comment:认证真实姓名;"`
 	CertificationResult   string `json:"certificationResult" form:"certification_result" gorm:"column:certification_result;comment:认证结果;"`

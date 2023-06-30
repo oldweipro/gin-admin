@@ -7,7 +7,7 @@ import (
 
 // Personnel 结构体
 type Personnel struct {
-	global.GVA_MODEL
+	global.Model
 	PersonUrl                   string `json:"personUrl" form:"personUrl" gorm:"column:person_url;comment:人员URL;"`
 	Specialty                   string `json:"specialty" form:"specialty" gorm:"column:specialty;comment:特长;"`
 	UnitNo                      string `json:"unitNo" form:"unitNo" gorm:"column:unit_no;comment:单位编号;"`

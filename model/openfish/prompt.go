@@ -7,7 +7,7 @@ import (
 
 // Prompt 结构体
 type Prompt struct {
-	global.GVA_MODEL
+	global.Model
 	Name        string `json:"name" form:"name" gorm:"column:name;comment:表示提示词的名称。;"`
 	Description string `json:"description" form:"description" gorm:"column:description;comment:表示提示词的详细描述信息。;"`
 	UseFee      *int   `json:"useFee" form:"useFee" gorm:"column:use_fee;comment:表示提示词的价格。0表示无限制;"`

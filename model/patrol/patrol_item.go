@@ -7,7 +7,7 @@ import (
 
 // PatrolItem 结构体
 type PatrolItem struct {
-	global.GVA_MODEL
+	global.Model
 	ItemTitle string `json:"itemTitle" form:"itemTitle" gorm:"column:item_title;comment:巡检项（内容）名称;"`
 	DeptId    *int   `json:"deptId" form:"deptId" gorm:"column:dept_id;comment:部门ID;"`
 	CreatedBy uint   `gorm:"column:created_by;comment:创建者"`

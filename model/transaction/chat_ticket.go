@@ -7,7 +7,7 @@ import (
 
 // ChatTicket 结构体
 type ChatTicket struct {
-	global.GVA_MODEL
+	global.Model
 	Amount         *int   `json:"amount" form:"amount" gorm:"column:amount;comment:数量;"`
 	ExpirationTime *int   `json:"expirationTime" form:"expirationTime" gorm:"column:expiration_time;comment:过期时间，时间戳，0表示无过期时间;"`
 	TicketName     string `json:"ticketName" form:"ticketName" gorm:"column:ticket_name;comment:票据名称;"`

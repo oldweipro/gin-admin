@@ -7,7 +7,7 @@ import (
 
 // Wallets 结构体
 type Wallets struct {
-	global.GVA_MODEL
+	global.Model
 	UserId     uint   `json:"userId" form:"userId" gorm:"column:user_id;comment:用户ID;"`
 	WalletName string `json:"walletName" form:"walletName" gorm:"default:'钱包';column:wallet_name;comment:钱包名称;"`
 	Balance    *int   `json:"balance" form:"balance" gorm:"default:0;column:balance;comment:余额;"`
