@@ -60,8 +60,8 @@ func (promptService *PromptService) GetPromptInfoList(info openfishReq.PromptSea
 	if info.Content != "" {
 		db = db.Where("content LIKE ?", "%"+info.Content+"%")
 	}
-	if info.Shortcut_key != "" {
-		db = db.Where("shortcut_key LIKE ?", "%"+info.Shortcut_key+"%")
+	if info.ShortcutKey != "" {
+		db = db.Where("shortcut_key LIKE ?", "%"+info.ShortcutKey+"%")
 	}
 	err = db.Count(&total).Error
 	if err != nil {
