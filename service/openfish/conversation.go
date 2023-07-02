@@ -274,7 +274,7 @@ func (conversationService *ConversationService) OpenAIDrawing(chatReq openfishRe
 
 // ChatGPTCompletions ChatGPT对话方法
 func (conversationService *ConversationService) ChatGPTCompletions(chatReq openfishReq.ChatReq, c *gin.Context) error {
-	tokenCount := len(chatReq.Prompt)
+	tokenCount := numTokens(chatReq.Prompt)
 	// 查询会话记录
 	conversationRecordList, _ := conversationService.GetConversationRecordListWithTokenByConversationId(*chatReq.ConversationId, tokenCount)
 	var messages []openai.ChatCompletionMessage
@@ -295,6 +295,15 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 		Role:    conversationRecordUser.Role,
 		Content: conversationRecordUser.Content,
 	})
+	//var completionReq openai.ChatCompletionRequest
+	//numTokens(completionReq.Prompt.(string)) * completionReq.N
+	//inputTokens := numTokens(completionReq.Messages[0].Content) * completionReq.N
+	//completionTokens := completionReq.MaxTokens * completionReq.N
+	//res.Usage = Usage{
+	//	PromptTokens:     inputTokens,
+	//	CompletionTokens: completionTokens,
+	//	TotalTokens:      inputTokens + completionTokens,
+	//}
 	req := openai.ChatCompletionRequest{
 		Model:     openai.GPT3Dot5Turbo16K0613,
 		MaxTokens: 3000,
@@ -309,6 +318,10 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 		}
 	}
 	return nil
+}
+
+func numTokens(s string) int {
+	return int(float32(len(s)) / 4)
 }
 
 // ChatOpenAIReverse https://chat.openai.com逆向接口: 需要自己搭建服务 https://github.com/acheong08/ChatGPT-to-API
