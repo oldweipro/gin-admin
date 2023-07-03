@@ -154,7 +154,7 @@ func (conversationService *ConversationService) GetConversationRecordListWithTok
 		  ) AS t
 		  WHERE sum <= ?
 		) ORDER BY created_at`
-	err := global.DB.Raw(query, conversationId, 10596-tokenCount).Scan(&conversationRecords).Error
+	err := global.DB.Raw(query, conversationId, 8596-tokenCount).Scan(&conversationRecords).Error
 	return conversationRecords, err
 }
 
