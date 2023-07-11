@@ -154,7 +154,7 @@ func (conversationService *ConversationService) GetConversationRecordListWithTok
 		  ) AS t
 		  WHERE sum <= ?
 		) ORDER BY created_at`
-	err := global.DB.Raw(query, conversationId, 8596-tokenCount).Scan(&conversationRecords).Error
+	err := global.DB.Raw(query, conversationId, 2596-tokenCount).Scan(&conversationRecords).Error
 	return conversationRecords, err
 }
 
@@ -305,8 +305,8 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 	//	TotalTokens:      inputTokens + completionTokens,
 	//}
 	req := openai.ChatCompletionRequest{
-		Model:     openai.GPT3Dot5Turbo16K0613,
-		MaxTokens: 3000,
+		Model:     openai.GPT3Dot5Turbo0613,
+		MaxTokens: 1000,
 		Messages:  messages,
 		Stream:    true,
 	}
