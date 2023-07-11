@@ -63,8 +63,8 @@ func Timer() {
 		//	fmt.Println("添加每天同步人员数据定时任务 error:", err)
 		//}
 
-		// 每周一开始同步
-		_, err := global.Timer.AddTaskByFunc("SyncLadderCookie", "0 0 * * MON", func() {
+		// 每个月开始同步
+		_, err := global.Timer.AddTaskByFunc("SyncLadderCookie", "0 0 1,5,10,15,20,25,28 * *", func() {
 			err := serverNodeService.SyncLadderCookie()
 			if err != nil {
 				fmt.Println("定时任务【同步梯子cookie】失败")
