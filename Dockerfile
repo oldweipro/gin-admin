@@ -12,7 +12,7 @@ RUN go env -w GO111MODULE=on \
 
 FROM alpine:latest
 
-LABEL MAINTAINER="SliverHorn@sliver_horn@qq.com"
+LABEL MAINTAINER="oldwei@oldweipro@gmail.com"
 
 WORKDIR /go/src/github.com/oldweipro/gin-admin
 
