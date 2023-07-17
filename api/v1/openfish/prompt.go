@@ -189,3 +189,24 @@ func (promptApi *PromptApi) GetPromptList(c *gin.Context) {
 		}, "获取成功", c)
 	}
 }
+
+// GetCurrentUserPromptList TODO 获取当前用户prompt
+func (promptApi *PromptApi) GetCurrentUserPromptList(c *gin.Context) {
+	var pageInfo openfishReq.PromptSearch
+	err := c.ShouldBindQuery(&pageInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	if list, total, err := promptService.GetPromptInfoList(pageInfo); err != nil {
+		global.Logger.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:     list,
+			Total:    total,
+			Page:     pageInfo.Page,
+			PageSize: pageInfo.PageSize,
+		}, "获取成功", c)
+	}
+}

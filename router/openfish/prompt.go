@@ -21,7 +21,8 @@ func (s *PromptRouter) InitPromptRouter(Router *gin.RouterGroup) {
 		promptRouter.PUT("updatePrompt", promptApi.UpdatePrompt)              // 更新Prompt
 	}
 	{
-		promptRouterWithoutRecord.GET("findPrompt", promptApi.FindPrompt)       // 根据ID获取Prompt
-		promptRouterWithoutRecord.GET("getPromptList", promptApi.GetPromptList) // 获取Prompt列表
+		promptRouterWithoutRecord.GET("findPrompt", promptApi.FindPrompt)                             // 根据ID获取Prompt
+		promptRouterWithoutRecord.GET("getPromptList", promptApi.GetPromptList)                       // 获取Prompt列表
+		promptRouterWithoutRecord.GET("getCurrentUserPromptList", promptApi.GetCurrentUserPromptList) // 获取当前用户Prompt列表
 	}
 }
