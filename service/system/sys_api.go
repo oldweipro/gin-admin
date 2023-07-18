@@ -10,12 +10,10 @@ import (
 	"gorm.io/gorm"
 )
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@function: CreateApi
-//@description: 新增基础api
-//@param: api model.SysApi
-//@return: err error
-
+// @function: CreateApi
+// @description: 新增基础api
+// @param: api model.SysApi
+// @return: err error
 type ApiService struct{}
 
 var ApiServiceApp = new(ApiService)
@@ -27,12 +25,10 @@ func (apiService *ApiService) CreateApi(api system.SysApi) (err error) {
 	return global.DB.Create(&api).Error
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@function: DeleteApi
-//@description: 删除基础api
-//@param: api model.SysApi
-//@return: err error
-
+// @function: DeleteApi
+// @description: 删除基础api
+// @param: api model.SysApi
+// @return: err error
 func (apiService *ApiService) DeleteApi(api system.SysApi) (err error) {
 	var entity system.SysApi
 	err = global.DB.Where("id = ?", api.ID).First(&entity).Error // 根据id查询api记录
@@ -50,12 +46,10 @@ func (apiService *ApiService) DeleteApi(api system.SysApi) (err error) {
 	return nil
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@function: GetAPIInfoList
-//@description: 分页获取数据,
-//@param: api model.SysApi, info request.PageInfo, order string, desc bool
-//@return: list interface{}, total int64, err error
-
+// @function: GetAPIInfoList
+// @description: 分页获取数据,
+// @param: api model.SysApi, info request.PageInfo, order string, desc bool
+// @return: list interface{}, total int64, err error
 func (apiService *ApiService) GetAPIInfoList(api system.SysApi, info request.PageInfo, order string, desc bool) (list interface{}, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
@@ -113,33 +107,27 @@ func (apiService *ApiService) GetAPIInfoList(api system.SysApi, info request.Pag
 	return apiList, total, err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@function: GetAllApis
-//@description: 获取所有的api
-//@return:  apis []model.SysApi, err error
-
+// @function: GetAllApis
+// @description: 获取所有的api
+// @return:  apis []model.SysApi, err error
 func (apiService *ApiService) GetAllApis() (apis []system.SysApi, err error) {
 	err = global.DB.Find(&apis).Error
 	return
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@function: GetApiById
-//@description: 根据id获取api
-//@param: id float64
-//@return: api model.SysApi, err error
-
+// @function: GetApiById
+// @description: 根据id获取api
+// @param: id float64
+// @return: api model.SysApi, err error
 func (apiService *ApiService) GetApiById(id int) (api system.SysApi, err error) {
 	err = global.DB.Where("id = ?", id).First(&api).Error
 	return
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@function: UpdateApi
-//@description: 根据id更新api
-//@param: api model.SysApi
-//@return: err error
-
+// @function: UpdateApi
+// @description: 根据id更新api
+// @param: api model.SysApi
+// @return: err error
 func (apiService *ApiService) UpdateApi(api system.SysApi) (err error) {
 	var oldA system.SysApi
 	err = global.DB.Where("id = ?", api.ID).First(&oldA).Error
@@ -161,12 +149,10 @@ func (apiService *ApiService) UpdateApi(api system.SysApi) (err error) {
 	return err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@function: DeleteApis
-//@description: 删除选中API
-//@param: apis []model.SysApi
-//@return: err error
-
+// @function: DeleteApis
+// @description: 删除选中API
+// @param: apis []model.SysApi
+// @return: err error
 func (apiService *ApiService) DeleteApisByIds(ids request.IdsReq) (err error) {
 	var apis []system.SysApi
 	err = global.DB.Find(&apis, "id in ?", ids.Ids).Delete(&apis).Error
@@ -183,12 +169,10 @@ func (apiService *ApiService) DeleteApisByIds(ids request.IdsReq) (err error) {
 	return err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@function: DeleteApis
-//@description: 删除选中API
-//@param: apis []model.SysApi
-//@return: err error
-
+// @function: DeleteApis
+// @description: 删除选中API
+// @param: apis []model.SysApi
+// @return: err error
 func (apiService *ApiService) FreshCasbin() (err error) {
 	e := CasbinServiceApp.Casbin()
 	err = e.LoadPolicy()

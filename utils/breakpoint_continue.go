@@ -17,7 +17,6 @@ const (
 	finishDir     = "./fileDir/"
 )
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: BreakPointContinue
 //@description: 断点续传
 //@param: content []byte, fileName string, contentNumber int, contentTotal int, fileMd5 string
@@ -33,7 +32,6 @@ func BreakPointContinue(content []byte, fileName string, contentNumber int, cont
 	return pathC, err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: CheckMd5
 //@description: 检查Md5
 //@param: content []byte, chunkMd5 string
@@ -48,7 +46,6 @@ func CheckMd5(content []byte, chunkMd5 string) (CanUpload bool) {
 	}
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: makeFileContent
 //@description: 创建切片内容
 //@param: content []byte, fileName string, FileDir string, contentNumber int
@@ -72,7 +69,6 @@ func makeFileContent(content []byte, fileName string, FileDir string, contentNum
 	return path, nil
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: makeFileContent
 //@description: 创建切片文件
 //@param: fileName string, FileMd5 string
@@ -100,7 +96,6 @@ func MakeFile(fileName string, FileMd5 string) (string, error) {
 	return finishDir + fileName, nil
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: RemoveChunk
 //@description: 移除切片
 //@param: FileMd5 string

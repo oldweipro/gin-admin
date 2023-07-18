@@ -25,7 +25,6 @@ func (l *Local) UploadBase64(base64Str, filename string) (string, string, error)
 	panic("implement me")
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@author: [ccfish86](https://github.com/ccfish86)
 //@author: [SliverHorn](https://github.com/SliverHorn)
 //@object: *Local
@@ -85,7 +84,6 @@ func (*Local) UploadFile(file *multipart.FileHeader) (string, string, error) {
 	return filepath, filename, nil
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@author: [ccfish86](https://github.com/ccfish86)
 //@author: [SliverHorn](https://github.com/SliverHorn)
 //@object: *Local

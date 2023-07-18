@@ -6,7 +6,6 @@ import (
 	"github.com/oldweipro/gin-admin/model/system/request"
 )
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: CreateSysDictionaryDetail
 //@description: 创建字典详情数据
 //@param: sysDictionaryDetail model.SysDictionaryDetail
@@ -19,7 +18,6 @@ func (dictionaryDetailService *DictionaryDetailService) CreateSysDictionaryDetai
 	return err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: DeleteSysDictionaryDetail
 //@description: 删除字典详情数据
 //@param: sysDictionaryDetail model.SysDictionaryDetail
@@ -30,7 +28,6 @@ func (dictionaryDetailService *DictionaryDetailService) DeleteSysDictionaryDetai
 	return err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: UpdateSysDictionaryDetail
 //@description: 更新字典详情数据
 //@param: sysDictionaryDetail *model.SysDictionaryDetail
@@ -41,7 +38,6 @@ func (dictionaryDetailService *DictionaryDetailService) UpdateSysDictionaryDetai
 	return err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetSysDictionaryDetail
 //@description: 根据id获取字典详情单条数据
 //@param: id uint
@@ -52,7 +48,6 @@ func (dictionaryDetailService *DictionaryDetailService) GetSysDictionaryDetail(i
 	return
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetSysDictionaryDetailInfoList
 //@description: 分页获取字典详情列表
 //@param: info request.SysDictionaryDetailSearch
