@@ -274,15 +274,19 @@ func (conversationService *ConversationService) OpenAIDrawing(chatReq openfishRe
 
 // ChatGPTCompletions ChatGPT对话方法
 func (conversationService *ConversationService) ChatGPTCompletions(chatReq openfishReq.ChatReq, c *gin.Context) error {
-	tokenCount := numTokens(chatReq.Prompt)
+	tokenCount := conversationService.NumTokens(chatReq.Prompt)
 	// 查询会话记录
 	conversationRecordList, _ := conversationService.GetConversationRecordListWithTokenByConversationId(*chatReq.ConversationId, tokenCount)
 	var messages []openai.ChatCompletionMessage
-	for _, cr := range conversationRecordList {
-		messages = append(messages, openai.ChatCompletionMessage{
-			Role:    cr.Role,
-			Content: cr.Content,
-		})
+	if chatReq.StandardAlone != nil && *chatReq.StandardAlone == 1 {
+		// 单机模式，没有上下文
+	} else {
+		for _, cr := range conversationRecordList {
+			messages = append(messages, openai.ChatCompletionMessage{
+				Role:    cr.Role,
+				Content: cr.Content,
+			})
+		}
 	}
 	// 预备存储新的聊天记录
 	conversationRecordUser := openfish.ConversationRecord{}
@@ -320,7 +324,7 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 	return nil
 }
 
-func numTokens(s string) int {
+func (conversationService *ConversationService) NumTokens(s string) int {
 	return int(float32(len(s)) / 4)
 }
 

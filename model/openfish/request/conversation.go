@@ -25,6 +25,8 @@ type ChatReq struct {
 	Prompt           string `form:"prompt" json:"prompt"`
 	ConversationId   *uint  `form:"conversationId" json:"conversationId"`
 	ConversationType *uint  `form:"conversationType" json:"conversationType"`
+	PromptId         *uint  `form:"promptId" json:"promptId"`
+	StandardAlone    *uint  `form:"standardAlone" json:"standardAlone"`
 	Sign             string `form:"sign" json:"sign"`
 }
 

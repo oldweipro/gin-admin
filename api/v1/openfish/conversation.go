@@ -77,12 +77,11 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 	userID := utils.GetUserID(c)
 	// 检查用户的请求状态
 	_, loaded := userRequestStatus.LoadOrStore(userID, true)
+	defer userRequestStatus.Delete(userID) // 在处理完毕后删除用户的请求状态
 	if loaded {
 		c.JSON(429, gin.H{"msg": "太多请求了"})
 		return
 	}
-
-	defer userRequestStatus.Delete(userID) // 在处理完毕后删除用户的请求状态
 	// 获取参数
 	var chatReq openfishReq.ChatReq
 	err := c.ShouldBindJSON(&chatReq)
@@ -102,6 +101,11 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 	hexHash := hex.EncodeToString(hash[:])
 	if hexHash != chatReq.Sign {
 		response.FailWithMessage("系统错误，缺少必要参数。", c)
+		return
+	}
+	tokenCount := conversationService.NumTokens(chatReq.Prompt)
+	if tokenCount > 2500 {
+		response.FailWithMessage("系统错误，您输入的字符过长，请减少输入。", c)
 		return
 	}
 	c.Status(http.StatusOK)
