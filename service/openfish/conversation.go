@@ -29,6 +29,7 @@ type ConversationService struct {
 }
 
 var chatGptService system.ChatGptService
+var promptService PromptService
 
 // CreateConversation 创建Conversation记录
 func (conversationService *ConversationService) CreateConversation(conversation *openfish.Conversation) (err error) {
@@ -278,15 +279,29 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 	// 查询会话记录
 	conversationRecordList, _ := conversationService.GetConversationRecordListWithTokenByConversationId(*chatReq.ConversationId, tokenCount)
 	var messages []openai.ChatCompletionMessage
+	// 判断是否开启单机模式 0关闭 1开启
 	if chatReq.StandardAlone != nil && *chatReq.StandardAlone == 1 {
-		// 单机模式，没有上下文
 	} else {
+		// 如果没有开启单机模式，则查询上下文
 		for _, cr := range conversationRecordList {
 			messages = append(messages, openai.ChatCompletionMessage{
 				Role:    cr.Role,
 				Content: cr.Content,
 			})
 		}
+	}
+	// 判断是否提示词问答
+	if chatReq.ConversationType != nil && *chatReq.ConversationType == 2 && chatReq.PromptId != nil {
+		// 查询提示词信息
+		prompt, err := promptService.GetPrompt(*chatReq.PromptId)
+		if err != nil {
+			fmt.Println("查询 GetPrompt 出错", err)
+		}
+		// 组装openai消息参数
+		messages = append(messages, openai.ChatCompletionMessage{
+			Role:    "user",
+			Content: prompt.Content,
+		})
 	}
 	// 预备存储新的聊天记录
 	conversationRecordUser := openfish.ConversationRecord{}
@@ -314,6 +329,7 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 		Messages:  messages,
 		Stream:    true,
 	}
+	fmt.Printf("%v", messages)
 	if err := conversationService.ChatOpenAIReverse(&conversationRecordUser, req, c, chatReq); err != nil {
 		global.Logger.Error("逆向工程调用错误: ", zap.Error(err))
 		if err = conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
