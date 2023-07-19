@@ -291,6 +291,11 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 			Role:    "user",
 			Content: prompt.Content,
 		})
+		// 组装openai消息参数
+		messages = append(messages, openai.ChatCompletionMessage{
+			Role:    "assistant",
+			Content: "让我们开始吧。",
+		})
 		// 前端会携带，后端也暂时写死：使用提示词只能是单机模式
 		chatReq.StandardAlone = 1
 	}
