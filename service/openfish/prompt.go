@@ -45,7 +45,7 @@ func (promptService *PromptService) GetPromptInfoList(info openfishReq.PromptSea
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.DB.Model(&openfish.Prompt{})
+	db := global.DB.Model(&openfish.Prompt{}).Select("id", "name", "description")
 	var prompts []openfish.Prompt
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {
@@ -68,6 +68,6 @@ func (promptService *PromptService) GetPromptInfoList(info openfishReq.PromptSea
 		return
 	}
 
-	err = db.Limit(limit).Offset(offset).Find(&prompts).Error
+	err = db.Limit(limit).Offset(offset).Order("created_at").Find(&prompts).Error
 	return prompts, total, err
 }

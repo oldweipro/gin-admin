@@ -279,21 +279,10 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 	// 查询会话记录
 	conversationRecordList, _ := conversationService.GetConversationRecordListWithTokenByConversationId(*chatReq.ConversationId, tokenCount)
 	var messages []openai.ChatCompletionMessage
-	// 判断是否开启单机模式 0关闭 1开启
-	if chatReq.StandardAlone != nil && *chatReq.StandardAlone == 1 {
-	} else {
-		// 如果没有开启单机模式，则查询上下文
-		for _, cr := range conversationRecordList {
-			messages = append(messages, openai.ChatCompletionMessage{
-				Role:    cr.Role,
-				Content: cr.Content,
-			})
-		}
-	}
 	// 判断是否提示词问答
-	if chatReq.ConversationType != nil && *chatReq.ConversationType == 2 && chatReq.PromptId != nil {
+	if chatReq.ConversationType != nil && *chatReq.ConversationType == 2 && chatReq.PromptId > 0 {
 		// 查询提示词信息
-		prompt, err := promptService.GetPrompt(*chatReq.PromptId)
+		prompt, err := promptService.GetPrompt(chatReq.PromptId)
 		if err != nil {
 			fmt.Println("查询 GetPrompt 出错", err)
 		}
@@ -302,6 +291,18 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 			Role:    "user",
 			Content: prompt.Content,
 		})
+		chatReq.StandardAlone = 1
+	}
+	// 判断是否开启单机模式 0关闭 1开启
+	if chatReq.StandardAlone == 1 {
+	} else {
+		// 如果没有开启单机模式，则查询上下文
+		for _, cr := range conversationRecordList {
+			messages = append(messages, openai.ChatCompletionMessage{
+				Role:    cr.Role,
+				Content: cr.Content,
+			})
+		}
 	}
 	// 预备存储新的聊天记录
 	conversationRecordUser := openfish.ConversationRecord{}
