@@ -280,7 +280,7 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 	conversationRecordList, _ := conversationService.GetConversationRecordListWithTokenByConversationId(*chatReq.ConversationId, tokenCount)
 	var messages []openai.ChatCompletionMessage
 	// 判断是否提示词问答
-	if chatReq.ConversationType != nil && *chatReq.ConversationType == 2 && chatReq.PromptId > 0 {
+	if chatReq.PromptId > 0 {
 		// 查询提示词信息
 		prompt, err := promptService.GetPrompt(chatReq.PromptId)
 		if err != nil {
@@ -291,6 +291,7 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 			Role:    "user",
 			Content: prompt.Content,
 		})
+		// 前端会携带，后端也暂时写死：使用提示词只能是单机模式
 		chatReq.StandardAlone = 1
 	}
 	// 判断是否开启单机模式 0关闭 1开启
