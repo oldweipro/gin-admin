@@ -219,7 +219,7 @@ func (conversationService *ConversationService) OpenAIDrawing(chatReq openfishRe
 	} else {
 		streamResponse := ""
 		for _, img := range image.Data {
-			fmt.Println(img.URL)
+			//fmt.Println(img.URL)
 			// 图片存入本地或者OSS
 			oss := upload.NewOss()
 			uploadUrl, _, imgErr := oss.UploadUrl(img.URL, "")
@@ -336,7 +336,6 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 		Messages:  messages,
 		Stream:    true,
 	}
-	fmt.Printf("%v", messages)
 	if err := conversationService.ChatOpenAIReverse(&conversationRecordUser, req, c, chatReq); err != nil {
 		global.Logger.Error("逆向工程调用错误: ", zap.Error(err))
 		if err = conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {

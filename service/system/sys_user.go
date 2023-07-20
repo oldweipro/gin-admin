@@ -39,7 +39,7 @@ func (userService *UserService) Register(u system.SysUser) (userInter system.Sys
 		// 创建钱包
 		var wallets transaction.Wallets
 		wallets.UserId = u.ID
-		fmt.Println("钱包ID: ", wallets.UserId)
+		//fmt.Println("钱包ID: ", wallets.UserId)
 		err = tx.Create(&wallets).Error
 		if err != nil {
 			return err
