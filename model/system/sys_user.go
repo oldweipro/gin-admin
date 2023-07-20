@@ -21,7 +21,7 @@ type SysUser struct {
 	Phone        string         `json:"phone"  gorm:"comment:用户手机号"`
 	Email        string         `json:"email"  gorm:"comment:用户邮箱"`
 	Enable       int            `json:"enable" gorm:"default:1;comment:用户是否被冻结 1正常 2冻结"`
-	LadderExpire int64          `json:"ladderExpire" gorm:"default:0;comment:梯子过期时间戳 0无限制"`
+	LadderExpire *uint          `json:"ladderExpire" gorm:"default:0;comment:梯子过期时间戳 0无限制"`
 }
 
 func (SysUser) TableName() string {

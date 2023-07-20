@@ -14,7 +14,7 @@ type Inbounds struct {
 	Total          *int64 `json:"total" form:"total" gorm:"column:total;comment:流量限制，0:无限制;size:64;"`
 	Remark         string `json:"remark" form:"remark" gorm:"column:remark;comment:入站规则名称;"`
 	Enable         *bool  `json:"enable" form:"enable" gorm:"column:enable;comment:是否启用;"`
-	ExpiryTime     *int64 `json:"expiryTime" form:"expiryTime" gorm:"column:expiry_time;comment:是一个13位的时间戳;size:13;"`
+	ExpiryTime     *uint  `json:"expiryTime" form:"expiryTime" gorm:"column:expiry_time;default:0;comment:是一个13位的时间戳;"`
 	Port           string `json:"port" form:"port" gorm:"column:port;comment:端口;size:12;"`
 	Protocol       string `json:"protocol" form:"protocol" gorm:"column:protocol;comment:协议;"`
 	Settings       string `json:"settings" form:"settings" gorm:"column:settings;comment:基本信息;size:500;"`

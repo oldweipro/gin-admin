@@ -127,7 +127,7 @@ func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo sy
 	inbounds.Total = &total
 	inbounds.Remark = userInfo.NickName
 	inbounds.Enable = &enable
-	inbounds.ExpiryTime = &expiryTime
+	inbounds.ExpiryTime = expiryTime
 	inbounds.Protocol = "vmess"
 	inbounds.Uid = &userInfo.BaseClaims.ID
 	inbounds.ClientId = uuid.NewString()
@@ -140,7 +140,7 @@ func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo sy
 	queryParams["total"] = strconv.FormatInt(*inbounds.Total, 10)
 	queryParams["remark"] = inbounds.Remark
 	queryParams["enable"] = "true"
-	queryParams["expiryTime"] = strconv.FormatInt(*inbounds.ExpiryTime, 10)
+	queryParams["expiryTime"] = strconv.FormatUint(uint64(*inbounds.ExpiryTime), 10)
 	queryParams["listen"] = ""
 	rand.Seed(time.Now().UnixNano())
 	r := rand.Intn(40000) + 20000

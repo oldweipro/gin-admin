@@ -3,12 +3,12 @@ package system
 import (
 	"errors"
 	"fmt"
+	systemReq "github.com/oldweipro/gin-admin/model/system/request"
 	"github.com/oldweipro/gin-admin/model/transaction"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/oldweipro/gin-admin/global"
-	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/system"
 	"github.com/oldweipro/gin-admin/utils"
 	"go.uber.org/zap"
@@ -132,7 +132,7 @@ func (userService *UserService) ForgotPassword(u *system.SysUser, newPassword st
 //@param: info request.PageInfo
 //@return: err error, list interface{}, total int64
 
-func (userService *UserService) GetUserInfoList(info request.PageInfo) (list interface{}, total int64, err error) {
+func (userService *UserService) GetUserInfoList(info systemReq.SysUseSearch) (list interface{}, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	db := global.DB.Model(&system.SysUser{})
@@ -140,6 +140,18 @@ func (userService *UserService) GetUserInfoList(info request.PageInfo) (list int
 	err = db.Count(&total).Error
 	if err != nil {
 		return
+	}
+	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {
+		db = db.Where("created_at BETWEEN ? AND ?", info.StartCreatedAt, info.EndCreatedAt)
+	}
+	if info.Phone != "" {
+		db = db.Where("phone LIKE ?", "%"+info.Phone+"%")
+	}
+	if info.Username != "" {
+		db = db.Where("username LIKE ?", "%"+info.Username+"%")
+	}
+	if info.NickName != "" {
+		db = db.Where("nick_name LIKE ?", "%"+info.NickName+"%")
 	}
 	err = db.Limit(limit).Offset(offset).Preload("Authorities").Preload("Authority").Find(&userList).Error
 	return userList, total, err
