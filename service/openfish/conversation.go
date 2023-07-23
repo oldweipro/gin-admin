@@ -338,10 +338,14 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 	}
 	if err := conversationService.ChatOpenAIReverse(&conversationRecordUser, req, c, chatReq); err != nil {
 		global.Logger.Error("逆向工程调用错误: ", zap.Error(err))
-		if err = conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
-			global.Logger.Error("OpenAI调用错误: ", zap.Error(err))
-			return err
+		if err = conversationService.ChatClaudeReverse(&conversationRecordUser, req, c, chatReq); err != nil {
+			global.Logger.Error("Claude调用错误: ", zap.Error(err))
+			if err = conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
+				global.Logger.Error("OpenAI调用错误: ", zap.Error(err))
+				return err
+			}
 		}
+
 	}
 	return nil
 }
@@ -354,6 +358,20 @@ func (conversationService *ConversationService) NumTokens(s string) int {
 func (conversationService *ConversationService) ChatOpenAIReverse(conversationRecordUser *openfish.ConversationRecord, req openai.ChatCompletionRequest, c *gin.Context, chatReq openfishReq.ChatReq) error {
 	config := openai.DefaultConfig("OpenAIReverse")
 	config.BaseURL = "http://127.0.0.1:8080/v1"
+	client := openai.NewClientWithConfig(config)
+	ctx := context.Background()
+	stream, err := client.CreateChatCompletionStream(ctx, req)
+	if err != nil {
+		return err
+	}
+	defer config.HTTPClient.CloseIdleConnections()
+	defer stream.Close()
+	return conversationService.ChatStream(stream, conversationRecordUser, c, chatReq)
+}
+
+func (conversationService *ConversationService) ChatClaudeReverse(conversationRecordUser *openfish.ConversationRecord, req openai.ChatCompletionRequest, c *gin.Context, chatReq openfishReq.ChatReq) error {
+	config := openai.DefaultConfig("ClaudeReverse")
+	config.BaseURL = "http://127.0.0.1:8787/v1"
 	client := openai.NewClientWithConfig(config)
 	ctx := context.Background()
 	stream, err := client.CreateChatCompletionStream(ctx, req)
