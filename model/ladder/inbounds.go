@@ -25,6 +25,7 @@ type Inbounds struct {
 	Sid            *uint  `json:"sid" form:"sid" gorm:"colum:sid;comment:关联服务器ID;"`
 	Link           string `json:"link" form:"link" gorm:"colum:link;comment:vmess链接;size:500"`
 	Link64         string `json:"link64" form:"link64" gorm:"colum:link64;comment:vmess链接base64加密后的;size:500"`
+	ClashSub       string `json:"clashSub" form:"clashSub" gorm:"-"`
 	CreatedBy      uint   `gorm:"column:created_by;comment:创建者"`
 	UpdatedBy      uint   `gorm:"column:updated_by;comment:更新者"`
 	DeletedBy      uint   `gorm:"column:deleted_by;comment:删除者"`

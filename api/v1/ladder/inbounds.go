@@ -12,6 +12,7 @@ import (
 	"github.com/oldweipro/gin-admin/service"
 	"github.com/oldweipro/gin-admin/utils"
 	"go.uber.org/zap"
+	"net/url"
 )
 
 type InboundsApi struct {
@@ -178,6 +179,13 @@ func (inboundsApi *InboundsApi) FindInboundsLink(c *gin.Context) {
 			inboundsLink.Link = string(vMessLinkJson)
 			vMessLinkJsonBase64 := base64.StdEncoding.EncodeToString(vMessLinkJson)
 			inboundsLink.Link64 = "vmess://" + vMessLinkJsonBase64
+
+			// 组装clashSub订阅地址
+			prefix := "https://subconverter.oldwei.com/sub?target=clash&url="
+			subConverter := prefix + inboundsLink.Link64
+			suffix := "&insert=false"
+			clashInstall := url.QueryEscape(subConverter) + suffix
+			inboundsLink.ClashSub = clashInstall
 			response.OkWithData(gin.H{"inboundsData": inboundsLink, "domain": serverNode.Domain, "region": serverNode.Region}, c)
 		}
 	}
