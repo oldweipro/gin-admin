@@ -182,9 +182,9 @@ func (inboundsApi *InboundsApi) FindInboundsLink(c *gin.Context) {
 
 			// 组装clashSub订阅地址
 			prefix := "https://subconverter.oldwei.com/sub?target=clash&url="
-			subConverter := prefix + inboundsLink.Link64
+			subConverter := inboundsLink.Link64
 			suffix := "&insert=false"
-			clashInstall := url.QueryEscape(subConverter) + suffix
+			clashInstall := prefix + url.QueryEscape(subConverter) + suffix
 			inboundsLink.ClashSub = clashInstall
 			response.OkWithData(gin.H{"inboundsData": inboundsLink, "domain": serverNode.Domain, "region": serverNode.Region}, c)
 		}
