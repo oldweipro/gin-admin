@@ -28,6 +28,7 @@ type AuthorityMenuApi struct{}
 func (a *AuthorityMenuApi) GetMenu(c *gin.Context) {
 	// 从数据库获取 AuthorityId，不从缓存获取
 	userID := utils.GetUserID(c)
+	// 会损失切换角色的功能
 	user, userErr := userService.FindUserById(userID)
 	if userErr != nil {
 		global.Logger.Error("获取菜单时，查询当前用户 AuthorityId 异常", zap.Error(userErr))
@@ -45,7 +46,44 @@ func (a *AuthorityMenuApi) GetMenu(c *gin.Context) {
 	}
 	response.OkWithDetailed(systemRes.SysMenusResponse{Menus: menus}, "获取成功", c)
 }
+func (a *AuthorityMenuApi) GetMenus(c *gin.Context) {
+	// 从数据库获取 该用户的所有AuthorityId
+	userID := utils.GetUserUuid(c)
+	user, userErr := userService.GetUserInfo(userID)
+	if userErr != nil {
+		global.Logger.Error("获取菜单时，查询当前用户 AuthorityId 异常", zap.Error(userErr))
+		response.FailWithMessage("账号异常", c)
+		return
+	}
+	authorities := user.Authorities
+	var menus []system.SysMenu
+	for _, authority := range authorities {
+		fmt.Println(authority.AuthorityId)
+		menu, err := menuService.GetMenuTree(authority.AuthorityId)
+		if err != nil {
+			global.Logger.Error("获取失败!", zap.Error(err))
+			response.FailWithMessage("获取失败", c)
+			return
+		}
+		menus = append(menus, menu...)
+	}
+	// 建立map来记录已存在的ID
+	existed := make(map[int]bool)
 
+	// 遍历数组,过滤重复的ID
+	var result []system.SysMenu
+	for _, item := range menus {
+		id := int(item.ID)
+		if _, ok := existed[id]; !ok {
+			existed[id] = true
+			result = append(result, item)
+		}
+	}
+	// 输出去重后的结果
+	response.OkWithDetailed(systemRes.SysMenusResponse{Menus: result}, "获取成功", c)
+}
+
+// GetMenusList 测试naiveUI菜单
 func (a *AuthorityMenuApi) GetMenusList(c *gin.Context) {
 	menusStr := `[
     {

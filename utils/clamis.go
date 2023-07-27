@@ -2,7 +2,6 @@ package utils
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/oldweipro/gin-admin/global"
 	systemReq "github.com/oldweipro/gin-admin/model/system/request"
 )
@@ -32,16 +31,16 @@ func GetUserID(c *gin.Context) uint {
 }
 
 // GetUserUuid 从Gin的Context中获取从jwt解析出来的用户UUID
-func GetUserUuid(c *gin.Context) uuid.UUID {
+func GetUserUuid(c *gin.Context) string {
 	if claims, exists := c.Get("claims"); !exists {
 		if cl, err := GetClaims(c); err != nil {
-			return uuid.UUID{}
+			return ""
 		} else {
-			return cl.UUID
+			return cl.UUID.String()
 		}
 	} else {
 		waitUse := claims.(*systemReq.CustomClaims)
-		return waitUse.UUID
+		return waitUse.UUID.String()
 	}
 }
 
