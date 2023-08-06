@@ -46,6 +46,8 @@ func (a *AuthorityMenuApi) GetMenu(c *gin.Context) {
 	}
 	response.OkWithDetailed(systemRes.SysMenusResponse{Menus: menus}, "获取成功", c)
 }
+
+// GetMenus naiveUI获取菜单，把所有的角色的菜单做一个去重的集合返回
 func (a *AuthorityMenuApi) GetMenus(c *gin.Context) {
 	// 从数据库获取 该用户的所有AuthorityId
 	userID := utils.GetUserUuid(c)
@@ -58,7 +60,6 @@ func (a *AuthorityMenuApi) GetMenus(c *gin.Context) {
 	authorities := user.Authorities
 	var menus []system.SysMenu
 	for _, authority := range authorities {
-		fmt.Println(authority.AuthorityId)
 		menu, err := menuService.GetMenuTree(authority.AuthorityId)
 		if err != nil {
 			global.Logger.Error("获取失败!", zap.Error(err))
