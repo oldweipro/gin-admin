@@ -14,13 +14,15 @@ type Response struct {
 
 const (
 	ERROR   = 7
-	EXPIRE  = 10042
 	SUCCESS = 0
 )
 
 func Result(code int, data interface{}, msg string, c *gin.Context) {
-	// 开始时间
-	c.JSON(http.StatusOK, Response{
+	HttpResponse(http.StatusOK, code, data, msg, c)
+}
+
+func HttpResponse(status, code int, data interface{}, msg string, c *gin.Context) {
+	c.JSON(status, Response{
 		code,
 		data,
 		msg,
@@ -56,5 +58,5 @@ func FailWithDetailed(data interface{}, message string, c *gin.Context) {
 }
 
 func FailAuthExpireWithDetailed(data interface{}, message string, c *gin.Context) {
-	Result(EXPIRE, data, message, c)
+	HttpResponse(http.StatusUnauthorized, ERROR, data, message, c)
 }
