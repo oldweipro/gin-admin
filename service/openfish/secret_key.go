@@ -6,6 +6,7 @@ import (
 	"github.com/oldweipro/gin-admin/model/openfish"
 	openfishReq "github.com/oldweipro/gin-admin/model/openfish/request"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type SecretKeyService struct {
@@ -52,8 +53,8 @@ func (secretKeyService *SecretKeyService) UpdateSecretKey(secretKey openfish.Sec
 }
 
 // GetSecretKey 根据id获取SecretKey记录
-func (secretKeyService *SecretKeyService) GetSecretKey(id uint) (secretKey openfish.SecretKey, err error) {
-	err = global.DB.Where("id = ?", id).First(&secretKey).Error
+func (secretKeyService *SecretKeyService) GetSecretKey(id, userId uint) (secretKey openfish.SecretKey, err error) {
+	err = global.DB.Where("id = ? and created_by = ?", id, userId).First(&secretKey).Error
 	return
 }
 
@@ -107,5 +108,28 @@ func (secretKeyService *SecretKeyService) GetSecretKeyInfoLessList(info openfish
 	}
 
 	err = db.Limit(limit).Offset(offset).Find(&secretKeys).Error
-	return secretKeys, total, err
+	var maskedKeys []openfish.SecretKey
+	for _, key := range secretKeys {
+		// sk密钥脱敏
+		key.Sk = secretKeyService.MaskString(key.Sk, 6, 36)
+		maskedKeys = append(maskedKeys, key)
+	}
+	return maskedKeys, total, err
+}
+
+func (secretKeyService *SecretKeyService) MaskString(input string, start int, length int) string {
+	if start < 0 || start >= len(input) || length <= 0 {
+		return input
+	}
+
+	end := start + length
+	if end > len(input) {
+		end = len(input)
+	}
+
+	prefix := input[:start]
+	suffix := input[end:]
+
+	maskedPart := strings.Repeat("*", length)
+	return prefix + maskedPart + suffix
 }

@@ -147,11 +147,12 @@ func (secretKeyApi *SecretKeyApi) FindSecretKey(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if resecretKey, err := secretKeyService.GetSecretKey(secretKey.ID); err != nil {
+	userId := utils.GetUserID(c)
+	if secretKey, err := secretKeyService.GetSecretKey(secretKey.ID, userId); err != nil {
 		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
-		response.OkWithData(gin.H{"resecretKey": resecretKey}, c)
+		response.OkWithData(gin.H{"sk": secretKey.Sk}, c)
 	}
 }
 
