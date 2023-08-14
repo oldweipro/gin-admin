@@ -60,3 +60,7 @@ func FailWithDetailed(data interface{}, message string, c *gin.Context) {
 func FailAuthExpireWithDetailed(data interface{}, message string, c *gin.Context) {
 	HttpResponse(http.StatusUnauthorized, ERROR, data, message, c)
 }
+
+func FailStatusForbiddenWithDetailed(data interface{}, message string, c *gin.Context) {
+	HttpResponse(http.StatusForbidden, ERROR, data, message, c)
+}
