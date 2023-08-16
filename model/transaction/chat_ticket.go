@@ -8,11 +8,11 @@ import (
 // ChatTicket 结构体
 type ChatTicket struct {
 	global.Model
-	Amount         *int   `json:"amount" form:"amount" gorm:"column:amount;comment:数量;"`
-	ExpirationTime *int   `json:"expirationTime" form:"expirationTime" gorm:"column:expiration_time;comment:过期时间，时间戳，0表示无过期时间;"`
+	Amount         *uint  `json:"amount" form:"amount" gorm:"column:amount;comment:数量;"`
+	ExpirationTime *uint  `json:"expirationTime" form:"expirationTime" gorm:"column:expiration_time;comment:过期时间，时间戳，0表示无过期时间;"`
 	TicketName     string `json:"ticketName" form:"ticketName" gorm:"column:ticket_name;comment:票据名称;"`
 	TicketValue    string `json:"ticketValue" form:"ticketValue" gorm:"column:ticket_value;comment:票据码;"`
-	BelongTo       *int   `json:"belongTo" form:"belongTo" gorm:"column:belong_to;comment:归属;"`
+	BelongTo       *uint  `json:"belongTo" form:"belongTo" gorm:"column:belong_to;comment:归属;"`
 	CreatedBy      uint   `gorm:"column:created_by;comment:创建者"`
 	UpdatedBy      uint   `gorm:"column:updated_by;comment:更新者"`
 	DeletedBy      uint   `gorm:"column:deleted_by;comment:删除者"`

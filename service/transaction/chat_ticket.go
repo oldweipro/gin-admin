@@ -99,7 +99,7 @@ func (chatTicketService *ChatTicketService) HandleValidateChatTicket(ticketValue
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		var srcWalletId uint = 0
 		// 更新交易记录
-		remark := fmt.Sprintf("验证鱼币兑换码: %s;兑换数量: %s", ticketValue, strconv.Itoa(*chatTicket.Amount))
+		remark := fmt.Sprintf("验证鱼币兑换码: %s;兑换数量: %s", ticketValue, strconv.Itoa(int(*chatTicket.Amount)))
 		balance := *wallets.Balance + *chatTicket.Amount
 		transactionHistory := transaction.TransactionHistory{
 			UserId:        &wallets.UserId,
@@ -138,9 +138,9 @@ func (chatTicketService *ChatTicketService) HandleCheckIn(wallets *transaction.W
 		// 系统账户
 		var srcWalletId uint = 0
 		// 数量
-		var quantity = 1
+		var quantity uint = 1
 		// 签到获得鱼币
-		var fishCoin = 1
+		var fishCoin uint = 1
 		// 更新交易记录
 		remark := "每日签到"
 		balance := *wallets.Balance + fishCoin
