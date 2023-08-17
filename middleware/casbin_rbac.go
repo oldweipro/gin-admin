@@ -31,10 +31,21 @@ func CasbinHandler() gin.HandlerFunc {
 				c.Abort()
 				return
 			}
-			waitUse.AuthorityId = user.AuthorityId
-			sub := strconv.Itoa(int(waitUse.AuthorityId))
-			e := casbinService.Casbin() // 判断策略中是否存在
-			success, _ := e.Enforce(sub, obj, act)
+			success := false
+			// 遍历所有角色权限
+			for _, authority := range user.Authorities {
+				sub := strconv.Itoa(int(authority.AuthorityId))
+				e := casbinService.Casbin() // 判断策略中是否存在
+				success, _ = e.Enforce(sub, obj, act)
+				if success {
+					break
+				}
+			}
+			// 判断单个角色权限
+			//waitUse.AuthorityId = user.AuthorityId
+			//sub := strconv.Itoa(int(waitUse.AuthorityId))
+			//e := casbinService.Casbin() // 判断策略中是否存在
+			//success, _ := e.Enforce(sub, obj, act)
 			if !success {
 				response.FailStatusForbiddenWithDetailed(gin.H{}, "权限不足", c)
 				c.Abort()
