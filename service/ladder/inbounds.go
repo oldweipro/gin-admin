@@ -13,6 +13,7 @@ import (
 	ladderReq "github.com/oldweipro/gin-admin/model/ladder/request"
 	systemReq "github.com/oldweipro/gin-admin/model/system/request"
 	systemService "github.com/oldweipro/gin-admin/service/system"
+	transactionService "github.com/oldweipro/gin-admin/service/transaction"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"math/rand"
@@ -25,6 +26,7 @@ type InboundsService struct {
 }
 
 var userService systemService.UserService
+var subscriptionPlanService transactionService.SubscriptionPlanService
 
 // CreateInbounds 创建Inbounds记录
 func (inboundsService *InboundsService) CreateInbounds(inbounds *ladder.Inbounds) (err error) {
@@ -116,7 +118,13 @@ func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo sy
 	var down int64 = 0
 	var total int64 = 0
 	enable := true
-	expiryTime := user.LadderExpire
+	// 从套餐中查询
+	subscriptionUser, err := subscriptionPlanService.GetCurrentSubscriptionPlan(user.ID)
+	if err != nil {
+		global.Logger.Info("查询当前用户订阅信息异常")
+		return err
+	}
+	expiryTime := subscriptionUser.EndTime.UnixMilli()
 	// 判断一下，如果有数据就不重置了
 	if inbounds.Up == nil {
 		inbounds.Up = &up
@@ -127,7 +135,7 @@ func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo sy
 	inbounds.Total = &total
 	inbounds.Remark = userInfo.NickName
 	inbounds.Enable = &enable
-	inbounds.ExpiryTime = expiryTime
+	inbounds.ExpiryTime = &expiryTime
 	inbounds.Protocol = "vmess"
 	inbounds.Uid = &userInfo.BaseClaims.ID
 	inbounds.ClientId = uuid.NewString()
@@ -140,7 +148,7 @@ func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo sy
 	queryParams["total"] = strconv.FormatInt(*inbounds.Total, 10)
 	queryParams["remark"] = inbounds.Remark
 	queryParams["enable"] = "true"
-	queryParams["expiryTime"] = strconv.FormatUint(uint64(*inbounds.ExpiryTime), 10)
+	queryParams["expiryTime"] = strconv.FormatInt(*inbounds.ExpiryTime, 10)
 	queryParams["listen"] = ""
 	rand.Seed(time.Now().UnixNano())
 	r := rand.Intn(40000) + 20000

@@ -19,6 +19,7 @@ type InboundsApi struct {
 }
 
 var inboundsService = service.ServiceGroupApp.LadderServiceGroup.InboundsService
+var subscriptionPlanService = service.ServiceGroupApp.TransactionServiceGroup.SubscriptionPlanService
 
 // CreateInbounds 创建Inbounds
 // @Tags Inbounds
@@ -146,6 +147,16 @@ func (inboundsApi *InboundsApi) FindInbounds(c *gin.Context) {
 
 // FindInboundsLink 根据服务器ID和当前用户查询节点链接信息
 func (inboundsApi *InboundsApi) FindInboundsLink(c *gin.Context) {
+	// 先查询你的状态是否激活
+	user, subErr := subscriptionPlanService.GetCurrentSubscriptionPlan(utils.GetUserID(c))
+	if subErr != nil {
+		response.FailWithMessage("请开通", c)
+		return
+	}
+	if user.Status == 0 {
+		response.FailWithMessage("得加钱", c)
+		return
+	}
 	var inbounds ladder.Inbounds
 	err := c.ShouldBindQuery(&inbounds)
 	if err != nil {
