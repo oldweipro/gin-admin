@@ -100,6 +100,7 @@ func Routers() *gin.Engine {
 		transactionRouter.InitWalletsRouter(PrivateGroup)
 		transactionRouter.InitTransactionHistoryRouter(PrivateGroup)
 		transactionRouter.InitProductRouter(PrivateGroup)
+		transactionRouter.InitSubscriptionPlanRouter(PrivateGroup)
 	}
 
 	PlatformGroup := Router.Group(global.ConfigServer.System.RouterPrefix)

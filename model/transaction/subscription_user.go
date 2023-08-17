@@ -10,6 +10,7 @@ type SubscriptionUser struct {
 	global.Model
 	SubscriptionPlanId uint      `json:"subscriptionPlanId" form:"subscriptionPlanId" gorm:"column:subscription_plan_id;comment:订阅ID。;"`
 	UserId             uint      `json:"userId" form:"userId" gorm:"column:user_id;comment:用户ID。;"`
+	Status             uint      `json:"status" form:"status" gorm:"column:status;comment:订阅状态。0禁用，1启用;"`
 	StartTime          time.Time `json:"startTime" form:"startTime" gorm:"column:start_time;comment:开始时间。;"`
 	EndTime            time.Time `json:"endTime" form:"endTime" gorm:"column:end_time;comment:结束时间，根据续费修改时间，定时任务刷新结束时间，及时去掉相关权限。;"`
 }

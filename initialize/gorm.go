@@ -70,7 +70,14 @@ func RegisterTables() {
 		transaction.ChatTicket{},
 		transaction.Wallets{},
 		transaction.TransactionHistory{},
-		transaction.Product{}, openfish.Feedback{}, openfish.SecretKey{}, openfish.Prompt{},
+		transaction.Product{},
+		transaction.SubscriptionPlan{},
+		transaction.SubscriptionUser{},
+		transaction.SubscriptionUserRecord{},
+
+		openfish.Feedback{},
+		openfish.SecretKey{},
+		openfish.Prompt{},
 	)
 	if err != nil {
 		global.Logger.Error("register table failed", zap.Error(err))

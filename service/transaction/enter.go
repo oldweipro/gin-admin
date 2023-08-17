@@ -5,4 +5,5 @@ type ServiceGroup struct {
 	WalletsService
 	HistoryService
 	ProductService
+	SubscriptionPlanService
 }

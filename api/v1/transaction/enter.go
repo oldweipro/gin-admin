@@ -5,4 +5,5 @@ type ApiGroup struct {
 	WalletsApi
 	HistoryApi
 	ProductApi
+	SubscriptionPlanApi
 }
