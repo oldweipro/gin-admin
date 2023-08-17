@@ -39,12 +39,6 @@ func (subscriptionPlanService *SubscriptionPlanService) GetSubscriptionPlan(id u
 	return
 }
 
-// GetSubscriptionPlanByTag 根据tag获取SubscriptionPlan记录
-func (subscriptionPlanService *SubscriptionPlanService) GetSubscriptionPlanByTag(tag uint) (subscriptionPlan transaction.SubscriptionPlan, err error) {
-	err = global.DB.Where("tag = ?", tag).First(&subscriptionPlan).Error
-	return
-}
-
 // GetCurrentSubscriptionPlan 查询当前用户订阅计划
 func (subscriptionPlanService *SubscriptionPlanService) GetCurrentSubscriptionPlan(id uint) (subscriptionUser transaction.SubscriptionUser, err error) {
 	err = global.DB.Where("user_id = ?", id).First(&subscriptionUser).Error

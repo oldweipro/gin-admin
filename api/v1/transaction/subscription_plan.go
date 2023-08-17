@@ -128,8 +128,8 @@ func (subscriptionPlanApi *SubscriptionPlanApi) UpdateSubscriptionPlan(c *gin.Co
 	}
 }
 
-// FindSubscriptionPlan 用id查询SubscriptionPlan
-func (subscriptionPlanApi *SubscriptionPlanApi) FindSubscriptionPlan(c *gin.Context) {
+// GetSubscriptionPlan 用id查询SubscriptionPlan
+func (subscriptionPlanApi *SubscriptionPlanApi) GetSubscriptionPlan(c *gin.Context) {
 	var subscriptionPlan transaction.SubscriptionPlan
 	err := c.ShouldBindQuery(&subscriptionPlan)
 	if err != nil {
@@ -137,26 +137,6 @@ func (subscriptionPlanApi *SubscriptionPlanApi) FindSubscriptionPlan(c *gin.Cont
 		return
 	}
 	if resubscriptionPlan, err := subscriptionPlanService.GetSubscriptionPlan(subscriptionPlan.ID); err != nil {
-		global.Logger.Error("查询失败!", zap.Error(err))
-		response.FailWithMessage("查询失败", c)
-	} else {
-		response.OkWithData(gin.H{"resubscriptionPlan": resubscriptionPlan}, c)
-	}
-}
-
-// GetSubscriptionPlanByTag 用tag查询SubscriptionPlan
-func (subscriptionPlanApi *SubscriptionPlanApi) GetSubscriptionPlanByTag(c *gin.Context) {
-	var subscriptionPlan transaction.SubscriptionPlan
-	err := c.ShouldBindQuery(&subscriptionPlan)
-	if err != nil {
-		response.FailWithMessage(err.Error(), c)
-		return
-	}
-	if subscriptionPlan.Tag == nil {
-		response.FailWithMessage("tag为必填参数", c)
-		return
-	}
-	if resubscriptionPlan, err := subscriptionPlanService.GetSubscriptionPlanByTag(*subscriptionPlan.Tag); err != nil {
 		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
