@@ -12,7 +12,8 @@ type SubscriptionPlan struct {
 	Price       *uint  `json:"price" form:"price" gorm:"column:price;comment:表示订阅计划的价格。;"`
 	Duration    *uint  `json:"duration" form:"duration" gorm:"column:duration;comment:表示订阅计划的时长，用秒表示;"`
 	Quantity    *uint  `json:"quantity" form:"quantity" gorm:"column:quantity;comment:表示订阅计划的数量;"`
-	MenuId      uint   `json:"menuId" form:"menuId" gorm:"column:menu_id;comment:关联的权限ID;"`
+	MenuId      *uint  `json:"menuId" form:"menuId" gorm:"column:menu_id;comment:关联的权限ID;"`
+	Tag         *uint  `json:"tag" form:"tag" gorm:"column:tag;comment:功能模块标识。;"`
 }
 
 // TableName SubscriptionPlan 表名

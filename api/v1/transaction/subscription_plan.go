@@ -144,6 +144,26 @@ func (subscriptionPlanApi *SubscriptionPlanApi) FindSubscriptionPlan(c *gin.Cont
 	}
 }
 
+// GetSubscriptionPlanByTag 用tag查询SubscriptionPlan
+func (subscriptionPlanApi *SubscriptionPlanApi) GetSubscriptionPlanByTag(c *gin.Context) {
+	var subscriptionPlan transaction.SubscriptionPlan
+	err := c.ShouldBindQuery(&subscriptionPlan)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	if subscriptionPlan.Tag == nil {
+		response.FailWithMessage("tag为必填参数", c)
+		return
+	}
+	if resubscriptionPlan, err := subscriptionPlanService.GetSubscriptionPlanByTag(*subscriptionPlan.Tag); err != nil {
+		global.Logger.Error("查询失败!", zap.Error(err))
+		response.FailWithMessage("查询失败", c)
+	} else {
+		response.OkWithData(gin.H{"resubscriptionPlan": resubscriptionPlan}, c)
+	}
+}
+
 // GetCurrentSubscriptionPlan 查询当前用户订阅计划
 func (subscriptionPlanApi *SubscriptionPlanApi) GetCurrentSubscriptionPlan(c *gin.Context) {
 	userID := utils.GetUserID(c)
