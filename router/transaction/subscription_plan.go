@@ -20,9 +20,10 @@ func (s *SubscriptionPlanRouter) InitSubscriptionPlanRouter(Router *gin.RouterGr
 		subscriptionPlanRouter.DELETE("deleteSubscriptionPlanByIds", subscriptionPlanApi.DeleteSubscriptionPlanByIds) // 批量删除SubscriptionPlan
 		subscriptionPlanRouter.PUT("updateSubscriptionPlan", subscriptionPlanApi.UpdateSubscriptionPlan)              // 更新SubscriptionPlan
 		subscriptionPlanRouter.GET("getCurrentSubscriptionPlan", subscriptionPlanApi.GetCurrentSubscriptionPlan)      // 查询当前用户订阅计划
+		subscriptionPlanRouter.GET("getSubscriptionPlanByTag", subscriptionPlanApi.GetSubscriptionPlanByTag)          // 查询某个功能的订阅计划
 	}
 	{
-		subscriptionPlanRouterWithoutRecord.GET("getSubscriptionPlan", subscriptionPlanApi.GetSubscriptionPlan) // 根据ID获取SubscriptionPlan
-		//subscriptionPlanRouterWithoutRecord.GET("getSubscriptionPlanList", subscriptionPlanApi.GetSubscriptionPlanList) // 获取SubscriptionPlan列表
+		subscriptionPlanRouterWithoutRecord.GET("getSubscriptionPlan", subscriptionPlanApi.GetSubscriptionPlan)         // 根据ID获取SubscriptionPlan
+		subscriptionPlanRouterWithoutRecord.GET("getSubscriptionPlanList", subscriptionPlanApi.GetSubscriptionPlanList) // 获取SubscriptionPlan列表
 	}
 }

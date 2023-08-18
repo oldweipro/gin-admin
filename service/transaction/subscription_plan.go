@@ -4,6 +4,7 @@ import (
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/transaction"
+	transactionRequest "github.com/oldweipro/gin-admin/model/transaction/request"
 )
 
 type SubscriptionPlanService struct {
@@ -39,6 +40,12 @@ func (subscriptionPlanService *SubscriptionPlanService) GetSubscriptionPlan(id u
 	return
 }
 
+// GetSubscriptionPlanByTag 根据tag获取SubscriptionPlan记录
+func (subscriptionPlanService *SubscriptionPlanService) GetSubscriptionPlanByTag(tag uint) (subscriptionPlan []transaction.SubscriptionPlan, err error) {
+	err = global.DB.Where("tag = ?", tag).Find(&subscriptionPlan).Error
+	return
+}
+
 // GetCurrentSubscriptionPlan 查询当前用户订阅计划
 func (subscriptionPlanService *SubscriptionPlanService) GetCurrentSubscriptionPlan(id uint) (subscriptionUser transaction.SubscriptionUser, err error) {
 	err = global.DB.Where("user_id = ?", id).First(&subscriptionUser).Error
@@ -46,27 +53,27 @@ func (subscriptionPlanService *SubscriptionPlanService) GetCurrentSubscriptionPl
 }
 
 // GetSubscriptionPlanInfoList 分页获取SubscriptionPlan记录
-//func (subscriptionPlanService *SubscriptionPlanService) GetSubscriptionPlanInfoList(info openfishReq.SubscriptionPlanSearch) (list []transaction.SubscriptionPlan, total int64, err error) {
-//	limit := info.PageSize
-//	offset := info.PageSize * (info.Page - 1)
-//	// 创建db
-//	db := global.DB.Model(&transaction.SubscriptionPlan{})
-//	var subscriptionPlans []transaction.SubscriptionPlan
-//	// 如果有条件搜索 下方会自动创建搜索语句
-//	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {
-//		db = db.Where("created_at BETWEEN ? AND ?", info.StartCreatedAt, info.EndCreatedAt)
-//	}
-//	if info.Name != "" {
-//		db = db.Where("name LIKE ?", "%"+info.Name+"%")
-//	}
-//	if info.Description != "" {
-//		db = db.Where("description LIKE ?", "%"+info.Description+"%")
-//	}
-//	err = db.Count(&total).Error
-//	if err != nil {
-//		return
-//	}
-//
-//	err = db.Limit(limit).Offset(offset).Find(&subscriptionPlans).Error
-//	return subscriptionPlans, total, err
-//}
+func (subscriptionPlanService *SubscriptionPlanService) GetSubscriptionPlanInfoList(info transactionRequest.SubscriptionPlanSearch) (list []transaction.SubscriptionPlan, total int64, err error) {
+	limit := info.PageSize
+	offset := info.PageSize * (info.Page - 1)
+	// 创建db
+	db := global.DB.Model(&transaction.SubscriptionPlan{})
+	var subscriptionPlans []transaction.SubscriptionPlan
+	// 如果有条件搜索 下方会自动创建搜索语句
+	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {
+		db = db.Where("created_at BETWEEN ? AND ?", info.StartCreatedAt, info.EndCreatedAt)
+	}
+	if info.Name != "" {
+		db = db.Where("name LIKE ?", "%"+info.Name+"%")
+	}
+	if info.Description != "" {
+		db = db.Where("description LIKE ?", "%"+info.Description+"%")
+	}
+	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
+
+	err = db.Limit(limit).Offset(offset).Find(&subscriptionPlans).Error
+	return subscriptionPlans, total, err
+}

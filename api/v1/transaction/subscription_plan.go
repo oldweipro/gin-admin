@@ -6,6 +6,7 @@ import (
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/common/response"
 	"github.com/oldweipro/gin-admin/model/transaction"
+	transactionRequest "github.com/oldweipro/gin-admin/model/transaction/request"
 	"github.com/oldweipro/gin-admin/service"
 	"github.com/oldweipro/gin-admin/utils"
 	"go.uber.org/zap"
@@ -140,7 +141,7 @@ func (subscriptionPlanApi *SubscriptionPlanApi) GetSubscriptionPlan(c *gin.Conte
 		global.Logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
-		response.OkWithData(gin.H{"resubscriptionPlan": resubscriptionPlan}, c)
+		response.OkWithData(resubscriptionPlan, c)
 	}
 }
 
@@ -149,29 +150,49 @@ func (subscriptionPlanApi *SubscriptionPlanApi) GetCurrentSubscriptionPlan(c *gi
 	userID := utils.GetUserID(c)
 	if subscriptionUser, err := subscriptionPlanService.GetCurrentSubscriptionPlan(userID); err != nil {
 		global.Logger.Error("查询失败!", zap.Error(err))
-		response.OkWithData(gin.H{"subscriptionUser": subscriptionUser}, c)
+		response.OkWithData(subscriptionUser, c)
 	} else {
-		response.OkWithData(gin.H{"subscriptionUser": subscriptionUser}, c)
+		response.OkWithData(subscriptionUser, c)
+	}
+}
+
+// GetSubscriptionPlanByTag 用tag查询SubscriptionPlan
+func (subscriptionPlanApi *SubscriptionPlanApi) GetSubscriptionPlanByTag(c *gin.Context) {
+	var subscriptionPlan transaction.SubscriptionPlan
+	err := c.ShouldBindQuery(&subscriptionPlan)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	if subscriptionPlan.Tag == nil {
+		response.FailWithMessage("tag为必填参数", c)
+		return
+	}
+	if subscriptionPlan, err := subscriptionPlanService.GetSubscriptionPlanByTag(*subscriptionPlan.Tag); err != nil {
+		global.Logger.Error("查询失败!", zap.Error(err))
+		response.FailWithMessage("查询失败", c)
+	} else {
+		response.OkWithData(subscriptionPlan, c)
 	}
 }
 
 // GetSubscriptionPlanList 分页获取SubscriptionPlan列表
-//func (subscriptionPlanApi *SubscriptionPlanApi) GetSubscriptionPlanList(c *gin.Context) {
-//	var pageInfo openfishReq.SubscriptionPlanSearch
-//	err := c.ShouldBindQuery(&pageInfo)
-//	if err != nil {
-//		response.FailWithMessage(err.Error(), c)
-//		return
-//	}
-//	if list, total, err := subscriptionPlanService.GetSubscriptionPlanInfoList(pageInfo); err != nil {
-//		global.Logger.Error("获取失败!", zap.Error(err))
-//		response.FailWithMessage("获取失败", c)
-//	} else {
-//		response.OkWithDetailed(response.PageResult{
-//			List:     list,
-//			Total:    total,
-//			Page:     pageInfo.Page,
-//			PageSize: pageInfo.PageSize,
-//		}, "获取成功", c)
-//	}
-//}
+func (subscriptionPlanApi *SubscriptionPlanApi) GetSubscriptionPlanList(c *gin.Context) {
+	var pageInfo transactionRequest.SubscriptionPlanSearch
+	err := c.ShouldBindQuery(&pageInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	if list, total, err := subscriptionPlanService.GetSubscriptionPlanInfoList(pageInfo); err != nil {
+		global.Logger.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:     list,
+			Total:    total,
+			Page:     pageInfo.Page,
+			PageSize: pageInfo.PageSize,
+		}, "获取成功", c)
+	}
+}
