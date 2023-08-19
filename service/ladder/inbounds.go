@@ -110,7 +110,6 @@ func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo sy
 	// 查询服务器信息
 	var serverNode ladder.ServerNode
 	global.DB.Where("id = ?", *inbounds.Sid).First(&serverNode)
-	user, err := userService.FindUserById(userInfo.BaseClaims.ID)
 	if err != nil {
 		return
 	}
@@ -119,7 +118,7 @@ func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo sy
 	var total int64 = 0
 	enable := true
 	// 从套餐中查询
-	subscriptionUser, err := subscriptionPlanService.GetCurrentSubscriptionPlan(user.ID)
+	subscriptionUser, err := subscriptionPlanService.GetCurrentSubscriptionPlan(userInfo.BaseClaims.ID)
 	if err != nil {
 		global.Logger.Info("查询当前用户订阅信息异常")
 		return err

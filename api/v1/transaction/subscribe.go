@@ -41,7 +41,11 @@ func (subscribeApi *SubscribeApi) SubscribePlan(c *gin.Context) {
 			// 续费订阅计划
 			err := subscribeService.RenewalSubscription(&userPlan, &plan)
 			if err != nil {
-				response.FailWithMessage("订阅异常!", c)
+				if err.Error() == "余额不足" {
+					response.FailWithMessage(err.Error(), c)
+				} else {
+					response.FailWithMessage("订阅异常", c)
+				}
 				return
 			}
 		}

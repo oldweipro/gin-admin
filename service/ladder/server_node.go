@@ -36,9 +36,9 @@ func (serverNodeService *ServerNodeService) DeleteServerNode(serverNode ladder.S
 }
 
 // DeleteServerNodeByIds 批量删除ServerNode记录
-func (serverNodeService *ServerNodeService) DeleteServerNodeByIds(ids request.IdsReq, deleted_by uint) (err error) {
+func (serverNodeService *ServerNodeService) DeleteServerNodeByIds(ids request.IdsReq, deletedBy uint) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Model(&ladder.ServerNode{}).Where("id in ?", ids.Ids).Update("deleted_by", deleted_by).Error; err != nil {
+		if err := tx.Model(&ladder.ServerNode{}).Where("id in ?", ids.Ids).Update("deleted_by", deletedBy).Error; err != nil {
 			return err
 		}
 		if err := tx.Where("id in ?", ids.Ids).Delete(&ladder.ServerNode{}).Error; err != nil {
