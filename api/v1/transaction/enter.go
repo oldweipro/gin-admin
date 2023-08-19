@@ -6,4 +6,5 @@ type ApiGroup struct {
 	HistoryApi
 	ProductApi
 	SubscriptionPlanApi
+	SubscribeApi
 }

@@ -32,9 +32,9 @@ func (historyService *HistoryService) DeleteTransactionHistory(transactionHistor
 }
 
 // DeleteTransactionHistoryByIds 批量删除TransactionHistory记录
-func (historyService *HistoryService) DeleteTransactionHistoryByIds(ids request.IdsReq, deleted_by uint) (err error) {
+func (historyService *HistoryService) DeleteTransactionHistoryByIds(ids request.IdsReq, deletedBy uint) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Model(&transaction.TransactionHistory{}).Where("id in ?", ids.Ids).Update("deleted_by", deleted_by).Error; err != nil {
+		if err := tx.Model(&transaction.TransactionHistory{}).Where("id in ?", ids.Ids).Update("deleted_by", deletedBy).Error; err != nil {
 			return err
 		}
 		if err := tx.Where("id in ?", ids.Ids).Delete(&transaction.TransactionHistory{}).Error; err != nil {

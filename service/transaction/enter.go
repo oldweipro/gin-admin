@@ -6,4 +6,5 @@ type ServiceGroup struct {
 	HistoryService
 	ProductService
 	SubscriptionPlanService
+	SubscribeService
 }

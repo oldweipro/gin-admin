@@ -14,6 +14,7 @@ func (s *SubscriptionPlanRouter) InitSubscriptionPlanRouter(Router *gin.RouterGr
 	subscriptionPlanRouter := Router.Group("subscriptionPlan").Use(middleware.OperationRecord())
 	subscriptionPlanRouterWithoutRecord := Router.Group("subscriptionPlan")
 	var subscriptionPlanApi = v1.ApiGroupApp.TransactionApiGroup.SubscriptionPlanApi
+	var subscribeApi = v1.ApiGroupApp.TransactionApiGroup.SubscribeApi
 	{
 		subscriptionPlanRouter.POST("createSubscriptionPlan", subscriptionPlanApi.CreateSubscriptionPlan)             // 新建SubscriptionPlan
 		subscriptionPlanRouter.DELETE("deleteSubscriptionPlan", subscriptionPlanApi.DeleteSubscriptionPlan)           // 删除SubscriptionPlan
@@ -21,6 +22,7 @@ func (s *SubscriptionPlanRouter) InitSubscriptionPlanRouter(Router *gin.RouterGr
 		subscriptionPlanRouter.PUT("updateSubscriptionPlan", subscriptionPlanApi.UpdateSubscriptionPlan)              // 更新SubscriptionPlan
 		subscriptionPlanRouter.GET("getCurrentSubscriptionPlan", subscriptionPlanApi.GetCurrentSubscriptionPlan)      // 查询当前用户订阅计划
 		subscriptionPlanRouter.GET("getSubscriptionPlanByTag", subscriptionPlanApi.GetSubscriptionPlanByTag)          // 查询某个功能的订阅计划
+		subscriptionPlanRouter.POST("subscribePlan", subscribeApi.SubscribePlan)                                      // 订阅
 	}
 	{
 		subscriptionPlanRouterWithoutRecord.GET("getSubscriptionPlan", subscriptionPlanApi.GetSubscriptionPlan)         // 根据ID获取SubscriptionPlan

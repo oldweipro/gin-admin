@@ -18,14 +18,6 @@ type WalletsApi struct {
 var walletsService = service.ServiceGroupApp.TransactionServiceGroup.WalletsService
 
 // CreateWallets 创建Wallets
-// @Tags Wallets
-// @Summary 创建Wallets
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body openfish.Wallets true "创建Wallets"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /wallets/createWallets [post]
 func (walletsApi *WalletsApi) CreateWallets(c *gin.Context) {
 	var wallets transaction.Wallets
 	err := c.ShouldBindJSON(&wallets)
@@ -49,14 +41,6 @@ func (walletsApi *WalletsApi) CreateWallets(c *gin.Context) {
 }
 
 // DeleteWallets 删除Wallets
-// @Tags Wallets
-// @Summary 删除Wallets
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body openfish.Wallets true "删除Wallets"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
-// @Router /wallets/deleteWallets [delete]
 func (walletsApi *WalletsApi) DeleteWallets(c *gin.Context) {
 	var wallets transaction.Wallets
 	err := c.ShouldBindJSON(&wallets)
@@ -73,14 +57,6 @@ func (walletsApi *WalletsApi) DeleteWallets(c *gin.Context) {
 }
 
 // DeleteWalletsByIds 批量删除Wallets
-// @Tags Wallets
-// @Summary 批量删除Wallets
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body request.IdsReq true "批量删除Wallets"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"批量删除成功"}"
-// @Router /wallets/deleteWalletsByIds [delete]
 func (walletsApi *WalletsApi) DeleteWalletsByIds(c *gin.Context) {
 	var IDS request.IdsReq
 	err := c.ShouldBindJSON(&IDS)
@@ -97,14 +73,6 @@ func (walletsApi *WalletsApi) DeleteWalletsByIds(c *gin.Context) {
 }
 
 // UpdateWallets 更新Wallets
-// @Tags Wallets
-// @Summary 更新Wallets
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body openfish.Wallets true "更新Wallets"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
-// @Router /wallets/updateWallets [put]
 func (walletsApi *WalletsApi) UpdateWallets(c *gin.Context) {
 	var wallets transaction.Wallets
 	err := c.ShouldBindJSON(&wallets)
@@ -128,14 +96,6 @@ func (walletsApi *WalletsApi) UpdateWallets(c *gin.Context) {
 }
 
 // FindWallets 用id查询Wallets
-// @Tags Wallets
-// @Summary 用id查询Wallets
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data query openfish.Wallets true "用id查询Wallets"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
-// @Router /wallets/findWallets [get]
 func (walletsApi *WalletsApi) FindWallets(c *gin.Context) {
 	var wallets transaction.Wallets
 	err := c.ShouldBindQuery(&wallets)
@@ -152,14 +112,6 @@ func (walletsApi *WalletsApi) FindWallets(c *gin.Context) {
 }
 
 // GetWalletsList 分页获取Wallets列表
-// @Tags Wallets
-// @Summary 分页获取Wallets列表
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data query openfishReq.WalletsSearch true "分页获取Wallets列表"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /wallets/getWalletsList [get]
 func (walletsApi *WalletsApi) GetWalletsList(c *gin.Context) {
 	var pageInfo transactionReq.WalletsSearch
 	err := c.ShouldBindQuery(&pageInfo)

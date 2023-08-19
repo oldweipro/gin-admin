@@ -18,14 +18,6 @@ type SubscriptionPlanApi struct {
 var subscriptionPlanService = service.ServiceGroupApp.TransactionServiceGroup.SubscriptionPlanService
 
 // CreateSubscriptionPlan 创建SubscriptionPlan
-// @Tags SubscriptionPlan
-// @Summary 创建SubscriptionPlan
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body openfish.SubscriptionPlan true "创建SubscriptionPlan"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /subscriptionPlan/createSubscriptionPlan [post]
 func (subscriptionPlanApi *SubscriptionPlanApi) CreateSubscriptionPlan(c *gin.Context) {
 	var subscriptionPlan transaction.SubscriptionPlan
 	err := c.ShouldBindJSON(&subscriptionPlan)
@@ -50,14 +42,6 @@ func (subscriptionPlanApi *SubscriptionPlanApi) CreateSubscriptionPlan(c *gin.Co
 }
 
 // DeleteSubscriptionPlan 删除SubscriptionPlan
-// @Tags SubscriptionPlan
-// @Summary 删除SubscriptionPlan
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body openfish.SubscriptionPlan true "删除SubscriptionPlan"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
-// @Router /subscriptionPlan/deleteSubscriptionPlan [delete]
 func (subscriptionPlanApi *SubscriptionPlanApi) DeleteSubscriptionPlan(c *gin.Context) {
 	var subscriptionPlan transaction.SubscriptionPlan
 	err := c.ShouldBindJSON(&subscriptionPlan)
@@ -74,14 +58,6 @@ func (subscriptionPlanApi *SubscriptionPlanApi) DeleteSubscriptionPlan(c *gin.Co
 }
 
 // DeleteSubscriptionPlanByIds 批量删除SubscriptionPlan
-// @Tags SubscriptionPlan
-// @Summary 批量删除SubscriptionPlan
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body request.IdsReq true "批量删除SubscriptionPlan"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"批量删除成功"}"
-// @Router /subscriptionPlan/deleteSubscriptionPlanByIds [delete]
 func (subscriptionPlanApi *SubscriptionPlanApi) DeleteSubscriptionPlanByIds(c *gin.Context) {
 	var IDS request.IdsReq
 	err := c.ShouldBindJSON(&IDS)
@@ -98,14 +74,6 @@ func (subscriptionPlanApi *SubscriptionPlanApi) DeleteSubscriptionPlanByIds(c *g
 }
 
 // UpdateSubscriptionPlan 更新SubscriptionPlan
-// @Tags SubscriptionPlan
-// @Summary 更新SubscriptionPlan
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body openfish.SubscriptionPlan true "更新SubscriptionPlan"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
-// @Router /subscriptionPlan/updateSubscriptionPlan [put]
 func (subscriptionPlanApi *SubscriptionPlanApi) UpdateSubscriptionPlan(c *gin.Context) {
 	var subscriptionPlan transaction.SubscriptionPlan
 	err := c.ShouldBindJSON(&subscriptionPlan)
@@ -147,8 +115,8 @@ func (subscriptionPlanApi *SubscriptionPlanApi) GetSubscriptionPlan(c *gin.Conte
 
 // GetCurrentSubscriptionPlan 查询当前用户订阅计划
 func (subscriptionPlanApi *SubscriptionPlanApi) GetCurrentSubscriptionPlan(c *gin.Context) {
-	userID := utils.GetUserID(c)
-	if subscriptionUser, err := subscriptionPlanService.GetCurrentSubscriptionPlan(userID); err != nil {
+	userId := utils.GetUserID(c)
+	if subscriptionUser, err := subscriptionPlanService.GetCurrentSubscriptionPlan(userId); err != nil {
 		global.Logger.Error("查询失败!", zap.Error(err))
 		response.OkWithData(subscriptionUser, c)
 	} else {

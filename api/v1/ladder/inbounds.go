@@ -153,7 +153,7 @@ func (inboundsApi *InboundsApi) FindInboundsLink(c *gin.Context) {
 		response.FailWithMessage("请开通", c)
 		return
 	}
-	if user.Status == 0 {
+	if *user.Status == 0 {
 		response.FailWithMessage("得加钱", c)
 		return
 	}

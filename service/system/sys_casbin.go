@@ -26,7 +26,7 @@ var CasbinServiceApp = new(CasbinService)
 func (casbinService *CasbinService) UpdateCasbin(AuthorityID uint, casbinInfos []request.CasbinInfo) error {
 	authorityId := strconv.Itoa(int(AuthorityID))
 	casbinService.ClearCasbin(0, authorityId)
-	rules := [][]string{}
+	var rules [][]string
 	for _, v := range casbinInfos {
 		rules = append(rules, []string{authorityId, v.Path, v.Method})
 	}

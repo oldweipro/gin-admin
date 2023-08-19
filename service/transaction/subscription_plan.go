@@ -5,6 +5,7 @@ import (
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/transaction"
 	transactionRequest "github.com/oldweipro/gin-admin/model/transaction/request"
+	"time"
 )
 
 type SubscriptionPlanService struct {
@@ -48,7 +49,27 @@ func (subscriptionPlanService *SubscriptionPlanService) GetSubscriptionPlanByTag
 
 // GetCurrentSubscriptionPlan 查询当前用户订阅计划
 func (subscriptionPlanService *SubscriptionPlanService) GetCurrentSubscriptionPlan(id uint) (subscriptionUser transaction.SubscriptionUser, err error) {
-	err = global.DB.Where("user_id = ?", id).First(&subscriptionUser).Error
+	// 如果不存在，则创建
+	db := global.DB.Model(&subscriptionUser)
+	var planId uint = 1
+	db.Where("user_id = ? and subscription_plan_id = ?", id, planId)
+	var total int64
+	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
+	if total == 0 {
+		// 创建订阅计划
+		subscriptionUser.UserId = &id
+		subscriptionUser.SubscriptionPlanId = &planId
+		var status uint = 0
+		subscriptionUser.Status = &status
+		subscriptionUser.StartTime = time.Now()
+		subscriptionUser.EndTime = time.Now()
+		err = db.Create(&subscriptionUser).Error
+		return
+	}
+	err = db.First(&subscriptionUser).Error
 	return
 }
 
