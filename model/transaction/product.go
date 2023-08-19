@@ -1,4 +1,3 @@
-// 自动生成模板Product
 package transaction
 
 import (

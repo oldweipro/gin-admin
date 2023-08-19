@@ -74,6 +74,8 @@ func RegisterTables() {
 		transaction.SubscriptionPlan{},
 		transaction.SubscriptionUser{},
 		transaction.SubscriptionUserRecord{},
+		transaction.RedeemCode{},
+		transaction.RedeemLog{},
 
 		openfish.Feedback{},
 		openfish.SecretKey{},
