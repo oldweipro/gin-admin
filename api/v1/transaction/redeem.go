@@ -33,3 +33,24 @@ func (redeemApi *RedeemApi) GenerateRedeemCode(c *gin.Context) {
 		response.OkWithMessage("生成兑换码成功", c)
 	}
 }
+
+// GetRedeemCodeList 获取兑换码列表
+func (redeemApi *RedeemApi) GetRedeemCodeList(c *gin.Context) {
+	var pageInfo request.RedeemSearch
+	err := c.ShouldBindQuery(&pageInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	if list, total, err := redeemService.GetRedeemCodeList(pageInfo); err != nil {
+		global.Logger.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:     list,
+			Total:    total,
+			Page:     pageInfo.Page,
+			PageSize: pageInfo.PageSize,
+		}, "获取成功", c)
+	}
+}

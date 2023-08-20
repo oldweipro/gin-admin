@@ -18,6 +18,6 @@ func (r *RedeemRouter) InitRedeemRouter(Router *gin.RouterGroup) {
 		redeemRouter.POST("generateRedeemCode", redeemApi.GenerateRedeemCode) // 生成兑换码
 	}
 	{
-		redeemRouterWithoutRecord.GET("getRedeemCodeList", redeemApi.GenerateRedeemCode) // 获取兑换码列表
+		redeemRouterWithoutRecord.GET("getRedeemCodeList", redeemApi.GetRedeemCodeList) // 获取兑换码列表
 	}
 }
