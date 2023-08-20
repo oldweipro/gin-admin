@@ -7,4 +7,5 @@ type ServiceGroup struct {
 	ProductService
 	SubscriptionPlanService
 	SubscribeService
+	RedeemService
 }

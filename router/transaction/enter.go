@@ -6,4 +6,5 @@ type RouterGroup struct {
 	TransactionHistoryRouter
 	ProductRouter
 	SubscriptionPlanRouter
+	RedeemRouter
 }

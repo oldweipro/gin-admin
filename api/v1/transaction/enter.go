@@ -7,4 +7,5 @@ type ApiGroup struct {
 	ProductApi
 	SubscriptionPlanApi
 	SubscribeApi
+	RedeemApi
 }
