@@ -42,7 +42,7 @@ func (redeemService *RedeemService) GenerateRedeemCode(req request.RedeemCodeReq
 func (redeemService *RedeemService) CheckRedeemCode(code string, userId uint) (redeemCode transaction.RedeemCode, err error) {
 	err = global.DB.Where("code=? and per_limit>0 and left_count>0 and status=0 and UNIX_TIMESTAMP(expire_time)>unix_timestamp(now())", code).First(&redeemCode).Error
 	if err != nil {
-		return transaction.RedeemCode{}, err
+		return transaction.RedeemCode{}, errors.New("兑换码失效")
 	}
 	if *redeemCode.TotalCount > 1 {
 		// 这个兑换码可以被兑换多次，查询兑换码和个人兑换记录
@@ -95,7 +95,7 @@ func (redeemService *RedeemService) RedeemFishCoin(redeemCode *transaction.Redee
 		}
 		if err = tx.Model(&transaction.RedeemCode{}).
 			Where("id = ?", redeemCode.ID).
-			Update("status=?", status).
+			Update("status", status).
 			Update("left_count", *redeemCode.LeftCount).
 			Update("total_redeemed", *redeemCode.TotalRedeemed).
 			Error; err != nil {

@@ -58,11 +58,13 @@ func (redeemApi *RedeemApi) RedeemFishCoin(c *gin.Context) {
 	userId := utils.GetUserID(c)
 	redeemCode, err := redeemService.CheckRedeemCode(redeemFishCoin.RedeemCode, userId)
 	if err != nil {
-		response.FailWithMessage("兑换码失效", c)
+		response.FailWithMessage(err.Error(), c)
+		return
 	}
 	wallets, err := walletsService.GetCurrentUserWallets(userId)
 	if err != nil {
 		response.FailWithMessage("账号异常，未开通钱包", c)
+		return
 	}
 	if err := redeemService.RedeemFishCoin(&redeemCode, &wallets); err != nil {
 		global.Logger.Error("兑换失败!", zap.Error(err))
@@ -70,6 +72,7 @@ func (redeemApi *RedeemApi) RedeemFishCoin(c *gin.Context) {
 	} else {
 		response.OkWithMessage("兑换成功", c)
 	}
+	return
 }
 
 // GetRedeemCodeList 获取兑换码列表
