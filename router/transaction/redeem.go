@@ -16,6 +16,7 @@ func (r *RedeemRouter) InitRedeemRouter(Router *gin.RouterGroup) {
 	var redeemApi = v1.ApiGroupApp.TransactionApiGroup.RedeemApi
 	{
 		redeemRouter.POST("generateRedeemCode", redeemApi.GenerateRedeemCode) // 生成兑换码
+		redeemRouter.POST("redeemFishCoin", redeemApi.RedeemFishCoin)         // 兑换鱼币
 	}
 	{
 		redeemRouterWithoutRecord.GET("getRedeemCodeList", redeemApi.GetRedeemCodeList) // 获取兑换码列表

@@ -18,14 +18,6 @@ type ChatTicketApi struct {
 var chatTicketService = service.ServiceGroupApp.TransactionServiceGroup.ChatTicketService
 
 // CreateChatTicket 创建ChatTicket
-// @Tags ChatTicket
-// @Summary 创建ChatTicket
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body openfish.ChatTicket true "创建ChatTicket"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /chatTicket/createChatTicket [post]
 func (chatTicketApi *ChatTicketApi) CreateChatTicket(c *gin.Context) {
 	var chatTicket transaction.ChatTicket
 	err := c.ShouldBindJSON(&chatTicket)
@@ -52,14 +44,6 @@ func (chatTicketApi *ChatTicketApi) CreateChatTicket(c *gin.Context) {
 }
 
 // DeleteChatTicket 删除ChatTicket
-// @Tags ChatTicket
-// @Summary 删除ChatTicket
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body openfish.ChatTicket true "删除ChatTicket"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
-// @Router /chatTicket/deleteChatTicket [delete]
 func (chatTicketApi *ChatTicketApi) DeleteChatTicket(c *gin.Context) {
 	var chatTicket transaction.ChatTicket
 	err := c.ShouldBindJSON(&chatTicket)
@@ -77,14 +61,6 @@ func (chatTicketApi *ChatTicketApi) DeleteChatTicket(c *gin.Context) {
 }
 
 // DeleteChatTicketByIds 批量删除ChatTicket
-// @Tags ChatTicket
-// @Summary 批量删除ChatTicket
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body request.IdsReq true "批量删除ChatTicket"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"批量删除成功"}"
-// @Router /chatTicket/deleteChatTicketByIds [delete]
 func (chatTicketApi *ChatTicketApi) DeleteChatTicketByIds(c *gin.Context) {
 	var IDS request.IdsReq
 	err := c.ShouldBindJSON(&IDS)
@@ -102,14 +78,6 @@ func (chatTicketApi *ChatTicketApi) DeleteChatTicketByIds(c *gin.Context) {
 }
 
 // UpdateChatTicket 更新ChatTicket
-// @Tags ChatTicket
-// @Summary 更新ChatTicket
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body openfish.ChatTicket true "更新ChatTicket"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
-// @Router /chatTicket/updateChatTicket [put]
 func (chatTicketApi *ChatTicketApi) UpdateChatTicket(c *gin.Context) {
 	var chatTicket transaction.ChatTicket
 	err := c.ShouldBindJSON(&chatTicket)
@@ -136,14 +104,6 @@ func (chatTicketApi *ChatTicketApi) UpdateChatTicket(c *gin.Context) {
 }
 
 // FindChatTicket 用id查询ChatTicket
-// @Tags ChatTicket
-// @Summary 用id查询ChatTicket
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data query openfish.ChatTicket true "用id查询ChatTicket"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
-// @Router /chatTicket/findChatTicket [get]
 func (chatTicketApi *ChatTicketApi) FindChatTicket(c *gin.Context) {
 	var chatTicket transaction.ChatTicket
 	err := c.ShouldBindQuery(&chatTicket)
@@ -160,14 +120,6 @@ func (chatTicketApi *ChatTicketApi) FindChatTicket(c *gin.Context) {
 }
 
 // GetChatTicketList 分页获取ChatTicket列表
-// @Tags ChatTicket
-// @Summary 分页获取ChatTicket列表
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data query openfishReq.ChatTicketSearch true "分页获取ChatTicket列表"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /chatTicket/getChatTicketList [get]
 func (chatTicketApi *ChatTicketApi) GetChatTicketList(c *gin.Context) {
 	var pageInfo openfishReq.ChatTicketSearch
 	err := c.ShouldBindQuery(&pageInfo)
