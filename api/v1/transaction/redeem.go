@@ -16,7 +16,7 @@ type RedeemApi struct {
 
 var redeemService = service.ServiceGroupApp.TransactionServiceGroup.RedeemService
 
-var RedeemFishCoinStatus sync.Map
+var redeemFishCoinStatus sync.Map
 
 // GenerateRedeemCode 生成兑换码
 func (redeemApi *RedeemApi) GenerateRedeemCode(c *gin.Context) {
@@ -49,11 +49,12 @@ func (redeemApi *RedeemApi) GenerateRedeemCode(c *gin.Context) {
 // RedeemFishCoin 兑换鱼币
 func (redeemApi *RedeemApi) RedeemFishCoin(c *gin.Context) {
 	userId := utils.GetUserID(c)
-	_, loaded := RedeemFishCoinStatus.LoadOrStore(userId, true)
+	_, loaded := redeemFishCoinStatus.LoadOrStore(userId, true)
 	if loaded {
 		response.FailStatusTooManyRequestsWithDetailed(nil, "请求过多", c)
 		return
 	}
+	defer redeemFishCoinStatus.Delete(userId)
 	var redeemFishCoin request.RedeemFishCoinRequest
 	err := c.ShouldBindJSON(&redeemFishCoin)
 	if err != nil {
