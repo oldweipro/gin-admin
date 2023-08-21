@@ -15,6 +15,8 @@ import (
 type ServerNodeService struct {
 }
 
+var inboundsService InboundsService
+
 // CreateServerNode 创建ServerNode记录
 func (serverNodeService *ServerNodeService) CreateServerNode(serverNode *ladder.ServerNode) (err error) {
 	err = global.DB.Create(serverNode).Error
@@ -90,6 +92,11 @@ func (serverNodeService *ServerNodeService) GetServerNodeInfoList(info ladderReq
 	return serverNodes, total, err
 }
 
+func (serverNodeService *ServerNodeService) GetUserServerNodeList() (serverNodes []ladder.ServerNode, err error) {
+	err = global.DB.Where("server_status = 1").Find(&serverNodes).Error
+	return
+}
+
 // GetServerNodeLessInfoList 分页获取ServerNode记录，过滤掉敏感信息
 func (serverNodeService *ServerNodeService) GetServerNodeLessInfoList(info ladderReq.ServerNodeSearch, userID uint) (list []ladderReq.ServerNodeResponse, total int64, err error) {
 	limit := info.PageSize
@@ -124,9 +131,13 @@ func (serverNodeService *ServerNodeService) GetServerNodeLessInfoList(info ladde
 		// 过滤数据
 		for _, inbound := range inbounds {
 			if *inbound.Sid == node.ID {
-				info.ExpiryTime = *inbound.ExpiryTime
-				info.Up = *inbound.Up
-				info.Down = *inbound.Down
+				obj, err := inboundsService.GetInboundsInfo(*inbound.Uid, *inbound.Sid)
+				if err != nil {
+					break
+				}
+				info.ExpiryTime = obj.ExpiryTime
+				info.Up = obj.Up
+				info.Down = obj.Down
 				break
 			}
 		}

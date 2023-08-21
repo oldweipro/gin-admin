@@ -88,6 +88,48 @@ func (inboundsService *InboundsService) GetInboundsLink(userInfo systemReq.Custo
 	return
 }
 
+func (inboundsService *InboundsService) GetInboundsInfo(userId, sid uint) (inboundObj ladder.Obj, err error) {
+	serverNode, err := serverNodeService.GetServerNode(sid)
+	if err != nil {
+		return ladder.Obj{}, err
+	}
+	reqUrl := "http://" + serverNode.ServerHost + ":" + strconv.Itoa(*serverNode.ServerPort) + "/xui/inbound/list"
+	cookie := &http.Cookie{
+		Name:  "session",
+		Value: serverNode.Cookie,
+	}
+	client := resty.New()
+	resp, err := client.R().
+		SetCookies([]*http.Cookie{
+			cookie,
+		}).
+		Post(reqUrl)
+	if err != nil {
+		return ladder.Obj{}, err
+	}
+	// 这里判断一下resp返回的内容
+	//fmt.Println(resp.StatusCode())
+	//fmt.Println(resp)
+	if resp.StatusCode() != 200 {
+		err = errors.New("请求节点服务器错误")
+		return ladder.Obj{}, err
+	}
+	var result ladder.XuiResponse
+	err = json.Unmarshal(resp.Body(), &result)
+	if err != nil {
+		return ladder.Obj{}, err
+	}
+	objs := result.Obj
+	var objInfo ladder.Obj
+	for _, obj := range objs {
+		if obj.Id == userId {
+			objInfo = obj
+			break
+		}
+	}
+	return objInfo, err
+}
+
 func (inboundsService *InboundsService) SetInboundsLink(userInfo systemReq.CustomClaims, inbounds ladder.Inbounds) (err error) {
 	if err = global.DB.Where("uid = ? and sid = ?", userInfo.BaseClaims.ID, *inbounds.Sid).First(&inbounds).Error; err != nil {
 		// 如果入站链接不存在，则创建链接，防止还没生成链接有人就点重置按钮导致数据库查不出来而报错
@@ -107,15 +149,28 @@ func (inboundsService *InboundsService) SetInboundsLink(userInfo systemReq.Custo
 }
 
 // UpdateServerNodeInbounds 根据节点服务器修改节点
-func (inboundsService *InboundsService) UpdateServerNodeInbounds(inbounds *ladder.Inbounds) (err error) {
-	serverNode, err := serverNodeService.GetServerNode(*inbounds.Sid)
-	if err != nil {
-		return err
+func (inboundsService *InboundsService) UpdateServerNodeInbounds(obj ladder.Obj, serverNode ladder.ServerNode) (err error) {
+	queryParams := make(map[string]string)
+	queryParams["id"] = strconv.Itoa(int(obj.Id))
+	queryParams["up"] = strconv.FormatInt(obj.Up, 10)
+	queryParams["down"] = strconv.FormatInt(obj.Down, 10)
+	queryParams["total"] = strconv.FormatInt(obj.Total, 10)
+	queryParams["remark"] = obj.Remark
+	if obj.Enable {
+		queryParams["enable"] = "true"
+	} else {
+		queryParams["enable"] = "false"
 	}
-	// 拿到那一条数据，直接修改即可
-	queryParams := inboundsService.AssemblyParameter(inbounds, serverNode)
+	queryParams["expiryTime"] = strconv.FormatInt(obj.ExpiryTime, 10)
+	queryParams["listen"] = obj.Listen
+	queryParams["port"] = strconv.FormatInt(obj.Port, 10)
+	queryParams["protocol"] = obj.Protocol
+	queryParams["settings"] = obj.Settings
+	queryParams["streamSettings"] = obj.StreamSettings
+	queryParams["tag"] = obj.Tag
+	queryParams["sniffing"] = obj.Sniffing
 	// 👇发起请求
-	reqUrl := "http://" + serverNode.ServerHost + ":" + strconv.Itoa(*serverNode.ServerPort) + "/xui/inbound/update/" + strconv.Itoa(int(inbounds.ID))
+	reqUrl := "http://" + serverNode.ServerHost + ":" + strconv.Itoa(*serverNode.ServerPort) + "/xui/inbound/update/" + strconv.Itoa(int(obj.Id))
 	cookie := &http.Cookie{
 		Name:  "session",
 		Value: serverNode.Cookie,
