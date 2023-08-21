@@ -47,7 +47,7 @@ func (redeemService *RedeemService) CheckRedeemCode(code string, userId uint) (r
 	if *redeemCode.TotalCount > 1 {
 		// 这个兑换码可以被兑换多次，查询兑换码和个人兑换记录
 		var count int64
-		if err = global.DB.Where("redeem_code_id=? and user_id=?", redeemCode.ID, userId).Count(&count).Error; err != nil {
+		if err = global.DB.Model(&transaction.RedeemLog{}).Where("redeem_code_id=? and user_id=?", redeemCode.ID, userId).Count(&count).Error; err != nil {
 			return transaction.RedeemCode{}, err
 		}
 		if count >= int64(*redeemCode.PerLimit) {
@@ -57,7 +57,7 @@ func (redeemService *RedeemService) CheckRedeemCode(code string, userId uint) (r
 	return
 }
 
-// RedeemFishCoin 生成兑换码
+// RedeemFishCoin 兑换鱼币
 func (redeemService *RedeemService) RedeemFishCoin(redeemCode *transaction.RedeemCode, wallets *transaction.Wallets) (err error) {
 	err = global.DB.Transaction(func(tx *gorm.DB) error {
 		var srcWalletId uint = 0
@@ -93,11 +93,10 @@ func (redeemService *RedeemService) RedeemFishCoin(redeemCode *transaction.Redee
 		if *redeemCode.LeftCount == 0 {
 			status = 1
 		}
+		updates := map[string]interface{}{"status": status, "left_count": *redeemCode.LeftCount, "total_redeemed": *redeemCode.TotalRedeemed}
 		if err = tx.Model(&transaction.RedeemCode{}).
 			Where("id = ?", redeemCode.ID).
-			Update("status", status).
-			Update("left_count", *redeemCode.LeftCount).
-			Update("total_redeemed", *redeemCode.TotalRedeemed).
+			Updates(updates).
 			Error; err != nil {
 			return err
 		}
@@ -132,7 +131,6 @@ func (redeemService *RedeemService) GetRedeemCodeList(info request.RedeemCodeSea
 	if err != nil {
 		return
 	}
-
-	err = db.Limit(limit).Offset(offset).Find(&redeemCodes).Error
+	err = db.Limit(limit).Offset(offset).Order("updated_at desc").Find(&redeemCodes).Error
 	return redeemCodes, total, err
 }

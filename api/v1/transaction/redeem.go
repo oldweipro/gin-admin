@@ -8,6 +8,7 @@ import (
 	"github.com/oldweipro/gin-admin/service"
 	"github.com/oldweipro/gin-admin/utils"
 	"go.uber.org/zap"
+	"strings"
 	"sync"
 )
 
@@ -61,6 +62,8 @@ func (redeemApi *RedeemApi) RedeemFishCoin(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
+	// 使用ReplaceAll函数将所有空格替换为空字符串
+	redeemFishCoin.RedeemCode = strings.ReplaceAll(redeemFishCoin.RedeemCode, " ", "")
 	if redeemFishCoin.RedeemCode == "" {
 		response.FailWithMessage("请填写鱼币兑换码", c)
 		return
