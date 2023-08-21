@@ -27,6 +27,7 @@ type InboundsService struct {
 
 var userService systemService.UserService
 var subscriptionPlanService transactionService.SubscriptionPlanService
+var serverNodeService ServerNodeService
 
 // CreateInbounds 创建Inbounds记录
 func (inboundsService *InboundsService) CreateInbounds(inbounds *ladder.Inbounds) (err error) {
@@ -105,6 +106,39 @@ func (inboundsService *InboundsService) SetInboundsLink(userInfo systemReq.Custo
 	return
 }
 
+// UpdateServerNodeInbounds 根据节点服务器修改节点
+func (inboundsService *InboundsService) UpdateServerNodeInbounds(inbounds *ladder.Inbounds) (err error) {
+	serverNode, err := serverNodeService.GetServerNode(*inbounds.Sid)
+	if err != nil {
+		return err
+	}
+	// 拿到那一条数据，直接修改即可
+	queryParams := inboundsService.AssemblyParameter(inbounds, serverNode)
+	// 👇发起请求
+	reqUrl := "http://" + serverNode.ServerHost + ":" + strconv.Itoa(*serverNode.ServerPort) + "/xui/inbound/update/" + strconv.Itoa(int(inbounds.ID))
+	cookie := &http.Cookie{
+		Name:  "session",
+		Value: serverNode.Cookie,
+	}
+	client := resty.New()
+	resp, err := client.R().
+		SetCookies([]*http.Cookie{
+			cookie,
+		}).
+		SetFormData(queryParams).
+		Post(reqUrl)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// 这里判断一下resp返回的内容
+	//fmt.Println(resp.StatusCode())
+	//fmt.Println(resp)
+	if resp.StatusCode() != 200 {
+		err = errors.New("请求节点服务器错误")
+	}
+	return err
+}
+
 // CreateServerNodeInboundsLink 向节点服务器添加节点链接
 func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo systemReq.CustomClaims, inbounds *ladder.Inbounds) (err error) {
 	// 查询服务器信息
@@ -138,7 +172,51 @@ func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo sy
 	inbounds.Protocol = "vmess"
 	inbounds.Uid = &userInfo.BaseClaims.ID
 	inbounds.ClientId = uuid.NewString()
+	queryParams := inboundsService.AssemblyParameter(inbounds, serverNode)
+	// 👇发起请求
+	reqUrl := "http://" + serverNode.ServerHost + ":" + strconv.Itoa(*serverNode.ServerPort) + "/xui/inbound/add"
+	cookie := &http.Cookie{
+		Name:  "session",
+		Value: serverNode.Cookie,
+	}
+	client := resty.New()
+	resp, err := client.R().
+		SetCookies([]*http.Cookie{
+			cookie,
+		}).
+		SetFormData(queryParams).
+		Post(reqUrl)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// 这里判断一下resp返回的内容
+	//fmt.Println(resp.StatusCode())
+	//fmt.Println(resp)
+	if resp.StatusCode() != 200 {
+		err = errors.New("请求节点服务器错误")
+	}
+	// TODO 这个vmess链接应该是动态生成的
+	vMessLink := make(map[string]interface{})
+	vMessLink["v"] = "2"
+	vMessLink["ps"] = serverNode.Region
+	vMessLink["add"] = serverNode.Domain
+	vMessLink["port"] = inbounds.Port
+	vMessLink["id"] = inbounds.ClientId
+	vMessLink["aid"] = 0
+	vMessLink["net"] = "tcp"
+	vMessLink["type"] = "none"
+	vMessLink["host"] = ""
+	vMessLink["path"] = ""
+	vMessLink["tls"] = "tls"
+	vMessLinkJson, _ := json.MarshalIndent(vMessLink, "", "  ")
+	inbounds.Link = string(vMessLinkJson)
+	vMessLinkJsonBase64 := base64.StdEncoding.EncodeToString(vMessLinkJson)
+	inbounds.Link64 = "vmess://" + vMessLinkJsonBase64
+	return
+}
 
+// AssemblyParameter 参数组装
+func (inboundsService *InboundsService) AssemblyParameter(inbounds *ladder.Inbounds, serverNode ladder.ServerNode) map[string]string {
 	// 👇组装请求参数
 	queryParams := make(map[string]string)
 	queryParams["id"] = strconv.Itoa(int(*inbounds.Uid))
@@ -198,46 +276,7 @@ func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo sy
 	sniffingJson, _ := json.MarshalIndent(sniffing, "", "  ")
 	inbounds.Sniffing = string(sniffingJson)
 	queryParams["sniffing"] = inbounds.Sniffing
-	// 👇发起请求
-	reqUrl := "http://" + serverNode.ServerHost + ":" + strconv.Itoa(*serverNode.ServerPort) + "/xui/inbound/add"
-	cookie := &http.Cookie{
-		Name:  "session",
-		Value: serverNode.Cookie,
-	}
-	client := resty.New()
-	resp, err := client.R().
-		SetCookies([]*http.Cookie{
-			cookie,
-		}).
-		SetFormData(queryParams).
-		Post(reqUrl)
-	if err != nil {
-		fmt.Println(err)
-	}
-	// 这里判断一下resp返回的内容
-	//fmt.Println(resp.StatusCode())
-	//fmt.Println(resp)
-	if resp.StatusCode() != 200 {
-		err = errors.New("请求节点服务器错误")
-	}
-	// TODO 这个vmess链接应该是动态生成的
-	vMessLink := make(map[string]interface{})
-	vMessLink["v"] = "2"
-	vMessLink["ps"] = serverNode.Region
-	vMessLink["add"] = serverNode.Domain
-	vMessLink["port"] = inbounds.Port
-	vMessLink["id"] = inbounds.ClientId
-	vMessLink["aid"] = 0
-	vMessLink["net"] = "tcp"
-	vMessLink["type"] = "none"
-	vMessLink["host"] = ""
-	vMessLink["path"] = ""
-	vMessLink["tls"] = "tls"
-	vMessLinkJson, _ := json.MarshalIndent(vMessLink, "", "  ")
-	inbounds.Link = string(vMessLinkJson)
-	vMessLinkJsonBase64 := base64.StdEncoding.EncodeToString(vMessLinkJson)
-	inbounds.Link64 = "vmess://" + vMessLinkJsonBase64
-	return
+	return queryParams
 }
 
 // GetInboundsInfoList 分页获取Inbounds记录

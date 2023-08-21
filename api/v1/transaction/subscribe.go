@@ -3,7 +3,9 @@ package transaction
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/oldweipro/gin-admin/global"
+	request2 "github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/common/response"
+	ladderReq "github.com/oldweipro/gin-admin/model/ladder/request"
 	"github.com/oldweipro/gin-admin/model/transaction/request"
 	"github.com/oldweipro/gin-admin/service"
 	"github.com/oldweipro/gin-admin/utils"
@@ -15,6 +17,8 @@ type SubscribeApi struct {
 }
 
 var subscribeService = service.ServiceGroupApp.TransactionServiceGroup.SubscribeService
+var inboundsService = service.ServiceGroupApp.LadderServiceGroup.InboundsService
+var serverNodeService = service.ServiceGroupApp.LadderServiceGroup.ServerNodeService
 
 var subscribePlanStatus sync.Map
 
@@ -53,6 +57,35 @@ func (subscribeApi *SubscribeApi) SubscribePlan(c *gin.Context) {
 			if err != nil {
 				response.FailWithMessage(err.Error(), c)
 				return
+			}
+			// 更新inbound时间
+			list, total, err := serverNodeService.GetServerNodeLessInfoList(ladderReq.ServerNodeSearch{
+				PageInfo: request2.PageInfo{
+					Page:     1,
+					PageSize: 1000,
+					Keyword:  "",
+				},
+			}, userId)
+			if err != nil {
+				response.FailWithMessage(err.Error(), c)
+				return
+			}
+			if total > 0 {
+				userInfo := utils.GetUserInfo(c)
+				for _, serverNode := range list {
+					inbounds, err := inboundsService.GetInboundsLink(*userInfo, serverNode.Id)
+					if err != nil {
+						response.FailWithMessage(err.Error(), c)
+						return
+					}
+					endTime := userPlan.EndTime.UnixMilli()
+					inbounds.ExpiryTime = &endTime
+					err = inboundsService.UpdateServerNodeInbounds(&inbounds)
+					if err != nil {
+						response.FailWithMessage(err.Error(), c)
+						return
+					}
+				}
 			}
 		}
 		response.OkWithMessage("订阅成功", c)
