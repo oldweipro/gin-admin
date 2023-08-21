@@ -190,6 +190,7 @@ func (serverNodeApi *ServerNodeApi) GetServerNodeList(c *gin.Context) {
 	}
 }
 
+// GetServerNodeLessList 查询当前用户的节点信息
 func (serverNodeApi *ServerNodeApi) GetServerNodeLessList(c *gin.Context) {
 	var pageInfo ladderReq.ServerNodeSearch
 	err := c.ShouldBindQuery(&pageInfo)
@@ -197,7 +198,8 @@ func (serverNodeApi *ServerNodeApi) GetServerNodeLessList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if list, total, err := serverNodeService.GetServerNodeLessInfoList(pageInfo); err != nil {
+	userID := utils.GetUserID(c)
+	if list, total, err := serverNodeService.GetServerNodeLessInfoList(pageInfo, userID); err != nil {
 		global.Logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {

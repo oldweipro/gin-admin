@@ -10,10 +10,13 @@ import (
 	"github.com/oldweipro/gin-admin/service"
 	"github.com/oldweipro/gin-admin/utils"
 	"go.uber.org/zap"
+	"sync"
 )
 
 type ChatTicketApi struct {
 }
+
+var checkInStatus sync.Map
 
 var chatTicketService = service.ServiceGroupApp.TransactionServiceGroup.ChatTicketService
 
@@ -168,8 +171,14 @@ func (chatTicketApi *ChatTicketApi) HandleValidateChatTicket(c *gin.Context) {
 
 // CheckIn 签到
 func (chatTicketApi *ChatTicketApi) CheckIn(c *gin.Context) {
-	// 查询当天是否已签到
 	userId := utils.GetUserID(c)
+	_, loaded := checkInStatus.LoadOrStore(userId, true)
+	if loaded {
+		response.FailStatusTooManyRequestsWithDetailed(nil, "请求过多", c)
+		return
+	}
+	defer checkInStatus.Delete(userId)
+	// 查询当天是否已签到
 	count, err := historyService.GetTodayTransactionHistoryByCurrentUser(userId)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)

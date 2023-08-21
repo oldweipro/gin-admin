@@ -197,7 +197,7 @@ func (inboundsApi *InboundsApi) FindInboundsLink(c *gin.Context) {
 			suffix := "&insert=false"
 			clashInstall := prefix + url.QueryEscape(subConverter) + suffix
 			inboundsLink.ClashSub = clashInstall
-			response.OkWithData(gin.H{"inboundsData": inboundsLink, "domain": serverNode.Domain, "region": serverNode.Region}, c)
+			response.OkWithData(gin.H{"inboundsData": inboundsLink, "domain": serverNode.Domain, "region": serverNode.Region, "expiryTime": inboundsLink.ExpiryTime}, c)
 		}
 	}
 }

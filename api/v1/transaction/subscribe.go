@@ -8,6 +8,7 @@ import (
 	"github.com/oldweipro/gin-admin/service"
 	"github.com/oldweipro/gin-admin/utils"
 	"go.uber.org/zap"
+	"sync"
 )
 
 type SubscribeApi struct {
@@ -15,8 +16,17 @@ type SubscribeApi struct {
 
 var subscribeService = service.ServiceGroupApp.TransactionServiceGroup.SubscribeService
 
+var subscribePlanStatus sync.Map
+
 // SubscribePlan 订阅计划 给某人。某个功能模块。按照时长，单价，扣费，记录，
 func (subscribeApi *SubscribeApi) SubscribePlan(c *gin.Context) {
+	userId := utils.GetUserID(c)
+	_, loaded := subscribePlanStatus.LoadOrStore(userId, true)
+	if loaded {
+		response.FailStatusTooManyRequestsWithDetailed(nil, "请求过多", c)
+		return
+	}
+	defer subscribePlanStatus.Delete(userId)
 	var subscribe request.SubscribeRequest
 	err := c.ShouldBindJSON(&subscribe)
 	if err != nil {
@@ -41,11 +51,7 @@ func (subscribeApi *SubscribeApi) SubscribePlan(c *gin.Context) {
 			// 续费订阅计划
 			err := subscribeService.RenewalSubscription(&userPlan, &plan)
 			if err != nil {
-				if err.Error() == "余额不足" {
-					response.FailWithMessage(err.Error(), c)
-				} else {
-					response.FailWithMessage("订阅异常", c)
-				}
+				response.FailWithMessage(err.Error(), c)
 				return
 			}
 		}

@@ -8,7 +8,7 @@ import (
 type SubscriptionPlan struct {
 	global.Model
 	Name        string `json:"name" form:"name" gorm:"column:name;comment:表示订阅计划的名称。;"`
-	Description string `json:"description" form:"description" gorm:"column:description;comment:表示订阅计划的详细描述信息。;"`
+	Description string `json:"description" form:"description" gorm:"column:description;comment:表示订阅计划的详细描述信息。;type:longtext;"`
 	Price       *uint  `json:"price" form:"price" gorm:"column:price;comment:表示订阅计划的价格。;"`
 	Duration    *uint  `json:"duration" form:"duration" gorm:"column:duration;comment:表示订阅计划的时长，用秒表示;"`
 	Quantity    *uint  `json:"quantity" form:"quantity" gorm:"column:quantity;comment:表示订阅计划的数量;"`

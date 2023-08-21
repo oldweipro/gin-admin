@@ -91,7 +91,7 @@ func (serverNodeService *ServerNodeService) GetServerNodeInfoList(info ladderReq
 }
 
 // GetServerNodeLessInfoList 分页获取ServerNode记录，过滤掉敏感信息
-func (serverNodeService *ServerNodeService) GetServerNodeLessInfoList(info ladderReq.ServerNodeSearch) (list []ladder.ServerNode, total int64, err error) {
+func (serverNodeService *ServerNodeService) GetServerNodeLessInfoList(info ladderReq.ServerNodeSearch, userID uint) (list []ladderReq.ServerNodeResponse, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
@@ -107,8 +107,32 @@ func (serverNodeService *ServerNodeService) GetServerNodeLessInfoList(info ladde
 		return
 	}
 
-	err = db.Select("ID", "bandwidth", "region", "describe").Limit(limit).Offset(offset).Find(&serverNodes).Error
-	return serverNodes, total, err
+	err = db.Select("id", "bandwidth", "region").Limit(limit).Offset(offset).Find(&serverNodes).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	var inbounds []ladder.Inbounds
+	err = global.DB.Where("uid = ?", userID).Find(&inbounds).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	for _, node := range serverNodes {
+		var info ladderReq.ServerNodeResponse
+		info.Id = node.ID
+		info.Bandwidth = node.Bandwidth
+		info.Region = node.Region
+		// 过滤数据
+		for _, inbound := range inbounds {
+			if *inbound.Sid == node.ID {
+				info.ExpiryTime = *inbound.ExpiryTime
+				info.Up = *inbound.Up
+				info.Down = *inbound.Down
+				break
+			}
+		}
+		list = append(list, info)
+	}
+	return list, total, err
 }
 
 // ServerNodeLogin 处理登陆获取cookie
