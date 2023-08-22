@@ -154,7 +154,7 @@ func (inboundsApi *InboundsApi) FindInboundsLink(c *gin.Context) {
 		return
 	}
 	if *user.Status == 0 {
-		response.FailWithMessage("得加钱", c)
+		response.FailWithMessage("请选择您的订阅计划", c)
 		return
 	}
 	var inbounds ladder.Inbounds
