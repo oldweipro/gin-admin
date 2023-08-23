@@ -5,6 +5,7 @@ import (
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/openfish"
 	openfishReq "github.com/oldweipro/gin-admin/model/openfish/request"
+	"time"
 )
 
 type MailAccountService struct {
@@ -61,6 +62,18 @@ func (mailAccountService *MailAccountService) UpdateMailAccount(mailAccount open
 // GetMailAccount 根据id获取MailAccount记录
 func (mailAccountService *MailAccountService) GetMailAccount(id uint) (mailAccount openfish.MailAccount, err error) {
 	err = global.DB.Where("id = ?", id).First(&mailAccount).Error
+	return
+}
+
+// GetAccessTokenByUpdatedAtAsc 获取 AccessToken by updated_at asc
+func (mailAccountService *MailAccountService) GetAccessTokenByUpdatedAtAsc() (mailAccount openfish.MailAccount, err error) {
+	err = global.DB.Where("openai_access_token != ''").Order("updated_at").First(&mailAccount).Error
+	return
+}
+
+// UpdateAccessTokenWithUpdatedAt 更新 AccessToken's UpdatedAt
+func (mailAccountService *MailAccountService) UpdateAccessTokenWithUpdatedAt(id uint) (err error) {
+	err = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", id).Update("updated_at", time.Now()).Error
 	return
 }
 

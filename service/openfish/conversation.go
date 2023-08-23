@@ -30,6 +30,7 @@ type ConversationService struct {
 
 var chatGptService system.ChatGptService
 var promptService PromptService
+var mailAccountService MailAccountService
 
 // CreateConversation 创建Conversation记录
 func (conversationService *ConversationService) CreateConversation(conversation *openfish.Conversation) (err error) {
@@ -356,7 +357,12 @@ func (conversationService *ConversationService) NumTokens(s string) int {
 
 // ChatOpenAIReverse https://chat.openai.com逆向接口: 需要自己搭建服务 https://github.com/acheong08/ChatGPT-to-API
 func (conversationService *ConversationService) ChatOpenAIReverse(conversationRecordUser *openfish.ConversationRecord, req openai.ChatCompletionRequest, c *gin.Context, chatReq openfishReq.ChatReq) error {
-	config := openai.DefaultConfig("OpenAIReverse")
+	// 更新时间升序获取token
+	mailAccount, err := mailAccountService.GetAccessTokenByUpdatedAtAsc()
+	if err != nil {
+		return err
+	}
+	config := openai.DefaultConfig(mailAccount.OpenaiAccessToken)
 	config.BaseURL = "http://127.0.0.1:8080/v1"
 	client := openai.NewClientWithConfig(config)
 	ctx := context.Background()
@@ -366,6 +372,13 @@ func (conversationService *ConversationService) ChatOpenAIReverse(conversationRe
 	}
 	defer config.HTTPClient.CloseIdleConnections()
 	defer stream.Close()
+	defer func() {
+		// 更新token的时间
+		err2 := mailAccountService.UpdateAccessTokenWithUpdatedAt(mailAccount.ID)
+		if err2 != nil {
+			return
+		}
+	}()
 	return conversationService.ChatStream(stream, conversationRecordUser, c, chatReq)
 }
 
