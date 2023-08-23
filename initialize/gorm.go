@@ -80,6 +80,7 @@ func RegisterTables() {
 		openfish.Feedback{},
 		openfish.SecretKey{},
 		openfish.Prompt{},
+		openfish.MailAccount{},
 	)
 	if err != nil {
 		global.Logger.Error("register table failed", zap.Error(err))
