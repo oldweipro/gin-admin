@@ -8,10 +8,10 @@ import (
 // MailAccount 结构体
 type MailAccount struct {
 	global.Model
-	Username                 string    `json:"username" form:"username" gorm:"column:username;comment:账号;"`
-	NickName                 string    `json:"nickName" form:"nickName" gorm:"column:nick_name;comment:昵称;"`
-	Remark                   string    `json:"remark" form:"remark" gorm:"column:remark;comment:备注;"`
-	GmailPassword            string    `json:"gmailPassword" form:"gmailPassword" gorm:"column:gmail_password;comment:gmail密码;"`
+	Username                 string    `json:"username" form:"username" gorm:"column:username;comment:mail账号;"`
+	NickName                 string    `json:"nickName" form:"nickName" gorm:"column:nick_name;comment:mail昵称;"`
+	Remark                   string    `json:"remark" form:"remark" gorm:"column:remark;comment:mail备注;"`
+	Password                 string    `json:"password" form:"password" gorm:"column:password;comment:mail密码;"`
 	ClaudeSessionKey         string    `json:"claudeSessionKey" form:"claudeSessionKey" gorm:"column:claude_session_key;comment:claude SessionKey;type:longtext;"`
 	ClaudeSessionKeyGetTime  time.Time `json:"claudeSessionKeyGetTime" form:"claudeSessionKeyGetTime" gorm:"column:claude_session_key_get_time;comment:claude SessionKey 获取时间;"`
 	OpenaiPassword           string    `json:"openaiPassword" form:"openaiPassword" gorm:"column:openai_password;comment:openai密码;"`
