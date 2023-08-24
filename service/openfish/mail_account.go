@@ -24,19 +24,22 @@ func (mailAccountService *MailAccountService) RefreshClaudeChat(ids request.IdsR
 }
 
 // RefreshOpenaiAccessToken 刷新 openai AccessToken
-func (mailAccountService *MailAccountService) RefreshOpenaiAccessToken(ids request.IdsReq) error {
+func (mailAccountService *MailAccountService) RefreshOpenaiAccessToken(ids request.IdsReq) (err error) {
 	var mailAccounts []openfish.MailAccount
-	err := global.DB.Where("id in ?", ids.Ids).Find(&mailAccounts).Error
+	err = global.DB.Where("id in ?", ids.Ids).Find(&mailAccounts).Error
 	// 循环遍历
 	proxyUrl := "http://127.0.0.1:7890"
 	for _, account := range mailAccounts {
-		authenticator := openai.NewAuthenticator(account.Username, account.Password, proxyUrl)
+		authenticator := openai.NewAuthenticator(account.Username, account.OpenaiPassword, proxyUrl)
 		authErr := authenticator.Begin()
 		if authErr != nil {
 			return errors.New(fmt.Sprintf("Location: %s, Status code: %s, Details: %s, Embedded error: %s", authErr.Location, fmt.Sprint(authErr.StatusCode), authErr.Details, authErr.Error.Error()))
 		}
 		accessToken := authenticator.GetAccessToken()
-		err = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", account.ID).Update("openai_access_token", accessToken).Error
+		updateColumns := make(map[string]interface{})
+		updateColumns["openai_access_token"] = accessToken
+		updateColumns["openai_access_token_get_time"] = time.Now()
+		err = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", account.ID).Updates(&updateColumns).Error
 		if err != nil {
 			global.Logger.Error("ID: " + strconv.Itoa(int(account.ID)) + ", 更新出错")
 		}

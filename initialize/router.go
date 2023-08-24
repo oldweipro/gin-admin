@@ -91,6 +91,7 @@ func Routers() *gin.Engine {
 		openfishRouter.InitConversationRouter(PrivateGroup)
 		openfishRouter.InitFeedbackRouter(PrivateGroup)
 		openfishRouter.InitSecretKeyRouter(PrivateGroup)
+		openfishRouter.InitMailAccountRouter(PrivateGroup)
 		openfishRouter.InitPromptRouter(PrivateGroup)
 
 	}

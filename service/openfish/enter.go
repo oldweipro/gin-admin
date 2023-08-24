@@ -5,4 +5,5 @@ type ServiceGroup struct {
 	FeedbackService
 	SecretKeyService
 	PromptService
+	MailAccountService
 }
