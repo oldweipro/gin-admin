@@ -1,4 +1,4 @@
-package openai
+package openaiReverse
 
 import (
 	"bytes"

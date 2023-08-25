@@ -1,13 +1,14 @@
 package openfish
 
 import (
-	"errors"
+	"context"
 	"fmt"
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/openfish"
 	openfishReq "github.com/oldweipro/gin-admin/model/openfish/request"
-	"github.com/oldweipro/gin-admin/utils/openai"
+	"github.com/oldweipro/gin-admin/utils/openai_reverse"
+	"github.com/sashabaranov/go-openai"
 	"strconv"
 	"time"
 )
@@ -18,8 +19,44 @@ type MailAccountService struct {
 // RefreshClaudeChat 产生一次Claude对话
 func (mailAccountService *MailAccountService) RefreshClaudeChat(ids request.IdsReq) (err error) {
 	var mailAccounts []openfish.MailAccount
-	err = global.DB.Where("id in ?", ids.Ids).Find(&mailAccounts).Error
-	//
+	err = global.DB.Where("claude_session_key != '' and id in ?", ids.Ids).Find(&mailAccounts).Error
+	if err != nil {
+		return err
+	}
+	// 循环遍历
+	req := openai.ChatCompletionRequest{
+		Model:     openai.GPT3Dot5Turbo0613,
+		MaxTokens: 1000,
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role:    "user",
+				Content: "你好啊",
+			},
+		},
+		Stream: false,
+	}
+	go func() {
+		for _, account := range mailAccounts {
+			config := openai.DefaultConfig(account.ClaudeSessionKey)
+			config.BaseURL = "http://127.0.0.1:8787/v1"
+			client := openai.NewClientWithConfig(config)
+			ctx := context.Background()
+			response, err := client.CreateChatCompletion(ctx, req)
+			config.HTTPClient.CloseIdleConnections()
+			if err != nil {
+				global.Logger.Error(err.Error())
+			} else {
+				global.Logger.Info(response.Choices[0].Message.Content)
+				// 更新数据库时间
+				updateColumns := make(map[string]interface{})
+				updateColumns["claude_session_key_get_time"] = time.Now()
+				err = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", account.ID).Updates(&updateColumns).Error
+				if err != nil {
+					global.Logger.Error("ID: " + strconv.Itoa(int(account.ID)) + ", 更新出错")
+				}
+			}
+		}
+	}()
 	return err
 }
 
@@ -29,21 +66,23 @@ func (mailAccountService *MailAccountService) RefreshOpenaiAccessToken(ids reque
 	err = global.DB.Where("id in ?", ids.Ids).Find(&mailAccounts).Error
 	// 循环遍历
 	proxyUrl := "http://127.0.0.1:7890"
-	for _, account := range mailAccounts {
-		authenticator := openai.NewAuthenticator(account.Username, account.OpenaiPassword, proxyUrl)
-		authErr := authenticator.Begin()
-		if authErr != nil {
-			return errors.New(fmt.Sprintf("Location: %s, Status code: %s, Details: %s, Embedded error: %s", authErr.Location, fmt.Sprint(authErr.StatusCode), authErr.Details, authErr.Error.Error()))
+	go func() {
+		for _, account := range mailAccounts {
+			authenticator := openaiReverse.NewAuthenticator(account.Username, account.OpenaiPassword, proxyUrl)
+			authErr := authenticator.Begin()
+			if authErr != nil {
+				global.Logger.Error(fmt.Sprintf("Location: %s, Status code: %s, Details: %s, Embedded error: %s", authErr.Location, fmt.Sprint(authErr.StatusCode), authErr.Details, authErr.Error.Error()))
+			}
+			accessToken := authenticator.GetAccessToken()
+			updateColumns := make(map[string]interface{})
+			updateColumns["openai_access_token"] = accessToken
+			updateColumns["openai_access_token_get_time"] = time.Now()
+			err = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", account.ID).Updates(&updateColumns).Error
+			if err != nil {
+				global.Logger.Error("ID: " + strconv.Itoa(int(account.ID)) + ", 更新出错")
+			}
 		}
-		accessToken := authenticator.GetAccessToken()
-		updateColumns := make(map[string]interface{})
-		updateColumns["openai_access_token"] = accessToken
-		updateColumns["openai_access_token_get_time"] = time.Now()
-		err = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", account.ID).Updates(&updateColumns).Error
-		if err != nil {
-			global.Logger.Error("ID: " + strconv.Itoa(int(account.ID)) + ", 更新出错")
-		}
-	}
+	}()
 	return err
 }
 
