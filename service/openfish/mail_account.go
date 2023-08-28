@@ -10,11 +10,14 @@ import (
 	"github.com/oldweipro/gin-admin/utils/openai_reverse"
 	"github.com/sashabaranov/go-openai"
 	"strconv"
+	"sync"
 	"time"
 )
 
 type MailAccountService struct {
 }
+
+var queueMutex sync.Mutex
 
 // RefreshClaudeChat 产生一次Claude对话
 func (mailAccountService *MailAccountService) RefreshClaudeChat(ids request.IdsReq) (err error) {
@@ -126,7 +129,10 @@ func (mailAccountService *MailAccountService) GetMailAccount(id uint) (mailAccou
 
 // GetAccessTokenByUpdatedAtAsc 获取 AccessToken by updated_at asc
 func (mailAccountService *MailAccountService) GetAccessTokenByUpdatedAtAsc() (mailAccount openfish.MailAccount, err error) {
+	queueMutex.Lock()
 	err = global.DB.Where("openai_access_token != ''").Order("updated_at").First(&mailAccount).Error
+	err = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", mailAccount.ID).Update("updated_at", time.Now()).Error
+	defer queueMutex.Unlock()
 	return
 }
 
