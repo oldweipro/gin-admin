@@ -35,7 +35,16 @@ func (secretKeyApi *SecretKeyApi) CreateSecretKey(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	secretKey.CreatedBy = utils.GetUserID(c)
+	userID := utils.GetUserID(c)
+	key, err := secretKeyService.GetSecretKeyList(userID)
+	if err != nil {
+		global.Logger.Error("创建失败!", zap.Error(err))
+		response.FailWithMessage("创建失败", c)
+	}
+	if key >= 3 {
+		response.OkWithMessage("每个人最多支持创建 3 个Key", c)
+	}
+	secretKey.CreatedBy = userID
 	secretKey.Sk = "sk-" + strings.ReplaceAll(uuid.NewString(), "-", "") + strings.ReplaceAll(uuid.NewString(), "-", "")[:16]
 	if err := secretKeyService.CreateSecretKey(&secretKey); err != nil {
 		global.Logger.Error("创建失败!", zap.Error(err))

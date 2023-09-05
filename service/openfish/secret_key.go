@@ -133,3 +133,8 @@ func (secretKeyService *SecretKeyService) MaskString(input string, start int, le
 	maskedPart := strings.Repeat("*", length)
 	return prefix + maskedPart + suffix
 }
+
+func (secretKeyService *SecretKeyService) GetSecretKeyList(id uint) (secretKey int64, err error) {
+	err = global.DB.Where("created_by = ?", id).Count(&secretKey).Error
+	return
+}
