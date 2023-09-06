@@ -135,6 +135,6 @@ func (secretKeyService *SecretKeyService) MaskString(input string, start int, le
 }
 
 func (secretKeyService *SecretKeyService) GetSecretKeyList(id uint) (secretKey int64, err error) {
-	err = global.DB.Where("created_by = ?", id).Count(&secretKey).Error
+	err = global.DB.Model(&openfish.SecretKey{}).Where("created_by = ?", id).Count(&secretKey).Error
 	return
 }
