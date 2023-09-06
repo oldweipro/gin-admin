@@ -12,6 +12,7 @@ type OpenApi struct{}
 
 var userRequestStatus sync.Map
 var secretKeyService = service.ServiceGroupApp.OpenfishServiceGroup.SecretKeyService
+var mailAccountService = service.ServiceGroupApp.OpenfishServiceGroup.MailAccountService
 
 func (o *OpenApi) ForwardChatCompletionsApi(c *gin.Context) {
 	// 获取用户ID
@@ -37,6 +38,7 @@ func (o *OpenApi) ForwardChatCompletionsApi(c *gin.Context) {
 	defer userRequestStatus.Delete(userID) // 在处理完毕后删除用户的请求状态
 	// 创建目标URL
 	targetURL := "http://127.0.0.1:8080" // 更改为您实际的目标服务URL
+	mailAccount, _ := mailAccountService.GetAccessTokenByUpdatedAtAsc()
 
 	// 创建反向代理器
 	target, _ := url.Parse(targetURL)
@@ -44,7 +46,7 @@ func (o *OpenApi) ForwardChatCompletionsApi(c *gin.Context) {
 
 	// 更改请求头中的Host字段
 	c.Request.Host = target.Host
-
+	c.Request.Header.Set("Authorization", "Bearer "+mailAccount.OpenaiAccessToken)
 	// 进行反向代理
 	proxy.ServeHTTP(c.Writer, c.Request)
 }
