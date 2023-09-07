@@ -3,9 +3,11 @@ package platform
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/oldweipro/gin-admin/service"
+	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"sync"
+	"time"
 )
 
 type OpenApi struct{}
@@ -47,6 +49,12 @@ func (o *OpenApi) ForwardChatCompletionsApi(c *gin.Context) {
 	// 更改请求头中的Host字段
 	c.Request.Host = target.Host
 	c.Request.Header.Set("Authorization", "Bearer "+mailAccount.OpenaiAccessToken)
+	// 创建一个自定义的 http.Client 并设置超时时间
+	client := &http.Client{
+		Timeout: time.Second * 3600,
+	}
+	// 使用自定义的 http.Client 进行反向代理
+	proxy.Transport = client.Transport
 	// 进行反向代理
 	proxy.ServeHTTP(c.Writer, c.Request)
 }
