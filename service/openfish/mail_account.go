@@ -142,6 +142,13 @@ func (mailAccountService *MailAccountService) UpdateAccessTokenWithUpdatedAt(id 
 	return
 }
 
+// GetMailAccountList 获取MailAccount列表记录
+func (mailAccountService *MailAccountService) GetMailAccountList() (list []openfish.MailAccount, err error) {
+	db := global.DB.Model(&openfish.MailAccount{})
+	err = db.Order("created_at desc").Find(&list).Error
+	return
+}
+
 // GetMailAccountInfoList 分页获取MailAccount记录
 func (mailAccountService *MailAccountService) GetMailAccountInfoList(info openfishReq.MailAccountSearch) (list []openfish.MailAccount, total int64, err error) {
 	limit := info.PageSize

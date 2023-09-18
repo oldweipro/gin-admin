@@ -3,6 +3,9 @@ package initialize
 import (
 	"fmt"
 	"github.com/oldweipro/gin-admin/global"
+	"github.com/oldweipro/gin-admin/model/common/request"
+	"time"
+
 	//v1 "github.com/oldweipro/gin-admin/api/v1"
 	"github.com/oldweipro/gin-admin/service"
 )
@@ -11,6 +14,7 @@ func Timer() {
 	//var certificationRecordApi = v1.ApiGroupApp.PatrolApiGroup.CertificationRecordApi
 	//var personnelService = service.ServiceGroupApp.PatrolServiceGroup.PersonnelService
 	var serverNodeService = service.ServiceGroupApp.LadderServiceGroup.ServerNodeService
+	var mailAccountService = service.ServiceGroupApp.OpenfishServiceGroup.MailAccountService
 	if global.ConfigServer.Timer.Start {
 		//for i := range global.ConfigServer.Timer.Detail {
 		//	go func(detail config.Detail) {
@@ -74,6 +78,46 @@ func Timer() {
 			fmt.Println("添加每天【同步梯子cookie】定时任务 error:", err)
 		}
 
-		// TODO 定时任务【同步梯子订阅计划到期】
+		// 同步 OpenAI ChatGPT accessToken
+		_, err = global.Timer.AddTaskByFunc("SyncChatGPTAccessToken", "0 0 1,5,10,15,20,25,28 * *", func() {
+			list, errGetMailAccountList := mailAccountService.GetMailAccountList()
+			if errGetMailAccountList != nil {
+				fmt.Println("同步 OpenAI ChatGPT accessToken 时，获取账户列表失败")
+			}
+			for _, account := range list {
+				var ids request.IdsReq
+				ids.Ids = append(ids.Ids, int(account.ID))
+				errRefreshOpenaiAccessToken := mailAccountService.RefreshOpenaiAccessToken(ids)
+				if errRefreshOpenaiAccessToken != nil {
+					fmt.Println("同步 OpenAI ChatGPT accessToken 失败")
+				}
+				time.Sleep(30 * time.Second)
+			}
+		})
+		if err != nil {
+			fmt.Println("添加同步 OpenAI ChatGPT accessToken 定时任务 error:", err)
+		}
+
+		// 同步 Claude SK
+		_, err = global.Timer.AddTaskByFunc("SyncChatGPTAccessToken", "0 0 1,5,10,15,20,25,28 * *", func() {
+			list, errGetMailAccountList := mailAccountService.GetMailAccountList()
+			if errGetMailAccountList != nil {
+				fmt.Println("同步 Claude SK 时，获取账户列表失败")
+			}
+			for _, account := range list {
+				if account.ClaudeSessionKey != "" {
+					var ids request.IdsReq
+					ids.Ids = append(ids.Ids, int(account.ID))
+					errRefreshOpenaiAccessToken := mailAccountService.RefreshClaudeChat(ids)
+					if errRefreshOpenaiAccessToken != nil {
+						fmt.Println("同步 Claude SK 失败")
+					}
+					time.Sleep(30 * time.Second)
+				}
+			}
+		})
+		if err != nil {
+			fmt.Println("添加同步 Claude SK 定时任务 error:", err)
+		}
 	}
 }
