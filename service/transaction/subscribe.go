@@ -54,6 +54,24 @@ func (subscribeService *SubscribeService) RenewalSubscription(userPlan *transact
 		if err := tx.Save(&userPlan).Error; err != nil {
 			return err
 		}
+		// 更新消费记录到 transaction
+		var srcWalletId uint = 0 // 系统账户
+		transactionHistory := transaction.TransactionHistory{
+			UserId:        &wallets.UserId,
+			SrcWalletId:   &wallets.ID,
+			DestWalletId:  &srcWalletId,
+			TypeEnum:      "checkin",
+			Quantity:      subscriptionUserRecord.Quantity,
+			Amount:        subscriptionUserRecord.Price,
+			BeforeBalance: wallets.Balance,
+			AfterBalance:  &balance,
+			ProductId:     &srcWalletId,
+			Remark:        subscriptionUserRecord.Description,
+			CreatedBy:     wallets.UserId,
+		}
+		if err = tx.Create(&transactionHistory).Error; err != nil {
+			return err
+		}
 		// 更新用户钱包的鱼币
 		if err = tx.Model(&transaction.Wallets{}).Where("id = ?", wallets.ID).Update("balance", balance).Error; err != nil {
 			return err
