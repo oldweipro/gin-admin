@@ -48,10 +48,9 @@ func (subscriptionPlanService *SubscriptionPlanService) GetSubscriptionPlanByTag
 }
 
 // GetCurrentSubscriptionPlan 查询当前用户订阅计划
-func (subscriptionPlanService *SubscriptionPlanService) GetCurrentSubscriptionPlan(id uint) (subscriptionUser transaction.SubscriptionUser, err error) {
+func (subscriptionPlanService *SubscriptionPlanService) GetCurrentSubscriptionPlan(id, planId uint) (subscriptionUser transaction.SubscriptionUser, err error) {
 	// 如果不存在，则创建
 	db := global.DB.Model(&subscriptionUser)
-	var planId uint = 1
 	db.Where("user_id = ? and subscription_plan_id = ?", id, planId)
 	var total int64
 	err = db.Count(&total).Error

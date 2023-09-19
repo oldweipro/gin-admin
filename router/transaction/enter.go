@@ -7,4 +7,5 @@ type RouterGroup struct {
 	ProductRouter
 	SubscriptionPlanRouter
 	RedeemRouter
+	ActivationCodeRouter
 }

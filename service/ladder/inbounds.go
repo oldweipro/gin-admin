@@ -207,7 +207,7 @@ func (inboundsService *InboundsService) CreateServerNodeInboundsLink(userInfo sy
 	var total int64 = 0
 	enable := true
 	// 从套餐中查询
-	subscriptionUser, err := subscriptionPlanService.GetCurrentSubscriptionPlan(userInfo.BaseClaims.ID)
+	subscriptionUser, err := subscriptionPlanService.GetCurrentSubscriptionPlan(userInfo.BaseClaims.ID, 1)
 	if err != nil {
 		global.Logger.Info("查询当前用户订阅信息异常")
 		return err

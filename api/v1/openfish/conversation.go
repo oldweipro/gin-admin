@@ -33,12 +33,11 @@ func (conversationApi *ConversationApi) OpenAIDrawing(c *gin.Context) {
 	userID := utils.GetUserID(c)
 	// 检查用户的请求状态
 	_, loaded := userRequestOpenAIDrawingStatus.LoadOrStore(userID, true)
+	defer userRequestOpenAIDrawingStatus.Delete(userID) // 在处理完毕后删除用户的请求状态
 	if loaded {
 		c.JSON(429, gin.H{"msg": "太多请求了"})
 		return
 	}
-
-	defer userRequestOpenAIDrawingStatus.Delete(userID) // 在处理完毕后删除用户的请求状态
 	// 获取参数
 	var chatReq openfishReq.ChatReq
 	err := c.ShouldBindJSON(&chatReq)

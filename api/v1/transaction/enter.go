@@ -8,4 +8,5 @@ type ApiGroup struct {
 	SubscriptionPlanApi
 	SubscribeApi
 	RedeemApi
+	ActivationCodeApi
 }

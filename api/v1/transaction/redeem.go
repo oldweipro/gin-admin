@@ -51,11 +51,11 @@ func (redeemApi *RedeemApi) GenerateRedeemCode(c *gin.Context) {
 func (redeemApi *RedeemApi) RedeemFishCoin(c *gin.Context) {
 	userId := utils.GetUserID(c)
 	_, loaded := redeemFishCoinStatus.LoadOrStore(userId, true)
+	defer redeemFishCoinStatus.Delete(userId)
 	if loaded {
 		response.FailStatusTooManyRequestsWithDetailed(nil, "请求过多", c)
 		return
 	}
-	defer redeemFishCoinStatus.Delete(userId)
 	var redeemFishCoin request.RedeemFishCoinRequest
 	err := c.ShouldBindJSON(&redeemFishCoin)
 	if err != nil {

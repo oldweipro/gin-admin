@@ -173,11 +173,11 @@ func (chatTicketApi *ChatTicketApi) HandleValidateChatTicket(c *gin.Context) {
 func (chatTicketApi *ChatTicketApi) CheckIn(c *gin.Context) {
 	userId := utils.GetUserID(c)
 	_, loaded := checkInStatus.LoadOrStore(userId, true)
+	defer checkInStatus.Delete(userId)
 	if loaded {
 		response.FailStatusTooManyRequestsWithDetailed(nil, "请求过多", c)
 		return
 	}
-	defer checkInStatus.Delete(userId)
 	// 查询当天是否已签到
 	count, err := historyService.GetTodayTransactionHistoryByCurrentUser(userId)
 	if err != nil {

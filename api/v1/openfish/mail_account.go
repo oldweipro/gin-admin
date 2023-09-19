@@ -42,11 +42,11 @@ func (mailAccountApi *MailAccountApi) RefreshOpenaiAccessToken(c *gin.Context) {
 	userID := utils.GetUserID(c)
 	// 检查用户的请求状态
 	_, loaded := refreshOpenaiAccessTokenStatus.LoadOrStore(userID, true)
+	defer refreshOpenaiAccessTokenStatus.Delete(userID) // 在处理完毕后删除用户的请求状态
 	if loaded {
 		c.JSON(429, gin.H{"msg": "太多请求了"})
 		return
 	}
-	defer refreshOpenaiAccessTokenStatus.Delete(userID) // 在处理完毕后删除用户的请求状态
 
 	var IDS request.IdsReq
 	err := c.ShouldBindJSON(&IDS)

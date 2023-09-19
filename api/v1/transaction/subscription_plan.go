@@ -116,7 +116,7 @@ func (subscriptionPlanApi *SubscriptionPlanApi) GetSubscriptionPlan(c *gin.Conte
 // GetCurrentSubscriptionPlan 查询当前用户订阅计划
 func (subscriptionPlanApi *SubscriptionPlanApi) GetCurrentSubscriptionPlan(c *gin.Context) {
 	userId := utils.GetUserID(c)
-	if subscriptionUser, err := subscriptionPlanService.GetCurrentSubscriptionPlan(userId); err != nil {
+	if subscriptionUser, err := subscriptionPlanService.GetCurrentSubscriptionPlan(userId, 1); err != nil {
 		global.Logger.Error("查询失败!", zap.Error(err))
 		response.OkWithData(subscriptionUser, c)
 	} else {

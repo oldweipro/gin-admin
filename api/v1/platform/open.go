@@ -28,6 +28,7 @@ func (o *OpenApi) ForwardChatCompletionsApi(c *gin.Context) {
 	userID = key.CreatedBy
 	// 检查用户的请求状态
 	_, loaded := userRequestStatus.LoadOrStore(userID, true)
+	defer userRequestStatus.Delete(userID) // 在处理完毕后删除用户的请求状态
 	if loaded {
 		c.JSON(429, gin.H{"error": map[string]interface{}{
 			"message": "您的请求过多，系统限制并发请求为1",
@@ -37,7 +38,6 @@ func (o *OpenApi) ForwardChatCompletionsApi(c *gin.Context) {
 		}})
 		return
 	}
-	defer userRequestStatus.Delete(userID) // 在处理完毕后删除用户的请求状态
 	// 创建目标URL
 	targetURL := "http://127.0.0.1:8080" // 更改为您实际的目标服务URL
 	mailAccount, _ := mailAccountService.GetAccessTokenByUpdatedAtAsc()

@@ -103,6 +103,7 @@ func Routers() *gin.Engine {
 		transactionRouter.InitProductRouter(PrivateGroup)
 		transactionRouter.InitSubscriptionPlanRouter(PrivateGroup)
 		transactionRouter.InitRedeemRouter(PrivateGroup)
+		transactionRouter.InitActivationCodeRouter(PrivateGroup)
 	}
 
 	PlatformGroup := Router.Group(global.ConfigServer.System.RouterPrefix)
