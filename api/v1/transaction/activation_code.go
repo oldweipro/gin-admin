@@ -7,6 +7,7 @@ import (
 	"github.com/oldweipro/gin-admin/model/common/response"
 	"github.com/oldweipro/gin-admin/utils"
 	"sync"
+	"time"
 )
 
 type ActivationCodeApi struct {
@@ -26,7 +27,16 @@ func (activationCodeApi *ActivationCodeApi) GetActivationCodeStatus(c *gin.Conte
 		response.FailWithMessage("请选择您的订阅计划", c)
 		return
 	}
-	response.OkWithMessage("您已开通", c)
+	// 获取当前时间
+	currentTime := time.Now()
+	// 创建一个要比较的时间
+	compareTime := user.EndTime
+	// 比较两个时间
+	if compareTime.Before(currentTime) {
+		response.FailWithMessage("您的订阅已过期，请重新选择订阅计划", c)
+		return
+	}
+	response.OkWithMessage("请尽情享受!", c)
 }
 
 // GetJetBrainsActivationCode 获取激活码

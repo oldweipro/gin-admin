@@ -13,6 +13,7 @@ import (
 	"github.com/oldweipro/gin-admin/utils"
 	"go.uber.org/zap"
 	"net/url"
+	"time"
 )
 
 type InboundsApi struct {
@@ -155,6 +156,15 @@ func (inboundsApi *InboundsApi) FindInboundsLink(c *gin.Context) {
 	}
 	if *user.Status == 0 {
 		response.FailWithMessage("请选择您的订阅计划", c)
+		return
+	}
+	// 获取当前时间
+	currentTime := time.Now()
+	// 创建一个要比较的时间
+	compareTime := user.EndTime
+	// 比较两个时间
+	if compareTime.Before(currentTime) {
+		response.FailWithMessage("您的订阅已过期，请重新选择订阅计划", c)
 		return
 	}
 	var inbounds ladder.Inbounds
