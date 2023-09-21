@@ -332,21 +332,19 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 	//	TotalTokens:      inputTokens + completionTokens,
 	//}
 	req := openai.ChatCompletionRequest{
-		Model:     openai.GPT3Dot5Turbo0613,
+		Model:     openai.GPT3Dot5Turbo16K0613,
 		MaxTokens: 1000,
 		Messages:  messages,
 		Stream:    true,
 	}
 	if err := conversationService.ChatOpenAIReverse(&conversationRecordUser, req, c, chatReq); err != nil {
-		global.Logger.Error("逆向工程调用错误: ", zap.Error(err))
-		if err = conversationService.ChatClaudeReverse(&conversationRecordUser, req, c, chatReq); err != nil {
-			global.Logger.Error("Claude调用错误: ", zap.Error(err))
-			if err = conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
-				global.Logger.Error("OpenAI调用错误: ", zap.Error(err))
-				return err
-			}
+		if err = conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
+			return err
 		}
-
+		//if err = conversationService.ChatClaudeReverse(&conversationRecordUser, req, c, chatReq); err != nil {
+		//	global.Logger.Error("Claude调用错误: ", zap.Error(err))
+		//
+		//}
 	}
 	return nil
 }
@@ -360,6 +358,7 @@ func (conversationService *ConversationService) ChatOpenAIReverse(conversationRe
 	// 更新时间升序获取token
 	mailAccount, err := mailAccountService.GetAccessTokenByUpdatedAtAsc()
 	if err != nil {
+		global.Logger.Error("逆向AT不可用: ")
 		return err
 	}
 	config := openai.DefaultConfig(mailAccount.OpenaiAccessToken)
@@ -368,17 +367,14 @@ func (conversationService *ConversationService) ChatOpenAIReverse(conversationRe
 	ctx := context.Background()
 	stream, err := client.CreateChatCompletionStream(ctx, req)
 	if err != nil {
+		global.Logger.Error("逆向: ", zap.Error(err))
+		//errMap := make(map[string]string)
+		//_ = json.Unmarshal([]byte(err.Error()), &errMap)
+		_ = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", mailAccount.ID).Update("openai_status", 0).Error
 		return err
 	}
 	defer config.HTTPClient.CloseIdleConnections()
 	defer stream.Close()
-	defer func() {
-		// 更新token的时间
-		err2 := mailAccountService.UpdateAccessTokenWithUpdatedAt(mailAccount.ID)
-		if err2 != nil {
-			return
-		}
-	}()
 	return conversationService.ChatStream(stream, conversationRecordUser, c, chatReq)
 }
 
@@ -398,17 +394,12 @@ func (conversationService *ConversationService) ChatClaudeReverse(conversationRe
 
 // ChatOpenAIApiKey 官方接口：更换TOKEN，使用代理
 func (conversationService *ConversationService) ChatOpenAIApiKey(conversationRecordUser *openfish.ConversationRecord, req openai.ChatCompletionRequest, c *gin.Context, chatReq openfishReq.ChatReq) error {
-	sk, err := chatGptService.GetSK()
+	mailAccount, err := mailAccountService.GetOpenaiKeyByUpdatedAtAsc()
 	if err != nil {
 		global.Logger.Error("获取sk失败!", zap.Error(err))
 		return err
 	}
-	// 更新openai sk
-	sk.UpdatedAt = time.Now()
-	if err := chatGptService.UpdateSK(sk); err != nil {
-		global.Logger.Error("更新openai sk失败!", zap.Error(err))
-	}
-	config := openai.DefaultConfig(sk.SK)
+	config := openai.DefaultConfig(mailAccount.OpenaiSk)
 	// 如果需要代理，请配置代理地址，如不需要可注释或删掉以下代码
 	config.HTTPClient.Transport = &http.Transport{
 		// 设置Transport字段为自定义Transport，包含代理设置

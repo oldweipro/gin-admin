@@ -130,9 +130,21 @@ func (mailAccountService *MailAccountService) GetMailAccount(id uint) (mailAccou
 // GetAccessTokenByUpdatedAtAsc 获取 AccessToken by updated_at asc
 func (mailAccountService *MailAccountService) GetAccessTokenByUpdatedAtAsc() (mailAccount openfish.MailAccount, err error) {
 	queueMutex.Lock()
-	err = global.DB.Where("openai_access_token != ''").Order("updated_at").First(&mailAccount).Error
-	err = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", mailAccount.ID).Update("updated_at", time.Now()).Error
 	defer queueMutex.Unlock()
+	err = global.DB.Where("openai_access_token != '' and openai_status = 1").Order("updated_at").First(&mailAccount).Error
+	if err != nil {
+		return
+	}
+	err = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", mailAccount.ID).Update("updated_at", time.Now()).Error
+	return
+}
+
+// GetOpenaiKeyByUpdatedAtAsc 获取 AccessToken by updated_at asc
+func (mailAccountService *MailAccountService) GetOpenaiKeyByUpdatedAtAsc() (mailAccount openfish.MailAccount, err error) {
+	queueMutex.Lock()
+	defer queueMutex.Unlock()
+	err = global.DB.Where("openai_sk != ''").Order("sk_used_at").First(&mailAccount).Error
+	err = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", mailAccount.ID).Update("sk_used_at", time.Now()).Error
 	return
 }
 

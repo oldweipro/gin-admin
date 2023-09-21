@@ -18,6 +18,7 @@ type MailAccount struct {
 	OpenaiAccessToken        string     `json:"openaiAccessToken" form:"openaiAccessToken" gorm:"column:openai_access_token;comment:openai AccessToken;type:longtext;"`
 	OpenaiAccessTokenGetTime *time.Time `json:"openaiAccessTokenGetTime" form:"openaiAccessTokenGetTime" gorm:"column:openai_access_token_get_time;comment:openai AccessToken 获取时间;"`
 	OpenaiSkExpire           *time.Time `json:"openaiSkExpire" form:"openaiSkExpire" gorm:"column:openai_sk_expire;comment:openai sk 过期时间;"`
+	SkUsedAt                 *time.Time `json:"skUsedAt" form:"skUsedAt" gorm:"column:sk_used_at;comment:openai sk 使用时间;"`
 	OpenaiSk                 string     `json:"openaiSk" form:"openaiSk" gorm:"column:openai_sk;comment:openai密钥;"`
 	OpenaiAmount             *uint      `json:"openaiAmount" form:"openaiAmount" gorm:"column:openai_amount;comment:openai余额，使用额度;"`
 	OpenaiStatus             *uint      `json:"openaiStatus" form:"openaiStatus" gorm:"column:openai_status;comment:openai状态，是否启用或禁用;"`
