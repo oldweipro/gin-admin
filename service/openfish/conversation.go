@@ -183,17 +183,12 @@ func (conversationService *ConversationService) GetConversationListByUserId(user
 
 // OpenAIDrawing openai作画
 func (conversationService *ConversationService) OpenAIDrawing(chatReq openfishReq.ChatReq, c *gin.Context) error {
-	sk, err := chatGptService.GetSK()
+	mailAccount, err := mailAccountService.GetAccessTokenByUpdatedAtAsc()
 	if err != nil {
-		global.Logger.Error("获取sk失败!", zap.Error(err))
+		global.Logger.Error("逆向AT不可用: ")
 		return err
 	}
-	// 更新openai sk
-	sk.UpdatedAt = time.Now()
-	if err := chatGptService.UpdateSK(sk); err != nil {
-		global.Logger.Error("更新openai sk失败!", zap.Error(err))
-	}
-	config := openai.DefaultConfig(sk.SK)
+	config := openai.DefaultConfig(mailAccount.OpenaiAccessToken)
 	// 如果需要代理，请配置代理地址，如不需要可注释或删掉以下代码
 	config.HTTPClient.Transport = &http.Transport{
 		// 设置Transport字段为自定义Transport，包含代理设置
@@ -361,8 +356,13 @@ func (conversationService *ConversationService) ChatOpenAIReverse(conversationRe
 		global.Logger.Error("逆向AT不可用: ")
 		return err
 	}
+	server, err := mailAccountService.GetServerNodeByUpdatedAtAsc()
+	if err != nil {
+		global.Logger.Error("逆向Server不可用: ")
+		return err
+	}
 	config := openai.DefaultConfig(mailAccount.OpenaiAccessToken)
-	config.BaseURL = "http://127.0.0.1:8080/v1"
+	config.BaseURL = server
 	client := openai.NewClientWithConfig(config)
 	ctx := context.Background()
 	stream, err := client.CreateChatCompletionStream(ctx, req)

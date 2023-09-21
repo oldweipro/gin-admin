@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/common/request"
+	"github.com/oldweipro/gin-admin/model/ladder"
 	"github.com/oldweipro/gin-admin/model/openfish"
 	openfishReq "github.com/oldweipro/gin-admin/model/openfish/request"
 	"github.com/oldweipro/gin-admin/utils/openai_reverse"
@@ -136,6 +137,20 @@ func (mailAccountService *MailAccountService) GetAccessTokenByUpdatedAtAsc() (ma
 		return
 	}
 	err = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", mailAccount.ID).Update("updated_at", time.Now()).Error
+	return
+}
+
+// GetServerNodeByUpdatedAtAsc 获取 ServerNode by updated_at asc
+func (mailAccountService *MailAccountService) GetServerNodeByUpdatedAtAsc() (server string, err error) {
+	queueMutex.Lock()
+	defer queueMutex.Unlock()
+	var serverNode ladder.ServerNode
+	err = global.DB.Where("server_host != '' and is_openai_server = 1").Order("updated_at").First(&serverNode).Error
+	if err != nil {
+		return
+	}
+	server = "http://" + serverNode.ServerHost + ":9332/v1"
+	err = global.DB.Model(&ladder.ServerNode{}).Where("id = ?", serverNode.ID).Update("updated_at", time.Now()).Error
 	return
 }
 
