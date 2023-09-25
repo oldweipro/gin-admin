@@ -22,6 +22,7 @@ func (s *MailAccountRouter) InitMailAccountRouter(Router *gin.RouterGroup) {
 		mailAccountRouter.POST("refreshClaudeChat", mailAccountApi.RefreshClaudeChat)               // 产生一次Claude对话
 		mailAccountRouter.POST("refreshOpenaiAccessToken", mailAccountApi.RefreshOpenaiAccessToken) // 刷新 openai AccessToken
 		mailAccountRouter.POST("syncOpenaiInfo", mailAccountApi.SyncOpenaiInfo)                     // 同步openai的信息: sk到期时间、余额
+		mailAccountRouter.POST("syncChatGPTAccessToken", mailAccountApi.SyncChatGPTAccessToken)     // 同步openai的AT
 	}
 	{
 		mailAccountRouterWithoutRecord.GET("getMailAccount", mailAccountApi.FindMailAccount)        // 根据ID获取

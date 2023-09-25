@@ -68,7 +68,7 @@ func (serverNodeService *ServerNodeService) GetServerNodeList() (list []ladder.S
 	// 创建db
 	db := global.DB.Model(&ladder.ServerNode{})
 	var serverNodes []ladder.ServerNode
-	err = db.Find(&serverNodes).Error
+	err = db.Where("server_status = 1").Find(&serverNodes).Error
 	return serverNodes, err
 }
 

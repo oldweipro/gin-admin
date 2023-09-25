@@ -81,6 +81,7 @@ func (mailAccountService *MailAccountService) RefreshOpenaiAccessToken(ids reque
 			updateColumns := make(map[string]interface{})
 			updateColumns["openai_access_token"] = accessToken
 			updateColumns["openai_access_token_get_time"] = time.Now()
+			updateColumns["openai_status"] = 1
 			err = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", account.ID).Updates(&updateColumns).Error
 			if err != nil {
 				global.Logger.Error("ID: " + strconv.Itoa(int(account.ID)) + ", 更新出错")
@@ -94,7 +95,7 @@ func (mailAccountService *MailAccountService) RefreshOpenaiAccessToken(ids reque
 func (mailAccountService *MailAccountService) SyncOpenaiInfo(ids request.IdsReq) (err error) {
 	var mailAccounts []openfish.MailAccount
 	err = global.DB.Where("id in ?", ids.Ids).Find(&mailAccounts).Error
-	//
+	// TODO
 	return err
 }
 
@@ -149,7 +150,7 @@ func (mailAccountService *MailAccountService) GetServerNodeByUpdatedAtAsc() (ser
 	if err != nil {
 		return
 	}
-	server = "http://" + serverNode.ServerHost + ":9332/v1"
+	server = "http://" + serverNode.ServerHost + ":9332"
 	err = global.DB.Model(&ladder.ServerNode{}).Where("id = ?", serverNode.ID).Update("updated_at", time.Now()).Error
 	return
 }
@@ -197,4 +198,30 @@ func (mailAccountService *MailAccountService) GetMailAccountInfoList(info openfi
 
 	err = db.Limit(limit).Offset(offset).Order("created_at desc").Find(&mailAccounts).Error
 	return mailAccounts, total, err
+}
+
+func (mailAccountService *MailAccountService) SyncChatGPTAccessToken() {
+	list, errGetMailAccountList := mailAccountService.GetMailAccountList()
+	if errGetMailAccountList != nil {
+		fmt.Println("同步 OpenAI ChatGPT accessToken 时，获取账户列表失败")
+	}
+	for _, account := range list {
+		// 获取当前时间
+		currentTime := time.Now()
+		// 计算三天前的时间
+		threeDaysAgo := currentTime.Add(-5 * 24 * time.Hour)
+		// 比较时间
+		if account.OpenaiAccessTokenGetTime == nil || account.OpenaiAccessTokenGetTime.Before(threeDaysAgo) {
+			var ids request.IdsReq
+			ids.Ids = append(ids.Ids, int(account.ID))
+			fmt.Println("正在同步: ", account.Username)
+			errRefreshOpenaiAccessToken := mailAccountService.RefreshOpenaiAccessToken(ids)
+			if errRefreshOpenaiAccessToken != nil {
+				fmt.Println("同步 OpenAI ChatGPT accessToken 失败")
+			}
+			fmt.Println("同步完成: ", account.Username)
+			time.Sleep(10 * time.Second)
+		}
+	}
+	fmt.Println(time.Now().Format("2006-01-02 15:04:05"), " 完成所有账号AT同步")
 }

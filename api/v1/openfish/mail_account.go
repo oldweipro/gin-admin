@@ -194,3 +194,8 @@ func (mailAccountApi *MailAccountApi) GetMailAccountList(c *gin.Context) {
 		}, "获取成功", c)
 	}
 }
+
+func (mailAccountApi *MailAccountApi) SyncChatGPTAccessToken(c *gin.Context) {
+	go mailAccountService.SyncChatGPTAccessToken()
+	response.OkWithMessage("开始同步", c)
+}

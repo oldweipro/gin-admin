@@ -3,9 +3,6 @@ package initialize
 import (
 	"fmt"
 	"github.com/oldweipro/gin-admin/global"
-	"github.com/oldweipro/gin-admin/model/common/request"
-	"time"
-
 	//v1 "github.com/oldweipro/gin-admin/api/v1"
 	"github.com/oldweipro/gin-admin/service"
 )
@@ -79,45 +76,33 @@ func Timer() {
 		}
 
 		// 同步 OpenAI ChatGPT accessToken
-		_, err = global.Timer.AddTaskByFunc("SyncChatGPTAccessToken", "0 0 1,5,10,15,20,25,28 * *", func() {
-			list, errGetMailAccountList := mailAccountService.GetMailAccountList()
-			if errGetMailAccountList != nil {
-				fmt.Println("同步 OpenAI ChatGPT accessToken 时，获取账户列表失败")
-			}
-			for _, account := range list {
-				var ids request.IdsReq
-				ids.Ids = append(ids.Ids, int(account.ID))
-				errRefreshOpenaiAccessToken := mailAccountService.RefreshOpenaiAccessToken(ids)
-				if errRefreshOpenaiAccessToken != nil {
-					fmt.Println("同步 OpenAI ChatGPT accessToken 失败")
-				}
-				time.Sleep(30 * time.Second)
-			}
+		_, err = global.Timer.AddTaskByFunc("SyncChatGPTAccessToken", global.ConfigServer.Timer.Spec, func() {
+			go mailAccountService.SyncChatGPTAccessToken()
 		})
 		if err != nil {
 			fmt.Println("添加同步 OpenAI ChatGPT accessToken 定时任务 error:", err)
 		}
 
 		// 同步 Claude SK
-		_, err = global.Timer.AddTaskByFunc("SyncChatGPTAccessToken", "0 0 1,5,10,15,20,25,28 * *", func() {
-			list, errGetMailAccountList := mailAccountService.GetMailAccountList()
-			if errGetMailAccountList != nil {
-				fmt.Println("同步 Claude SK 时，获取账户列表失败")
-			}
-			for _, account := range list {
-				if account.ClaudeSessionKey != "" {
-					var ids request.IdsReq
-					ids.Ids = append(ids.Ids, int(account.ID))
-					errRefreshOpenaiAccessToken := mailAccountService.RefreshClaudeChat(ids)
-					if errRefreshOpenaiAccessToken != nil {
-						fmt.Println("同步 Claude SK 失败")
-					}
-					time.Sleep(30 * time.Second)
-				}
-			}
-		})
-		if err != nil {
-			fmt.Println("添加同步 Claude SK 定时任务 error:", err)
-		}
+		//_, err = global.Timer.AddTaskByFunc("SyncChatGPTAccessToken", "0 0 1,5,10,15,20,25,28 * *", func() {
+		//	list, errGetMailAccountList := mailAccountService.GetMailAccountList()
+		//	if errGetMailAccountList != nil {
+		//		fmt.Println("同步 Claude SK 时，获取账户列表失败")
+		//	}
+		//	for _, account := range list {
+		//		if account.ClaudeSessionKey != "" {
+		//			var ids request.IdsReq
+		//			ids.Ids = append(ids.Ids, int(account.ID))
+		//			errRefreshOpenaiAccessToken := mailAccountService.RefreshClaudeChat(ids)
+		//			if errRefreshOpenaiAccessToken != nil {
+		//				fmt.Println("同步 Claude SK 失败")
+		//			}
+		//			time.Sleep(30 * time.Second)
+		//		}
+		//	}
+		//})
+		//if err != nil {
+		//	fmt.Println("添加同步 Claude SK 定时任务 error:", err)
+		//}
 	}
 }

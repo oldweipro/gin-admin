@@ -362,7 +362,7 @@ func (conversationService *ConversationService) ChatOpenAIReverse(conversationRe
 		return err
 	}
 	config := openai.DefaultConfig(mailAccount.OpenaiAccessToken)
-	config.BaseURL = server
+	config.BaseURL = server + "/v1"
 	client := openai.NewClientWithConfig(config)
 	ctx := context.Background()
 	stream, err := client.CreateChatCompletionStream(ctx, req)

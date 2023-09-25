@@ -39,11 +39,11 @@ func (o *OpenApi) ForwardChatCompletionsApi(c *gin.Context) {
 		return
 	}
 	// 创建目标URL
-	targetURL := "http://127.0.0.1:8080" // 更改为您实际的目标服务URL
+	server, _ := mailAccountService.GetServerNodeByUpdatedAtAsc() // 更改为您实际的目标服务URL
 	mailAccount, _ := mailAccountService.GetAccessTokenByUpdatedAtAsc()
 
 	// 创建反向代理器
-	target, _ := url.Parse(targetURL)
+	target, _ := url.Parse(server)
 	proxy := httputil.NewSingleHostReverseProxy(target)
 
 	// 更改请求头中的Host字段
