@@ -204,6 +204,7 @@ func (mailAccountService *MailAccountService) SyncChatGPTAccessToken() {
 	list, errGetMailAccountList := mailAccountService.GetMailAccountList()
 	if errGetMailAccountList != nil {
 		fmt.Println("同步 OpenAI ChatGPT accessToken 时，获取账户列表失败")
+		return
 	}
 	for _, account := range list {
 		// 获取当前时间
@@ -224,4 +225,29 @@ func (mailAccountService *MailAccountService) SyncChatGPTAccessToken() {
 		}
 	}
 	fmt.Println(time.Now().Format("2006-01-02 15:04:05"), " 完成所有账号AT同步")
+}
+
+func (mailAccountService *MailAccountService) SyncChatGPTAccessTokenStatus() {
+	list, errGetMailAccountList := mailAccountService.GetMailAccountList()
+	if errGetMailAccountList != nil {
+		fmt.Println("修改所有账号AT状态时，获取账户列表失败")
+		return
+	}
+	for _, account := range list {
+		if *account.OpenaiStatus == 1 {
+			continue
+		}
+		var ids request.IdsReq
+		ids.Ids = append(ids.Ids, int(account.ID))
+		errRefreshOpenaiAccessToken := mailAccountService.UpdateOpenaiStatus(ids)
+		if errRefreshOpenaiAccessToken != nil {
+			fmt.Println("修改账号AT状态失败")
+		}
+	}
+	fmt.Println(time.Now().Format("2006-01-02 15:04:05"), " 修改所有账号AT状态完成")
+}
+
+func (mailAccountService *MailAccountService) UpdateOpenaiStatus(ids request.IdsReq) (err error) {
+	err = global.DB.Model(&openfish.MailAccount{}).Where("id in ?", ids.Ids).Update("openai_status", 1).Error
+	return
 }

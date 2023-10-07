@@ -83,6 +83,14 @@ func Timer() {
 			fmt.Println("添加同步 OpenAI ChatGPT accessToken 定时任务 error:", err)
 		}
 
+		// 每小时修改所有账号AT状态
+		_, err = global.Timer.AddTaskByFunc("SyncChatGPTAccessTokenStatus", "@hourly", func() {
+			go mailAccountService.SyncChatGPTAccessTokenStatus()
+		})
+		if err != nil {
+			fmt.Println("添加 每小时修改所有账号AT状态 定时任务 error:", err)
+		}
+
 		// 同步 Claude SK
 		//_, err = global.Timer.AddTaskByFunc("SyncChatGPTAccessToken", "0 0 1,5,10,15,20,25,28 * *", func() {
 		//	list, errGetMailAccountList := mailAccountService.GetMailAccountList()
