@@ -124,10 +124,10 @@ func (serverNodeService *ServerNodeService) GetServerNodeLessInfoList(info ladde
 		return nil, 0, err
 	}
 	for _, node := range serverNodes {
-		var info ladderReq.ServerNodeResponse
-		info.Id = node.ID
-		info.Bandwidth = node.Bandwidth
-		info.Region = node.Region
+		var serverNodeResp ladderReq.ServerNodeResponse
+		serverNodeResp.Id = node.ID
+		serverNodeResp.Bandwidth = node.Bandwidth
+		serverNodeResp.Region = node.Region
 		// 过滤数据
 		for _, inbound := range inbounds {
 			if *inbound.Sid == node.ID {
@@ -135,13 +135,13 @@ func (serverNodeService *ServerNodeService) GetServerNodeLessInfoList(info ladde
 				if err != nil {
 					break
 				}
-				info.ExpiryTime = obj.ExpiryTime
-				info.Up = obj.Up
-				info.Down = obj.Down
+				serverNodeResp.ExpiryTime = obj.ExpiryTime
+				serverNodeResp.Up = obj.Up
+				serverNodeResp.Down = obj.Down
 				break
 			}
 		}
-		list = append(list, info)
+		list = append(list, serverNodeResp)
 	}
 	return list, total, err
 }

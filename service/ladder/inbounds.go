@@ -99,6 +99,7 @@ func (inboundsService *InboundsService) GetInboundsInfo(userId, sid uint) (inbou
 		Value: serverNode.Cookie,
 	}
 	client := resty.New()
+	client.SetTimeout(time.Second * 3)
 	resp, err := client.R().
 		SetCookies([]*http.Cookie{
 			cookie,
