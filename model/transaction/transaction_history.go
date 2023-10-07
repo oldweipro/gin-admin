@@ -17,7 +17,7 @@ type TransactionHistory struct {
 	BeforeBalance *uint  `json:"beforeBalance" form:"beforeBalance" gorm:"default:0;column:before_balance;comment:交易前钱包金额。;"`
 	AfterBalance  *uint  `json:"afterBalance" form:"afterBalance" gorm:"default:0;column:after_balance;comment:交易后钱包金额。;"`
 	ProductId     *uint  `json:"productId" form:"productId" gorm:"column:product_id;comment:与商品表中的ProductID字段相关联，表示交易涉及的商品。充值渠道只有兑换码，当为充值时，此ID为chat_ticket表的ID;"`
-	Remark        string `json:"remark" form:"remark" gorm:"column:remark;comment:交易备注信息;"`
+	Remark        string `json:"remark" form:"remark" gorm:"column:remark;comment:交易备注信息;type:longtext;"`
 	CreatedBy     uint   `gorm:"column:created_by;comment:创建者"`
 	UpdatedBy     uint   `gorm:"column:updated_by;comment:更新者"`
 	DeletedBy     uint   `gorm:"column:deleted_by;comment:删除者"`
