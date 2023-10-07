@@ -12,7 +12,7 @@ type Inbounds struct {
 	Up             *int64 `json:"up" form:"up" gorm:"column:up;comment:上行流量;size:64;"`
 	Down           *int64 `json:"down" form:"down" gorm:"column:down;comment:下行流量;size:64;"`
 	Total          *int64 `json:"total" form:"total" gorm:"column:total;comment:流量限制，0:无限制;size:64;"`
-	Remark         string `json:"remark" form:"remark" gorm:"column:remark;comment:入站规则名称;"`
+	Remark         string `json:"remark" form:"remark" gorm:"column:remark;comment:入站规则名称;type:longtext;"`
 	Enable         *bool  `json:"enable" form:"enable" gorm:"column:enable;comment:是否启用;"`
 	ExpiryTime     *int64 `json:"expiryTime" form:"expiryTime" gorm:"column:expiry_time;default:0;comment:是一个13位的时间戳;"`
 	Port           string `json:"port" form:"port" gorm:"column:port;comment:端口;size:12;"`
