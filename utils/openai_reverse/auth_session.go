@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/bogdanfinn/tls-client/profiles"
 	"io"
 	"net/url"
 	"regexp"
@@ -58,7 +59,7 @@ func NewAuthenticator(emailAddress, password, proxy string) *Authenticator {
 	jar := tls_client.NewCookieJar()
 	options := []tls_client.HttpClientOption{
 		tls_client.WithTimeoutSeconds(20),
-		tls_client.WithClientProfile(tls_client.Okhttp4Android13),
+		tls_client.WithClientProfile(profiles.Okhttp4Android13),
 		tls_client.WithNotFollowRedirects(),
 		tls_client.WithCookieJar(jar), // create cookieJar instance and pass it as argument
 		// Proxy

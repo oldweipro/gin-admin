@@ -11,7 +11,7 @@ func Timer() {
 	//var certificationRecordApi = v1.ApiGroupApp.PatrolApiGroup.CertificationRecordApi
 	//var personnelService = service.ServiceGroupApp.PatrolServiceGroup.PersonnelService
 	var serverNodeService = service.ServiceGroupApp.LadderServiceGroup.ServerNodeService
-	var mailAccountService = service.ServiceGroupApp.OpenfishServiceGroup.MailAccountService
+	//var mailAccountService = service.ServiceGroupApp.OpenfishServiceGroup.MailAccountService
 	if global.ConfigServer.Timer.Start {
 		//for i := range global.ConfigServer.Timer.Detail {
 		//	go func(detail config.Detail) {
@@ -76,20 +76,20 @@ func Timer() {
 		}
 
 		// 同步 OpenAI ChatGPT accessToken
-		_, err = global.Timer.AddTaskByFunc("SyncChatGPTAccessToken", global.ConfigServer.Timer.Spec, func() {
-			go mailAccountService.SyncChatGPTAccessToken()
-		})
-		if err != nil {
-			fmt.Println("添加同步 OpenAI ChatGPT accessToken 定时任务 error:", err)
-		}
+		//_, err = global.Timer.AddTaskByFunc("SyncChatGPTAccessToken", global.ConfigServer.Timer.Spec, func() {
+		//	go mailAccountService.SyncChatGPTAccessToken()
+		//})
+		//if err != nil {
+		//	fmt.Println("添加同步 OpenAI ChatGPT accessToken 定时任务 error:", err)
+		//}
 
 		// 每小时修改所有账号AT状态
-		_, err = global.Timer.AddTaskByFunc("SyncChatGPTAccessTokenStatus", "@hourly", func() {
-			go mailAccountService.SyncChatGPTAccessTokenStatus()
-		})
-		if err != nil {
-			fmt.Println("添加 每小时修改所有账号AT状态 定时任务 error:", err)
-		}
+		//_, err = global.Timer.AddTaskByFunc("SyncChatGPTAccessTokenStatus", "@hourly", func() {
+		//	go mailAccountService.SyncChatGPTAccessTokenStatus()
+		//})
+		//if err != nil {
+		//	fmt.Println("添加 每小时修改所有账号AT状态 定时任务 error:", err)
+		//}
 
 		// 同步 Claude SK
 		//_, err = global.Timer.AddTaskByFunc("SyncChatGPTAccessToken", "0 0 1,5,10,15,20,25,28 * *", func() {

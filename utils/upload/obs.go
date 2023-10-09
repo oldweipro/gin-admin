@@ -45,7 +45,6 @@ func (o *Obs) UploadFile(file *multipart.FileHeader) (string, string, error) {
 				Bucket: global.ConfigServer.HuaWeiObs.Bucket,
 				Key:    filename,
 			},
-			ContentType: file.Header.Get("content-type"),
 		},
 		Body: open,
 	}

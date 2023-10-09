@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	swaggerFiles "github.com/swaggo/files"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,7 +10,6 @@ import (
 	"github.com/oldweipro/gin-admin/middleware"
 	"github.com/oldweipro/gin-admin/router"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 // 初始化总路由
