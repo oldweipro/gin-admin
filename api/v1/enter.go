@@ -3,6 +3,7 @@ package v1
 import (
 	"github.com/oldweipro/gin-admin/api/v1/example"
 	"github.com/oldweipro/gin-admin/api/v1/ladder"
+	"github.com/oldweipro/gin-admin/api/v1/memo_nexus"
 	"github.com/oldweipro/gin-admin/api/v1/openfish"
 	"github.com/oldweipro/gin-admin/api/v1/patrol"
 	"github.com/oldweipro/gin-admin/api/v1/platform"
@@ -18,6 +19,7 @@ type ApiGroup struct {
 	PlatformApiGroup    platform.ApiGroup
 	OpenfishApiGroup    openfish.ApiGroup
 	TransactionApiGroup transaction.ApiGroup
+	MemoNexusApiGroup   memo_nexus.ApiGroup
 }
 
 var ApiGroupApp = new(ApiGroup)

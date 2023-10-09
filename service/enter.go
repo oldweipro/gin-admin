@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/oldweipro/gin-admin/service/example"
 	"github.com/oldweipro/gin-admin/service/ladder"
+	"github.com/oldweipro/gin-admin/service/memo_nexus"
 	"github.com/oldweipro/gin-admin/service/openfish"
 	"github.com/oldweipro/gin-admin/service/patrol"
 	"github.com/oldweipro/gin-admin/service/system"
@@ -16,6 +17,7 @@ type ServiceGroup struct {
 	LadderServiceGroup      ladder.ServiceGroup
 	OpenfishServiceGroup    openfish.ServiceGroup
 	TransactionServiceGroup transaction.ServiceGroup
+	MemoNexusService        memo_nexus.ServiceGroup
 }
 
 var ServiceGroupApp = new(ServiceGroup)

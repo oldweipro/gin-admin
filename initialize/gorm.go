@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	"github.com/oldweipro/gin-admin/model/memo_nexus/bilibili"
 	"github.com/oldweipro/gin-admin/model/transaction"
 	"os"
 
@@ -81,6 +82,9 @@ func RegisterTables() {
 		openfish.SecretKey{},
 		openfish.Prompt{},
 		openfish.MailAccount{},
+
+		bilibili.BuiltinMember{},
+		bilibili.UpMember{},
 	)
 	if err != nil {
 		global.Logger.Error("register table failed", zap.Error(err))

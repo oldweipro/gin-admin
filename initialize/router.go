@@ -106,6 +106,11 @@ func Routers() *gin.Engine {
 		transactionRouter.InitActivationCodeRouter(PrivateGroup)
 	}
 
+	{
+		memoNexusRouter := router.RouterGroupApp.MemoNexus
+		memoNexusRouter.InitMemoNexusRouter(PrivateGroup)
+	}
+
 	PlatformGroup := Router.Group(global.ConfigServer.System.RouterPrefix)
 	PlatformGroup.Use(middleware.PlatformOpenApiSkAuth())
 
