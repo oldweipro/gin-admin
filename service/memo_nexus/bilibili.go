@@ -48,7 +48,7 @@ func (bilibiliService *BilibiliService) GetLoginQrcodeGenerate() response.LoginQ
 }
 
 func (bilibiliService *BilibiliService) LoginQrcodePoll(qrcodeKey string) bilibili.BuiltinMember {
-	sysMember := bilibili.BuiltinMember{}
+	builtinMember := bilibili.BuiltinMember{}
 	client := req.C().SetTimeout(5 * time.Second)
 	params := make(map[string]interface{})
 	params["qrcode_key"] = qrcodeKey
@@ -63,42 +63,43 @@ func (bilibiliService *BilibiliService) LoginQrcodePoll(qrcodeKey string) bilibi
 		log.Println("error:", err)
 		log.Println("raw content:")
 		log.Println(resp.Dump())
-		return sysMember
+		return builtinMember
 	}
 
 	if resp.IsErrorState() {
 		fmt.Println(respData.Message)
-		return sysMember
+		return builtinMember
 	}
 
 	if resp.IsSuccessState() {
 		if respData.Data.Code == 86038 {
-			sysMember.Mid = 86038
-			return sysMember
+			builtinMember.Mid = 86038
+			return builtinMember
 		}
 		if respData.Code == 0 && respData.Data.Code == 0 {
 			for _, cookie := range resp.Cookies() {
 				switch cookie.Name {
 				case "SESSDATA":
-					sysMember.SessData = cookie.Value
+					builtinMember.SessData = cookie.Value
 				case "DedeUserID":
-					sysMember.DedeUserID = cookie.Value
+					builtinMember.DedeUserID = cookie.Value
 				case "DedeUserID__ckMd5":
-					sysMember.DedeUserIDCkMd5 = cookie.Value
+					builtinMember.DedeUserIDCkMd5 = cookie.Value
 				case "sid":
-					sysMember.Sid = cookie.Value
+					builtinMember.Sid = cookie.Value
 				case "bili_jct":
-					sysMember.BiliJct = cookie.Value
+					builtinMember.BiliJct = cookie.Value
 				}
 			}
+			builtinMember.RefreshToken = respData.Data.RefreshToken
 		}
-		return sysMember
+		return builtinMember
 	}
 
 	log.Println("unknown status", resp.Status)
 	log.Println("raw content:")
 	log.Println(resp.Dump())
-	return sysMember
+	return builtinMember
 }
 
 func (bilibiliService *BilibiliService) SaveBuiltinMember(builtinMember bilibili.BuiltinMember) (err error) {

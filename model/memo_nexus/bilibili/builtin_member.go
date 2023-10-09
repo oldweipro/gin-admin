@@ -13,6 +13,8 @@ type BuiltinMember struct {
 	DedeUserID      string         `json:"dedeUserID" gorm:"column:dede_user_id;comment:cookie"`
 	Sid             string         `json:"sid" gorm:"column:sid;type:longtext;comment:cookie"`
 	DedeUserIDCkMd5 string         `json:"dedeUserIDCkMd5" gorm:"column:dede_user_id_ck_md5;comment:cookie"`
+	RefreshToken    string         `json:"refreshToken" gorm:"column:refresh_token;comment:refresh_token"`
+	IsUse           uint           `json:"isUse" gorm:"column:is_use;comment:是否启用;not null;default:0"`
 	CreatedAt       time.Time      `json:"createdAt" form:"createdAt"` // 创建时间
 	UpdatedAt       time.Time      `json:"updatedAt" form:"updatedAt"` // 更新时间
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`             // 删除时间
