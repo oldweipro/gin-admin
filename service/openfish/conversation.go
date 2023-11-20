@@ -358,9 +358,6 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 		if err := conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
 			return err
 		}
-		if err = conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
-			global.Logger.Error("ChatOpenAIApiKey Error: ", zap.Error(err))
-		}
 	}
 
 	return nil
