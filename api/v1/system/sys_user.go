@@ -75,6 +75,34 @@ func (b *BaseApi) Login(c *gin.Context) {
 	response.FailWithMessage("验证码错误", c)
 }
 
+func (b *BaseApi) LoginWithoutCaptcha(c *gin.Context) {
+	var l systemReq.LoginWithoutCaptcha
+	err := c.ShouldBindJSON(&l)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = utils.Verify(l, utils.LoginWithoutCaptchaVerify)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	u := &system.SysUser{Username: l.Username, Password: l.Password}
+	user, err := userService.Login(u)
+	if err != nil {
+		global.Logger.Error("登陆失败! 用户名不存在或者密码错误!", zap.Error(err))
+		response.FailWithMessage("用户名不存在或者密码错误", c)
+		return
+	}
+	if user.Enable != 1 {
+		global.Logger.Error("登陆失败! 用户被禁止登录!")
+		response.FailWithMessage("用户被禁止登录", c)
+		return
+	}
+	b.TokenNext(c, *user)
+	return
+}
+
 // EmailLogin
 // @Tags     Base
 // @Summary  用户登录

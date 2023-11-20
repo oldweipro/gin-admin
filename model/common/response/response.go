@@ -58,13 +58,13 @@ func FailWithDetailed(data interface{}, message string, c *gin.Context) {
 }
 
 func FailAuthExpireWithDetailed(data interface{}, message string, c *gin.Context) {
-	HttpResponse(http.StatusUnauthorized, ERROR, data, message, c)
+	HttpResponse(http.StatusUnauthorized, http.StatusUnauthorized, data, message, c)
 }
 
 func FailStatusForbiddenWithDetailed(data interface{}, message string, c *gin.Context) {
-	HttpResponse(http.StatusForbidden, ERROR, data, message, c)
+	HttpResponse(http.StatusForbidden, http.StatusForbidden, data, message, c)
 }
 
 func FailStatusTooManyRequestsWithDetailed(data interface{}, message string, c *gin.Context) {
-	HttpResponse(http.StatusTooManyRequests, ERROR, data, message, c)
+	HttpResponse(http.StatusTooManyRequests, http.StatusTooManyRequests, data, message, c)
 }

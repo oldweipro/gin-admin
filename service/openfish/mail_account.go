@@ -1,15 +1,17 @@
 package openfish
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/oldweipro/gin-admin/global"
 	"github.com/oldweipro/gin-admin/model/common/request"
 	"github.com/oldweipro/gin-admin/model/ladder"
 	"github.com/oldweipro/gin-admin/model/openfish"
 	openfishReq "github.com/oldweipro/gin-admin/model/openfish/request"
-	"github.com/oldweipro/gin-admin/utils/openai_reverse"
 	"github.com/sashabaranov/go-openai"
+	"net/http"
 	"strconv"
 	"sync"
 	"time"
@@ -69,25 +71,77 @@ func (mailAccountService *MailAccountService) RefreshOpenaiAccessToken(ids reque
 	var mailAccounts []openfish.MailAccount
 	err = global.DB.Where("id in ?", ids.Ids).Find(&mailAccounts).Error
 	// 循环遍历
-	proxyUrl := "http://127.0.0.1:7890"
-	go func() {
-		for _, account := range mailAccounts {
-			authenticator := openaiReverse.NewAuthenticator(account.Username, account.OpenaiPassword, proxyUrl)
-			authErr := authenticator.Begin()
-			if authErr != nil {
-				global.Logger.Error(fmt.Sprintf("Location: %s, Status code: %s, Details: %s, Embedded error: %s", authErr.Location, fmt.Sprint(authErr.StatusCode), authErr.Details, authErr.Error.Error()))
+	//proxyUrl := "http://127.0.0.1:7890"
+	for _, account := range mailAccounts {
+		//authenticator := openaiReverse.NewAuthenticator(account.Username, account.OpenaiPassword, proxyUrl)
+		//authErr := authenticator.Begin()
+		//if authErr != nil {
+		//	global.Logger.Error(fmt.Sprintf("Location: %s, Status code: %s, Details: %s, Embedded error: %s", authErr.Location, fmt.Sprint(authErr.StatusCode), authErr.Details, authErr.Error.Error()))
+		//}
+		//accessToken := authenticator.GetAccessToken()
+		data := map[string]interface{}{
+			"username": account.Username,
+			"password": account.OpenaiPassword,
+		}
+		jsonData, err := json.Marshal(data)
+		if err != nil {
+			fmt.Println("JSON编码失败:", err)
+			continue
+		}
+		response, err := http.Post("http://localhost:8998/chatgpt/login", "application/json", bytes.NewBuffer(jsonData))
+		if err != nil {
+			fmt.Println("请求失败:", err)
+		}
+		defer response.Body.Close()
+
+		var result map[string]interface{}
+		err = json.NewDecoder(response.Body).Decode(&result)
+		if err != nil {
+			fmt.Println("解析失败:", err)
+			continue
+		}
+
+		formattedResult := make(map[string]string)
+		for key, value := range result {
+			formattedResult[key] = fmt.Sprintf("%v", value)
+		}
+
+		accessToken := formattedResult["data"]
+		// missing access token
+		// Email is not valid.
+		// captcha required
+		// You do not have an account because it has been deleted or deactivated. If you believe this was an error, please contact us through our help center at help.openai.com. (error=account_deactivated)
+		fmt.Println(accessToken)
+		// artyom3egprod@email.com
+		//arturvim2o@email.com
+		//arturqdwck@email.com
+		//artyom3egprod@email.com
+		//arturmylip@email.com
+		//arturmbv33@email.com
+		//arturh3fadeev@email.com
+		//arturd2d@email.com
+		//arturanib5@email.com
+
+		updateColumns := make(map[string]interface{})
+		updateColumns["openai_access_token"] = accessToken
+		updateColumns["openai_access_token_get_time"] = time.Now()
+		if formattedResult["code"] == "7" {
+			// 账号被封了
+			updateColumns["openai_status"] = 0
+			err = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", account.ID).Updates(&updateColumns).Error
+			if err != nil {
+				global.Logger.Error("ID: " + strconv.Itoa(int(account.ID)) + ", 更新出错")
 			}
-			accessToken := authenticator.GetAccessToken()
-			updateColumns := make(map[string]interface{})
-			updateColumns["openai_access_token"] = accessToken
-			updateColumns["openai_access_token_get_time"] = time.Now()
+			continue
+		}
+		if formattedResult["code"] == "0" {
 			updateColumns["openai_status"] = 1
 			err = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", account.ID).Updates(&updateColumns).Error
 			if err != nil {
 				global.Logger.Error("ID: " + strconv.Itoa(int(account.ID)) + ", 更新出错")
 			}
 		}
-	}()
+	}
 	return err
 }
 
@@ -173,7 +227,7 @@ func (mailAccountService *MailAccountService) UpdateAccessTokenWithUpdatedAt(id 
 // GetMailAccountList 获取MailAccount列表记录
 func (mailAccountService *MailAccountService) GetMailAccountList() (list []openfish.MailAccount, err error) {
 	db := global.DB.Model(&openfish.MailAccount{})
-	err = db.Order("created_at desc").Find(&list).Error
+	err = db.Where("openai_status = ?", 2).Order("created_at desc").Find(&list).Error
 	return
 }
 
@@ -183,6 +237,7 @@ func (mailAccountService *MailAccountService) GetMailAccountInfoList(info openfi
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
 	db := global.DB.Model(&openfish.MailAccount{})
+	db = db.Where("openai_status > ?", 0)
 	var mailAccounts []openfish.MailAccount
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {
@@ -209,7 +264,7 @@ func (mailAccountService *MailAccountService) SyncChatGPTAccessToken() {
 	for _, account := range list {
 		// 获取当前时间
 		currentTime := time.Now()
-		// 计算三天前的时间
+		// 计算五天前的时间
 		threeDaysAgo := currentTime.Add(-5 * 24 * time.Hour)
 		// 比较时间
 		if account.OpenaiAccessTokenGetTime == nil || account.OpenaiAccessTokenGetTime.Before(threeDaysAgo) {

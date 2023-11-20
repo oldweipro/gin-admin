@@ -39,6 +39,12 @@ type Login struct {
 	CaptchaId string `json:"captchaId"` // 验证码ID
 }
 
+// LoginWithoutCaptcha User login structure
+type LoginWithoutCaptcha struct {
+	Username string `json:"username"` // 用户名
+	Password string `json:"password"` // 密码
+}
+
 // User emailLogin structure
 type EmailLogin struct {
 	Email    string `json:"email"`    // 邮箱

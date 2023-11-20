@@ -21,6 +21,5 @@ type BuiltinMember struct {
 }
 
 func (BuiltinMember) TableName() string {
-	println()
 	return "builtin_member"
 }

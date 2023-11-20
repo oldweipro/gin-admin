@@ -99,7 +99,7 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 	hash := md5.Sum([]byte(str))
 	hexHash := hex.EncodeToString(hash[:])
 	if hexHash != chatReq.Sign {
-		response.FailWithMessage("系统错误，缺少必要参数。", c)
+		response.FailWithMessage("系统错误，签名验证失败。", c)
 		return
 	}
 	tokenCount := conversationService.NumTokens(chatReq.Prompt)
@@ -309,7 +309,83 @@ func (conversationApi *ConversationApi) GetConversationList(c *gin.Context) {
 	}
 }
 
-// GetCurrentUserConversationList 分页获取当前用户对话列表
+// GetCurrentUserConversations 重写获取当前用户对话列表
+func (conversationApi *ConversationApi) GetCurrentUserConversations(c *gin.Context) {
+	userInfo := utils.GetUserInfo(c)
+	conversationList, err := conversationService.GetConversationListByUserId(userInfo.BaseClaims.ID, 0)
+	if err != nil {
+		response.FailWithMessage("系统内部错误", c)
+		return
+	}
+	if len(conversationList) == 0 {
+		// 创建一个聊天
+		var conversation openfish.Conversation
+		conversation.ConversationName = "新聊天"
+		conversation.ConversationType = 0
+		conversation.CreatedBy = utils.GetUserID(c)
+		if err := conversationService.CreateConversation(&conversation); err != nil {
+			global.Logger.Error("创建会话失败!", zap.Error(err))
+			response.FailWithMessage("系统异常", c)
+			return
+		}
+		// conversationId等于空则创建该信息到数据库
+		conversationRecord := openfish.ConversationRecord{}
+		conversationRecord.Content = "请详细描述您的问题。"
+		conversationRecord.Role = "system"
+		conversationRecord.ConversationId = &conversation.ID
+		conversationRecord.CreatedBy = utils.GetUserID(c)
+		if err := conversationService.CreateConversationRecord(&conversationRecord); err != nil {
+			global.Logger.Error("AI会话创建失败!", zap.Error(err))
+			response.FailWithMessage("系统异常", c)
+			return
+		}
+		conversationList = append(conversationList, conversation)
+	}
+	response.OkWithDetailed(conversationList, "获取成功", c)
+}
+
+func (conversationApi *ConversationApi) GetConversationRecords(c *gin.Context) {
+	var conversation openfish.Conversation
+	err := c.ShouldBindQuery(&conversation)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	conversationRecordList, err := conversationService.GetConversationRecordListByConversationId(conversation.ID)
+	if err != nil {
+		return
+	}
+	// 创建conversation对话对象，两个属性 data和uuid
+	var conversationDataGroups []map[string]interface{}
+	for _, record := range conversationRecordList {
+		requestOption := make(map[string]interface{})
+		requestOption["prompt"] = record.Content
+		requestOption["options"] = nil
+		conversationData := map[string]interface{}{
+			"text":                record.Content,
+			"dateTime":            record.CreatedAt.Format("2006-01-02 15:04:05"),
+			"conversationOptions": nil,
+			"error":               false,
+			"inversion":           false,
+			"loading":             false,
+			"requestOptions":      requestOption,
+		}
+		if record.Role == "user" {
+			conversationData["inversion"] = true
+			requestOption["prompt"] = record.Content
+		} else if record.Role == "assistant" {
+			// TODO oldwei 计划是requestOption的prompt是不一样的，应该是user的text
+			requestOption["prompt"] = record.Content
+			conversationData["inversion"] = false
+		}
+		conversationData["requestOptions"] = requestOption
+		conversationDataGroups = append(conversationDataGroups, conversationData)
+	}
+	response.OkWithDetailed(conversationDataGroups, "获取成功", c)
+}
+
+// GetCurrentUserConversationList 获取当前用户对话列表
 // @Tags Conversation
 // @Summary 分页获取当前用户对话列表
 // @Security ApiKeyAuth

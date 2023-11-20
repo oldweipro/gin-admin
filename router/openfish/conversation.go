@@ -24,9 +24,10 @@ func (s *ConversationRouter) InitConversationRouter(Router *gin.RouterGroup) {
 		conversationRouter.POST("updateConversationName", conversationApi.UpdateConversationName)     // 更新Conversation
 	}
 	{
-		conversationRouterWithoutRecord.GET("findConversation", conversationApi.FindConversation)                             // 根据ID获取Conversation
-		conversationRouterWithoutRecord.GET("getConversationList", conversationApi.GetConversationList)                       // 获取Conversation列表
-		conversationRouterWithoutRecord.GET("getConversationRecordList", conversationApi.GetConversationRecordList)           // 获取ConversationRecord列表
-		conversationRouterWithoutRecord.GET("getCurrentUserConversationList", conversationApi.GetCurrentUserConversationList) // 获取当前用户聊天列表
+		conversationRouterWithoutRecord.GET("findConversation", conversationApi.FindConversation)                          // 根据ID获取Conversation
+		conversationRouterWithoutRecord.GET("getConversationList", conversationApi.GetConversationList)                    // 获取Conversation列表
+		conversationRouterWithoutRecord.GET("getConversationRecordList", conversationApi.GetConversationRecordList)        // 获取ConversationRecord列表
+		conversationRouterWithoutRecord.GET("getCurrentUserConversationList", conversationApi.GetCurrentUserConversations) // 获取当前用户聊天列表
+		conversationRouterWithoutRecord.GET("getConversationRecords", conversationApi.GetConversationRecords)              // 获取聊天记录列表
 	}
 }

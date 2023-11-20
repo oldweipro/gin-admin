@@ -13,6 +13,7 @@ func (s *BaseRouter) InitBaseRouter(Router *gin.RouterGroup) (R gin.IRoutes) {
 	certificationRecordApi := v1.ApiGroupApp.PatrolApiGroup.CertificationRecordApi
 	{
 		baseRouter.POST("login", baseApi.Login)
+		baseRouter.POST("loginWithoutCaptcha", baseApi.LoginWithoutCaptcha)
 		baseRouter.POST("emailLogin", baseApi.EmailLogin)
 		baseRouter.POST("captcha", baseApi.Captcha)
 		baseRouter.POST("registerWithSmsCode", baseApi.RegisterWithSmsCode)             // 用户使用短信验证码注册

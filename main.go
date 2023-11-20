@@ -30,7 +30,7 @@ func main() {
 	initialize.Timer()
 	initialize.DBList()
 	if global.DB != nil {
-		initialize.RegisterTables() // 初始化表
+		//initialize.RegisterTables() // 初始化表
 		// 程序结束前关闭数据库链接
 		db, _ := global.DB.DB()
 		defer func(db *sql.DB) {

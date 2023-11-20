@@ -31,6 +31,7 @@ type ConversationService struct {
 var chatGptService system.ChatGptService
 var promptService PromptService
 var mailAccountService MailAccountService
+var countChat int
 
 // CreateConversation 创建Conversation记录
 func (conversationService *ConversationService) CreateConversation(conversation *openfish.Conversation) (err error) {
@@ -327,20 +328,41 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 	//	TotalTokens:      inputTokens + completionTokens,
 	//}
 	req := openai.ChatCompletionRequest{
-		Model:     openai.GPT3Dot5Turbo16K0613,
-		MaxTokens: 1000,
-		Messages:  messages,
-		Stream:    true,
+		Model:       openai.GPT3Dot5Turbo16K0613,
+		MaxTokens:   1000,
+		Messages:    messages,
+		Stream:      true,
+		Temperature: 0.2,
+		TopP:        0.1,
 	}
-	if err := conversationService.ChatOpenAIReverse(&conversationRecordUser, req, c, chatReq); err != nil {
-		if err = conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
+	// 优先使用ChatGLMServer
+	//if countChat <= 3 {
+	//	countChat++
+	//	if err := conversationService.ChatGLMServer(&conversationRecordUser, req, c, chatReq); err != nil {
+	//		global.Logger.Error("ChatGLMServer调用错误: ", zap.Error(err))
+	//	}
+	//	countChat--
+	//} else {
+	//	if err := conversationService.ChatOpenAIReverse(&conversationRecordUser, req, c, chatReq); err != nil {
+	//		if err := conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
+	//			return err
+	//		}
+	//		//if err = conversationService.ChatClaudeReverse(&conversationRecordUser, req, c, chatReq); err != nil {
+	//		//	global.Logger.Error("Claude调用错误: ", zap.Error(err))
+	//		//
+	//		//}
+	//	}
+	//}
+
+	if err := conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
+		if err := conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
 			return err
 		}
-		//if err = conversationService.ChatClaudeReverse(&conversationRecordUser, req, c, chatReq); err != nil {
-		//	global.Logger.Error("Claude调用错误: ", zap.Error(err))
-		//
-		//}
+		if err = conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
+			global.Logger.Error("ChatOpenAIApiKey Error: ", zap.Error(err))
+		}
 	}
+
 	return nil
 }
 
@@ -370,7 +392,8 @@ func (conversationService *ConversationService) ChatOpenAIReverse(conversationRe
 		global.Logger.Error("逆向: ", zap.Error(err))
 		//errMap := make(map[string]string)
 		//_ = json.Unmarshal([]byte(err.Error()), &errMap)
-		_ = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", mailAccount.ID).Update("openai_status", 0).Error
+		// 0禁用 1使用 2故障
+		//_ = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", mailAccount.ID).Update("openai_status", 2).Error
 		return err
 	}
 	defer config.HTTPClient.CloseIdleConnections()
@@ -385,6 +408,21 @@ func (conversationService *ConversationService) ChatClaudeReverse(conversationRe
 	ctx := context.Background()
 	stream, err := client.CreateChatCompletionStream(ctx, req)
 	if err != nil {
+		return err
+	}
+	defer config.HTTPClient.CloseIdleConnections()
+	defer stream.Close()
+	return conversationService.ChatStream(stream, conversationRecordUser, c, chatReq)
+}
+
+func (conversationService *ConversationService) ChatGLMServer(conversationRecordUser *openfish.ConversationRecord, req openai.ChatCompletionRequest, c *gin.Context, chatReq openfishReq.ChatReq) error {
+	config := openai.DefaultConfig("ChatGLMServer")
+	config.BaseURL = "https://chatglm.oldwei.com/v1"
+	client := openai.NewClientWithConfig(config)
+	ctx := context.Background()
+	stream, err := client.CreateChatCompletionStream(ctx, req)
+	if err != nil {
+		global.Logger.Error("ChatGLMServer出错了:", zap.Error(err))
 		return err
 	}
 	defer config.HTTPClient.CloseIdleConnections()
@@ -416,6 +454,8 @@ func (conversationService *ConversationService) ChatOpenAIApiKey(conversationRec
 	ctx := context.Background()
 	stream, err := client.CreateChatCompletionStream(ctx, req)
 	if err != nil {
+		fmt.Println("sk也不可用")
+		//_ = global.DB.Model(&openfish.MailAccount{}).Where("id = ?", mailAccount.ID).Update("openai_sk", "").Error
 		return err
 	}
 	defer config.HTTPClient.CloseIdleConnections()

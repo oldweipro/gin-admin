@@ -83,7 +83,7 @@ func Timer() {
 		//	fmt.Println("添加同步 OpenAI ChatGPT accessToken 定时任务 error:", err)
 		//}
 
-		// 每小时修改所有账号AT状态
+		// 每小时修改所有账号AT状态，这个有问题，得改掉
 		//_, err = global.Timer.AddTaskByFunc("SyncChatGPTAccessTokenStatus", "@hourly", func() {
 		//	go mailAccountService.SyncChatGPTAccessTokenStatus()
 		//})
