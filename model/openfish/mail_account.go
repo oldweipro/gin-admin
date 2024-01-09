@@ -24,6 +24,12 @@ type MailAccount struct {
 	OpenaiSk                 string     `json:"openaiSk" form:"openaiSk" gorm:"column:openai_sk;comment:openai密钥;"`
 	OpenaiAmount             *uint      `json:"openaiAmount" form:"openaiAmount" gorm:"column:openai_amount;comment:openai余额，使用额度;"`
 	OpenaiStatus             *uint      `json:"openaiStatus" form:"openaiStatus" gorm:"column:openai_status;comment:openai状态，是否1启用或0禁用2暂时不可用;"`
+	UniqueName               string     `json:"uniqueName" form:"uniqueName" gorm:"column:unique_name;comment:pandora share token唯一值;"`
+	TokenKey                 string     `json:"tokenKey" form:"tokenKey" gorm:"column:token_key;comment:pandora share token;"`
+	SiteLimit                string     `json:"siteLimit" form:"siteLimit" gorm:"column:site_limit;comment:pandora share token 站点限制;"`
+	ExpireAt                 int        `json:"expireAt" form:"expireAt" gorm:"column:expire_at;comment:pandora share token 过期时间;"`
+	OpenaiRefreshToken       string     `json:"openaiRefreshToken" form:"openaiRefreshToken" gorm:"column:openai_refresh_token;comment:pandora OpenaiRefreshToken;"`
+	OpenaiSessionToken       string     `json:"openaiSessionToken" form:"openaiSessionToken" gorm:"column:openai_session_token;type:longtext;comment:pandora OpenaiSessionToken;"`
 }
 
 // TableName MailAccount 表名

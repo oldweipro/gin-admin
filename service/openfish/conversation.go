@@ -270,6 +270,32 @@ func (conversationService *ConversationService) OpenAIDrawing(chatReq openfishRe
 	return nil
 }
 
+func (conversationService *ConversationService) ChatGPTCompletionsV2(c *gin.Context) {
+	streamResponse := openai.ChatCompletionStreamResponse{
+		ID:      "chatcmpl-8RCc2ral4VtAhlYMB4n9YHp8NcBpH",
+		Object:  "chat.completion.chunk",
+		Created: 1701494030,
+		Model:   "gpt-3.5-turbo-0613",
+		Choices: []openai.ChatCompletionStreamChoice{
+			{
+				Index: 0,
+				Delta: openai.ChatCompletionStreamChoiceDelta{
+					Content: "Hi",
+				},
+				FinishReason: "",
+			},
+		},
+	}
+	marshal, _ := json.Marshal(streamResponse)
+	for i := 0; i < 10; i++ {
+		time.Sleep(time.Second)
+		sse.Encode(c.Writer, sse.Event{
+			Data: string(marshal),
+		})
+		c.Writer.Flush()
+	}
+}
+
 // ChatGPTCompletions ChatGPT对话方法
 func (conversationService *ConversationService) ChatGPTCompletions(chatReq openfishReq.ChatReq, c *gin.Context) error {
 	tokenCount := conversationService.NumTokens(chatReq.Prompt)
@@ -354,12 +380,12 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 	//	}
 	//}
 
-	if err := conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
-		if err := conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
-			return err
-		}
+	if err := conversationService.ChatOpenAIReverse(&conversationRecordUser, req, c, chatReq); err != nil {
+		//if err := conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
+		//	return err
+		//}
+		return err
 	}
-
 	return nil
 }
 
@@ -375,13 +401,15 @@ func (conversationService *ConversationService) ChatOpenAIReverse(conversationRe
 		global.Logger.Error("逆向AT不可用: ")
 		return err
 	}
-	server, err := mailAccountService.GetServerNodeByUpdatedAtAsc()
-	if err != nil {
-		global.Logger.Error("逆向Server不可用: ")
-		return err
-	}
+	//server, err := mailAccountService.GetServerNodeByUpdatedAtAsc()
+	//if err != nil {
+	//	global.Logger.Error("逆向Server不可用: ")
+	//	return err
+	//}
+	//baseUrl := server + "/v1"
+	baseUrl := "https://chatgpt.oldwei.com/QNm190KQK81J/v1"
 	config := openai.DefaultConfig(mailAccount.OpenaiAccessToken)
-	config.BaseURL = server + "/v1"
+	config.BaseURL = baseUrl
 	client := openai.NewClientWithConfig(config)
 	ctx := context.Background()
 	stream, err := client.CreateChatCompletionStream(ctx, req)

@@ -35,7 +35,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/qiniu/go-sdk/v7 v7.17.1
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/sashabaranov/go-openai v1.15.4
+	github.com/sashabaranov/go-openai v1.17.9
 	github.com/shirou/gopsutil/v3 v3.23.9
 	github.com/songzhibin97/gkit v1.2.11
 	github.com/spf13/viper v1.17.0

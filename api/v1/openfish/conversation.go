@@ -117,6 +117,10 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 	}
 }
 
+func (conversationApi *ConversationApi) ChatCompletionsV2(c *gin.Context) {
+	conversationService.ChatGPTCompletionsV2(c)
+}
+
 // CreateConversation 创建Conversation
 // @Tags Conversation
 // @Summary 创建Conversation

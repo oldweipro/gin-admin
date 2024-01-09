@@ -19,3 +19,9 @@ type ChatMessage struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }
+
+type ChatHistory struct {
+	Uuid   uint   `json:"uuid"`
+	Title  string `json:"title"`
+	IsEdit bool   `json:"isEdit"`
+}
