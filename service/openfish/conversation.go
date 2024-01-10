@@ -407,7 +407,7 @@ func (conversationService *ConversationService) ChatOpenAIReverse(conversationRe
 	//	return err
 	//}
 	//baseUrl := server + "/v1"
-	baseUrl := "https://chatgpt.oldwei.com/QNm190KQK81J/v1"
+	baseUrl := "http://127.0.0.1:9333/v1"
 	config := openai.DefaultConfig(mailAccount.OpenaiAccessToken)
 	config.BaseURL = baseUrl
 	client := openai.NewClientWithConfig(config)

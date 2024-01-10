@@ -187,7 +187,7 @@ func (mailAccountService *MailAccountService) GetMailAccount(id uint) (mailAccou
 func (mailAccountService *MailAccountService) GetAccessTokenByUpdatedAtAsc() (mailAccount openfish.MailAccount, err error) {
 	queueMutex.Lock()
 	defer queueMutex.Unlock()
-	err = global.DB.Where("openai_access_token != '' and openai_status = 1").Order("updated_at").First(&mailAccount).Error
+	err = global.DB.Where("openai_access_token != '' and openai_status = 1 and (to_days(now())-to_days(openai_access_token_get_time) < 7)").Order("updated_at").First(&mailAccount).Error
 	if err != nil {
 		return
 	}

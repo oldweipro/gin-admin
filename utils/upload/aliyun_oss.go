@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"mime/multipart"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
@@ -60,17 +59,17 @@ func (*AliyunOSS) UploadUrl(fileUrl, filename string) (string, string, error) {
 
 	// 创建自定义的http.Client
 	client := &http.Client{
-		Transport: &http.Transport{
-			// 设置Transport字段为自定义Transport，包含代理设置
-			Proxy: func(req *http.Request) (*url.URL, error) {
-				// 设置代理
-				proxyURL, err := url.Parse("http://127.0.0.1:7890")
-				if err != nil {
-					return nil, err
-				}
-				return proxyURL, nil
-			},
-		},
+		//Transport: &http.Transport{
+		//	// 设置Transport字段为自定义Transport，包含代理设置
+		//	Proxy: func(req *http.Request) (*url.URL, error) {
+		//		// 设置代理
+		//		proxyURL, err := url.Parse("http://127.0.0.1:7890")
+		//		if err != nil {
+		//			return nil, err
+		//		}
+		//		return proxyURL, nil
+		//	},
+		//},
 	}
 
 	// 上传文件流。
