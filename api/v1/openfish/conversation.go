@@ -103,7 +103,7 @@ func (conversationApi *ConversationApi) ChatCompletions(c *gin.Context) {
 		return
 	}
 	tokenCount := conversationService.NumTokens(chatReq.Prompt)
-	if tokenCount > 2500 {
+	if tokenCount > 3000 {
 		response.FailWithMessage("系统错误，您输入的字符过长，请减少输入。", c)
 		return
 	}

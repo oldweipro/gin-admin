@@ -157,7 +157,7 @@ func (conversationService *ConversationService) GetConversationRecordListWithTok
 		  ) AS t
 		  WHERE sum <= ?
 		) ORDER BY created_at`
-	err := global.DB.Raw(query, conversationId, 2596-tokenCount).Scan(&conversationRecords).Error
+	err := global.DB.Raw(query, conversationId, 10000-tokenCount).Scan(&conversationRecords).Error
 	return conversationRecords, err
 }
 
@@ -354,8 +354,8 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 	//	TotalTokens:      inputTokens + completionTokens,
 	//}
 	req := openai.ChatCompletionRequest{
-		Model:       openai.GPT3Dot5Turbo16K0613,
-		MaxTokens:   1000,
+		Model:       openai.GPT3Dot5Turbo16K,
+		MaxTokens:   10000,
 		Messages:    messages,
 		Stream:      true,
 		Temperature: 0.2,
@@ -380,7 +380,7 @@ func (conversationService *ConversationService) ChatGPTCompletions(chatReq openf
 	//	}
 	//}
 
-	if err := conversationService.ChatOpenAIReverse(&conversationRecordUser, req, c, chatReq); err != nil {
+	if err := conversationService.ChatAzureAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
 		//if err := conversationService.ChatOpenAIApiKey(&conversationRecordUser, req, c, chatReq); err != nil {
 		//	return err
 		//}
@@ -488,6 +488,21 @@ func (conversationService *ConversationService) ChatOpenAIApiKey(conversationRec
 	return conversationService.ChatStream(stream, conversationRecordUser, c, chatReq)
 }
 
+// ChatAzureAIApiKey AzureAI官方接口：更换TOKEN，使用代理
+func (conversationService *ConversationService) ChatAzureAIApiKey(conversationRecordUser *openfish.ConversationRecord, req openai.ChatCompletionRequest, c *gin.Context, chatReq openfishReq.ChatReq) error {
+	config := openai.DefaultAzureConfig("xxxx", "https://xxxxx.openai.azure.com/")
+	client := openai.NewClientWithConfig(config)
+	ctx := context.Background()
+	stream, err := client.CreateChatCompletionStream(ctx, req)
+	if err != nil {
+		fmt.Println("AzureAI不可用")
+		return err
+	}
+	defer config.HTTPClient.CloseIdleConnections()
+	defer stream.Close()
+	return conversationService.ChatStream(stream, conversationRecordUser, c, chatReq)
+}
+
 // ChatStream AI对话流处理
 func (conversationService *ConversationService) ChatStream(stream *openai.ChatCompletionStream, conversationRecordUser *openfish.ConversationRecord, c *gin.Context, chatReq openfishReq.ChatReq) error {
 
@@ -533,6 +548,7 @@ func (conversationService *ConversationService) ChatStream(stream *openai.ChatCo
 		sse.Encode(c.Writer, sse.Event{
 			Data: string(marshal),
 		})
+		time.Sleep(100 * time.Millisecond)
 		c.Writer.Flush()
 	}
 }
