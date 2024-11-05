@@ -31,7 +31,6 @@ CREATE TABLE `announcements_info`  (
   `user_id` bigint NULL DEFAULT NULL COMMENT '发布者',
   `attachments` json NULL COMMENT '相关附件',
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_gva_announcements_info_deleted_at`(`deleted_at` ASC) USING BTREE,
   INDEX `idx_announcements_info_deleted_at`(`deleted_at` ASC) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
