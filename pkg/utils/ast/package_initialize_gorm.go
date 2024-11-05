@@ -13,7 +13,7 @@ type PackageInitializeGorm struct {
 	Type         Type   // 类型
 	Path         string // 文件路径
 	ImportPath   string // 导包路径
-	Business     string // 业务库 oldwei => oldwei, 不要传"oldwei"
+	Business     string // 业务库 base => base, 不要传"base"
 	StructName   string // 结构体名称
 	PackageName  string // 包名
 	RelativePath string // 相对路径

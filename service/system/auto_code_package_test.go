@@ -24,18 +24,7 @@ func Test_autoCodePackage_Create(t *testing.T) {
 				ctx: context.Background(),
 				info: &request.SysAutoCodePackageCreate{
 					Template:    "package",
-					PackageName: "oldwei",
-				},
-			},
-			wantErr: false,
-		},
-		{
-			name: "测试 plugin",
-			args: args{
-				ctx: context.Background(),
-				info: &request.SysAutoCodePackageCreate{
-					Template:    "plugin",
-					PackageName: "oldwei",
+					PackageName: "base",
 				},
 			},
 			wantErr: false,

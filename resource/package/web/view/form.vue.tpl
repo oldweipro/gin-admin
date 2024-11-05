@@ -1,7 +1,7 @@
 {{- if not .OnlyTemplate }}
 <template>
   <div>
-    <div class="oldwei-form-box">
+    <div class="base-form-box">
       <el-form :model="formData" ref="elFormRef" label-position="right" :rules="rule" label-width="80px">
       {{- range .Fields}}
       {{- if .Form }}

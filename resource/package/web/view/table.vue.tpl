@@ -3,7 +3,7 @@
 {{- if not .OnlyTemplate}}
 <template>
   <div>
-    <div class="oldwei-search-box">
+    <div class="base-search-box">
       <el-form ref="elSearchFormRef" :inline="true" :model="searchInfo" class="demo-form-inline" :rules="searchRule" @keyup.enter="onSubmit">
       {{- if .BaseModel }}
       <el-form-item label="创建日期" prop="createdAt">
@@ -150,8 +150,8 @@
         </el-form-item>
       </el-form>
     </div>
-    <div class="oldwei-table-box">
-        <div class="oldwei-btn-list">
+    <div class="base-table-box">
+        <div class="base-btn-list">
             <el-button {{ if $global.AutoCreateBtnAuth }}v-auth="btnAuth.add"{{ end }} type="primary" icon="plus" @click="openDialog">新增</el-button>
             <el-button {{ if $global.AutoCreateBtnAuth }}v-auth="btnAuth.batchDelete"{{ end }} icon="delete" style="margin-left: 10px;" :disabled="!multipleSelection.length" @click="onDelete">删除</el-button>
             {{ if .HasExcel -}}
@@ -270,7 +270,7 @@
             </template>
         </el-table-column>
         </el-table>
-        <div class="oldwei-pagination">
+        <div class="base-pagination">
             <el-pagination
             layout="total, sizes, prev, pager, next, jumper"
             :current-page="page"
